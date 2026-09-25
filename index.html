@@ -119,12 +119,15 @@ a.zap{
 
 /* ── Tela de entrada ── */
 .entrada{padding-bottom:8px}
-.selos{display:flex; flex-wrap:wrap; gap:7px; margin:0 0 20px}
-.selo{
-  font-size:12.5px; color:var(--luz-2); background:var(--noite-2);
-  border:1px solid var(--linha); border-radius:20px; padding:4px 11px;
-  white-space:nowrap;
+.selos{
+  display:flex; align-items:center; justify-content:center; flex-wrap:wrap;
+  gap:10px; margin:0 0 20px; padding:11px 14px;
+  background:var(--noite-2); border:1px solid var(--linha); border-radius:12px;
 }
+.selo{display:flex; align-items:center; gap:7px; font-size:13px; color:var(--luz-2)}
+.selo-ic{display:flex; flex:none}
+.selo-ic svg{width:15px; height:15px; display:block}
+.selo-div{width:1px; align-self:stretch; background:var(--linha); flex:none}
 .capa{
   position:relative; width:100%; overflow:hidden; margin:0 0 22px;
   background:var(--noite-2); border:1px solid var(--linha);
@@ -404,6 +407,17 @@ a.zap{
   // Nada aqui é escrito no código: cada bloco lê o seu conteúdo de
   // `schema.intro_<idioma>` e some se o campo estiver vazio. Até a ordem vem
   // de lá, na lista `ordem`, porque reordenar landing é o que mais se faz.
+  // Os mesmos seis ícones que a clínica usa, desenhados inline: sem requisição
+  // extra e sem depender de fonte de ícone que pode não carregar.
+  var ICONES = {
+    star:  '<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+    users: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>',
+    clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+    check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>',
+    heart: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>',
+    shield:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>'
+  };
+
   var BLOCOS = {
     headline: function(c){
       return c.headline ? '<h1>' + esc(c.headline) + '</h1>' : '';
@@ -412,11 +426,17 @@ a.zap{
       return c.subheadline ? '<p class="apoio">' + esc(c.subheadline) + '</p>' : '';
     },
     badges: function(c){
-      var b = c.badges || [];
+      var b = (c.badges || []).filter(function(x){ return x && (x.texto || x.text); });
       if (!b.length) return '';
-      return '<div class="selos">' + b.map(function(x){
-        return '<span class="selo">' + esc(x) + '</span>';
-      }).join('') + '</div>';
+      // Cartão único com divisores, igual ao da clínica: selos soltos parecem
+      // etiqueta, agrupados parecem atestado.
+      var itens = b.map(function(x){
+        var icone = ICONES[x.icone] || ICONES.star;
+        var cor = x.cor || 'var(--lua)';
+        return '<div class="selo"><span class="selo-ic" style="color:' + esc(cor) + '">' +
+               icone + '</span><span>' + esc(x.texto || x.text) + '</span></div>';
+      }).join('<span class="selo-div"></span>');
+      return '<div class="selos">' + itens + '</div>';
     },
     imagem: function(c){
       var im = c.imagem || {};
@@ -475,8 +495,10 @@ a.zap{
       '<p class="passo-n">' + t('rotulo_inicio','Para começar') + '</p>' +
       '<h2 class="pergunta">' + t('sexo_titulo','Você é homem ou mulher?') + '</h2>' +
       '<p class="apoio">' + t('sexo_apoio','O sono muda bastante entre os dois, e as próximas perguntas se ajustam.') + '</p>' +
-      '<div class="opcoes"></div>';
+      '<div class="opcoes"></div>' +
+      '<button class="voltar" type="button">' + t('voltar','← voltar') + '</button>';
     var caixa = tela.querySelector('.opcoes');
+    tela.querySelector('.voltar').onclick = telaAbertura;
     [['f',t('sexo_f','Mulher')],['m',t('sexo_m','Homem')]].forEach(function(par){
       var b = document.createElement('button');
       b.type = 'button'; b.className = 'opcao';
