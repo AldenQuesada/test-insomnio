@@ -197,6 +197,53 @@ a.zap{
   // Toda string visível vem do banco quando o quiz está em espanhol. O
   // português continua embutido como padrão, para o quiz não ficar mudo se a
   // tradução faltar.
+  // ── Rastreamento ───────────────────────────────────────────────────
+  // Nada é carregado se o ID não estiver no banco: página sem campanha não
+  // deve carregar rastreador, nem por engano.
+  var RAST = {}, EV = {};
+
+  function ligarPixelMeta(id){
+    if (!id || window.fbq) return;
+    /* eslint-disable */
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+    n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}
+    (window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    /* eslint-enable */
+    window.fbq('init', id);
+  }
+
+  function ligarGA4(id){
+    if (!id || window.gtag) return;
+    var g = document.createElement('script');
+    g.async = true;
+    g.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(id);
+    document.head.appendChild(g);
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function(){ window.dataLayer.push(arguments); };
+    window.gtag('js', new Date());
+    window.gtag('config', id);
+  }
+
+  // Um id por evento, estável entre pixel e banco. Se um dia entrar a API de
+  // Conversões pelo servidor, é ele que evita contar a mesma conversão duas
+  // vezes.
+  function idEvento(nome){ return sessao + '-' + nome; }
+
+  function rastrear(chave, dados){
+    var nome = EV[chave];
+    if (!nome) return;
+    var padrao = ['ViewContent','Lead','CompleteRegistration','Contact','Search'];
+    try {
+      if (window.fbq) {
+        window.fbq(padrao.indexOf(nome) >= 0 ? 'track' : 'trackCustom',
+                   nome, dados || {}, { eventID: idEvento(chave) });
+      }
+    } catch (e) {}
+    try { if (window.gtag) window.gtag('event', nome, dados || {}); } catch (e) {}
+  }
+
   function esc(x){
     return String(x == null ? '' : x)
       .replace(/&/g,'&amp;').replace(/</g,'&lt;')
@@ -218,6 +265,8 @@ a.zap{
     medium:   url.get('utm_medium'),
     campaign: url.get('utm_campaign')
   };
+  // O clique do anúncio: é o que liga o lead de volta à peça que o trouxe.
+  var fbclid = url.get('fbclid');
 
   function api(caminho, corpo){
     return fetch(CFG.url + '/rest/v1/' + caminho, {
@@ -288,6 +337,7 @@ a.zap{
         b.classList.add('escolhida');
         respostas[q.id] = i;
         evento('answer', { pergunta: q.id, valor: i });
+        rastrear('pergunta', { passo: passo + 1, total: perguntas.length });
         // A pausa existe para a pessoa VER que a escolha foi registrada antes
         // de a tela trocar. Sem ela, parece que o toque falhou.
         setTimeout(function(){ irPara(passo + 1); }, 300);
@@ -369,6 +419,7 @@ a.zap{
     fone.oninput = validar;
     fone.onkeydown = function(e){ if (e.key === 'Enter' && !botao.disabled) botao.click(); };
     evento('contact');
+    rastrear('contato');
     setTimeout(function(){ fone.focus(); }, 60);
 
     botao.onclick = function(){
@@ -388,6 +439,7 @@ a.zap{
           p_whatsapp: fone.value,
           p_sexo: pessoa.sexo,
           p_pais: pessoa.pais && pessoa.pais.codigo,
+          p_fbclid: fbclid,
           p_session_id: sessao,
           p_utm: utm
         })
@@ -395,6 +447,10 @@ a.zap{
       .then(function(r){ return r.json(); })
       .then(function(res){
         if (!res || !res.ok) throw new Error((res && res.erro) || 'falhou');
+        // A conversão que importa: só dispara quando o banco confirmou que
+        // gravou. Disparar no clique contaria lead que nunca existiu.
+        rastrear('final', { content_name: 'quiz-' + CFG.slug,
+                            value: res.score, currency: 'USD' });
         mostrarResultado(res);
       })
       .catch(function(){
@@ -508,6 +564,7 @@ a.zap{
 
     botao.onclick = function(){
       evento('start');
+      rastrear('inicio');
       carregarPaises();
       telaSexo();
     };
@@ -533,6 +590,7 @@ a.zap{
         b.classList.add('escolhida');
         pessoa.sexo = par[0];
         evento('answer', { pergunta: 'sexo', valor: par[0] });
+        rastrear('sexo', { sexo: par[0] });
         setTimeout(telaNome, 300);
       };
       caixa.appendChild(b);
@@ -557,6 +615,7 @@ a.zap{
     botao.onclick = function(){
       pessoa.nome = campo.value.trim();
       evento('answer', { pergunta: 'nome' });
+      rastrear('nome');
       irPara(0);
     };
     tela.querySelector('.voltar').onclick = telaSexo;
@@ -597,11 +656,17 @@ a.zap{
       if (md && T.descricao) md.setAttribute('content', T.descricao);
       var bar = document.getElementById('barra');
       if (bar && T.aria_progresso) bar.setAttribute('aria-label', T.aria_progresso);
+
+      RAST = quiz.schema.rastreio || {};
+      EV = RAST.eventos || {};
+      ligarPixelMeta(RAST.meta_pixel);
+      ligarGA4(RAST.ga4);
       perguntas = (quiz.schema.perguntas || []).filter(function(q){
         return q.tipo === 'scale';
       });
       telaAbertura();
       evento('page_view');
+      rastrear('abertura', { content_name: quiz.slug || CFG.slug });
     })
     .catch(function(){
       tela.innerHTML =
