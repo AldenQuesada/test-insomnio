@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="referrer" content="no-referrer">
-<title>Teste da Insônia · Instituto AQS</title>
+<title>Test del Insomnio</title>
+<meta name="description" content="">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
 :root{
@@ -160,7 +161,7 @@ a.zap{
 </style>
 </head>
 <body>
-<div class="barra"><i id="progresso"></i></div>
+<div class="barra" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="barra"><i id="progresso"></i></div>
 <main class="palco"><div class="tela" id="tela"></div></main>
 
 <script src="config.js"></script>
@@ -226,9 +227,12 @@ a.zap{
   }
 
   function pintarProgresso(){
+    var bar = document.getElementById('barra');
     // As duas telas de entrada ocupam os primeiros 16% da barra.
     // As duas telas de entrada ocupam os primeiros 16% da barra.
-    progresso.style.width = (16 + Math.round((passo / perguntas.length) * 84)) + '%';
+    var pct = 16 + Math.round((passo / perguntas.length) * 84);
+    progresso.style.width = pct + '%';
+    if (bar) bar.setAttribute('aria-valuenow', pct);
   }
 
   function irPara(n){
@@ -296,7 +300,7 @@ a.zap{
       '<p class="apoio">' + t('contato_apoio','A sua pontuação já está calculada.') + '</p>' +
       '<label class="campo"><span>' + t('contato_campo','Seu WhatsApp') + '</span>' +
         '<span class="fone-linha">' +
-        '<select id="ddi" aria-label="Código do país"></select>' +
+        '<select id="ddi" aria-label="' + esc(t('aria_ddi','Código do país')) + '"></select>' +
         '<input id="fone" type="tel" inputmode="numeric" autocomplete="tel" autofocus></span></label>' +
       '<p class="dica" id="dica"></p>' +
       '<button class="principal" id="enviar" disabled>' + t('contato_botao','Ver o meu resultado') + '</button>' +
@@ -569,7 +573,15 @@ a.zap{
       });
       escalas  = quiz.schema['escalas_' + IDIOMA]     || quiz.schema.escalas   || {};
       escalasF = quiz.schema['escalas_' + IDIOMA + '_f'] || quiz.schema.escalas_f || {};
-      document.documentElement.lang = IDIOMA;
+      // Título, descrição e idioma do documento também vêm do banco: são o
+      // que aparece na aba e no cartão de compartilhamento.
+      var tags = quiz.schema.lang_tag || {};
+      document.documentElement.lang = tags[IDIOMA] || IDIOMA;
+      if (T.titulo_aba) document.title = T.titulo_aba;
+      var md = document.querySelector('meta[name="description"]');
+      if (md && T.descricao) md.setAttribute('content', T.descricao);
+      var bar = document.getElementById('barra');
+      if (bar && T.aria_progresso) bar.setAttribute('aria-label', T.aria_progresso);
       perguntas = (quiz.schema.perguntas || []).filter(function(q){
         return q.tipo === 'scale';
       });
