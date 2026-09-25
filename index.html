@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<title>Teste da Insônia · Instituto AQS</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  --noite:#11151d; --noite-2:#1a2130; --noite-3:#252e40;
+  --luz:#f4f1ea; --luz-2:#cdd3de; --luz-3:#8d97a8;
+  --linha:#2d3648;
+  --lua:#e2a04a;
+  --calmo:#57c193;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; background:var(--noite); color:var(--luz);
+  font-family:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,sans-serif;
+  font-size:16px; line-height:1.6;
+  display:flex; flex-direction:column;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+
+/* ── Progresso ── */
+.barra{height:3px; background:var(--noite-3); flex:none}
+.barra i{display:block; height:100%; width:0; background:var(--lua);
+  transition:width .35s ease}
+@media (prefers-reduced-motion:reduce){ .barra i{transition:none} }
+
+.palco{flex:1 1 auto; display:flex; align-items:center; justify-content:center;
+  padding:20px 16px 40px}
+.tela{width:100%; max-width:560px}
+
+.passo-n{font-size:12.5px; color:var(--luz-3); letter-spacing:.06em;
+  text-transform:uppercase; margin:0 0 10px}
+h1{font-family:Fraunces,Georgia,serif; font-weight:700;
+  font-size:clamp(25px,5.6vw,36px); line-height:1.16; letter-spacing:-.02em;
+  margin:0 0 8px; text-wrap:balance}
+h2.pergunta{font-family:Fraunces,Georgia,serif; font-weight:600;
+  font-size:clamp(21px,4.6vw,29px); line-height:1.22; letter-spacing:-.015em;
+  margin:0 0 22px; text-wrap:balance}
+p.apoio{color:var(--luz-2); margin:0 0 22px; font-size:15.5px}
+
+/* ── Opções ── */
+.opcoes{display:flex; flex-direction:column; gap:9px}
+button.opcao{
+  width:100%; text-align:left; font:inherit; font-size:16px;
+  color:var(--luz); background:var(--noite-2);
+  border:1px solid var(--linha); border-radius:11px;
+  padding:15px 17px; cursor:pointer; display:flex; align-items:center; gap:13px;
+  transition:border-color .16s, background .16s, transform .08s;
+}
+button.opcao:hover{border-color:var(--luz-3); background:var(--noite-3)}
+button.opcao:active{transform:scale(.99)}
+button.opcao:focus-visible{outline:2px solid var(--lua); outline-offset:2px}
+button.opcao .marca{
+  flex:none; width:22px; height:22px; border-radius:50%;
+  border:2px solid var(--linha); display:grid; place-items:center;
+}
+button.opcao.escolhida{border-color:var(--lua); background:var(--noite-3)}
+button.opcao.escolhida .marca{border-color:var(--lua); background:var(--lua)}
+button.opcao.escolhida .marca::after{content:""; width:8px; height:8px;
+  border-radius:50%; background:var(--noite)}
+
+/* ── Campos ── */
+label.campo{display:block; margin-bottom:16px}
+label.campo span{display:block; font-size:13px; color:var(--luz-3);
+  margin-bottom:6px; letter-spacing:.03em}
+input{
+  width:100%; font:inherit; font-size:17px; color:var(--luz);
+  background:var(--noite-2); border:1px solid var(--linha);
+  border-radius:11px; padding:14px 16px;
+}
+input:focus{outline:none; border-color:var(--lua)}
+button.principal{
+  width:100%; font:inherit; font-size:16.5px; font-weight:600;
+  color:var(--noite); background:var(--lua); border:0; border-radius:11px;
+  padding:16px; cursor:pointer; margin-top:6px;
+}
+button.principal:disabled{opacity:.45; cursor:not-allowed}
+button.voltar{
+  background:none; border:0; color:var(--luz-3); font:inherit; font-size:14px;
+  cursor:pointer; padding:10px 0; margin-top:16px;
+}
+button.voltar:hover{color:var(--luz)}
+
+/* ── Resultado ── */
+.nota{font-family:Fraunces,Georgia,serif; font-size:clamp(56px,16vw,86px);
+  font-weight:700; line-height:1; color:var(--lua); letter-spacing:-.03em}
+.nota small{font-size:22px; color:var(--luz-3); font-weight:600}
+.faixa{display:inline-block; margin:14px 0 18px; padding:5px 13px;
+  border:1px solid var(--lua); color:var(--lua); border-radius:20px;
+  font-size:13.5px; letter-spacing:.03em}
+.aviso{font-size:13.5px; color:var(--luz-3); border-left:2px solid var(--linha);
+  padding-left:13px; margin-top:26px}
+a.zap{
+  display:flex; align-items:center; justify-content:center; gap:9px;
+  background:var(--calmo); color:#08150f; font-weight:600; font-size:16.5px;
+  text-decoration:none; border-radius:11px; padding:16px; margin-top:22px;
+}
+.erro{color:#e38891; font-size:14.5px; margin-top:12px}
+.fone-linha{display:flex; align-items:stretch; gap:8px}
+.fone-linha select{
+  flex:none; font:inherit; font-size:16px; color:var(--luz);
+  background:var(--noite-3); border:1px solid var(--linha);
+  border-radius:11px; padding:14px 10px; cursor:pointer;
+}
+.fone-linha select:focus{outline:none; border-color:var(--lua)}
+.fone-linha input{flex:1 1 auto; min-width:0}
+.dica{font-size:13px; color:var(--luz-3); margin:-8px 0 14px}
+.oculto{display:none !important}
+</style>
+</head>
+<body>
+<div class="barra"><i id="progresso"></i></div>
+<main class="palco"><div class="tela" id="tela"></div></main>
+
+<script src="config.js"></script>
+<script>
+(function(){
+  'use strict';
+  var CFG = window.QUIZ_CONFIG;
+  var tela = document.getElementById('tela');
+  var progresso = document.getElementById('progresso');
+
+  var quiz = null, perguntas = [], escalas = {}, escalasF = {};
+  var respostas = {}, passo = 0;
+  var pessoa = { sexo: null, nome: '', pais: null };
+  var paises = [];
+
+  // Concordância de gênero: em português "cansada" e "cansado" são telas
+  // diferentes, e errar isso faz a pessoa sentir que o teste não é sobre ela.
+  var IDIOMA = 'pt', T = {}, faixaFrases = {}, titulosFaixa = {};
+
+  // Toda string visível vem do banco quando o quiz está em espanhol. O
+  // português continua embutido como padrão, para o quiz não ficar mudo se a
+  // tradução faltar.
+  function t(chave, padrao){ return T[chave] || padrao; }
+  function es(){ return IDIOMA === 'es'; }
+
+  function f(){ return pessoa.sexo === 'f'; }
+  function oa(m, fem){ return f() ? fem : m; }
+  function primeiroNome(){ return (pessoa.nome || '').trim().split(/\s+/)[0] || ''; }
+  var sessao = 's-' + Date.now() + '-' + Math.random().toString(36).slice(2,9);
+
+  // A UTM vem do anúncio e precisa sobreviver até o lead: é ela que diz qual
+  // criativo trouxe cada pessoa.
+  var url = new URLSearchParams(location.search);
+  var utm = {
+    source:   url.get('utm_source'),
+    medium:   url.get('utm_medium'),
+    campaign: url.get('utm_campaign')
+  };
+
+  function api(caminho, corpo){
+    return fetch(CFG.url + '/rest/v1/' + caminho, {
+      method: corpo ? 'POST' : 'GET',
+      headers: {
+        'apikey': CFG.anon,
+        'Authorization': 'Bearer ' + CFG.anon,
+        'Content-Type': 'application/json'
+      },
+      body: corpo ? JSON.stringify(corpo) : undefined
+    }).then(function(r){ return r.json(); });
+  }
+
+  function evento(tipo, extra){
+    // Best-effort: se o registro de evento falhar, o quiz não pode parar.
+    api('quiz_events', {
+      quiz_id: quiz.id, session_id: sessao, tipo: tipo,
+      passo: passo, metadata: extra || {}
+    }).catch(function(){});
+  }
+
+  function pintarProgresso(){
+    // As duas telas de entrada ocupam os primeiros 16% da barra.
+    // As duas telas de entrada ocupam os primeiros 16% da barra.
+    progresso.style.width = (16 + Math.round((passo / perguntas.length) * 84)) + '%';
+  }
+
+  function irPara(n){
+    passo = n;
+    pintarProgresso();
+    if (n >= perguntas.length) { pedirContato(); return; }
+    desenharPergunta(perguntas[n]);
+  }
+
+  function desenharPergunta(q){
+    var opcoes = (f() && escalasF[q.escala]) || escalas[q.escala] || [];
+    var enunciado = (f() && q['texto_' + IDIOMA + '_f']) || q['texto_' + IDIOMA]
+                    || (f() && q.texto_f) || q.texto;
+    var nome = primeiroNome();
+    var atual = respostas[q.id];
+    tela.innerHTML =
+      '<p class="passo-n">' + t('rotulo_pergunta','Pergunta') + ' ' + (passo + 1) +
+        ' ' + t('de','de') + ' ' + perguntas.length + '</p>' +
+      '<h2 class="pergunta"></h2>' +
+      '<div class="opcoes"></div>' +
+      (passo > 0 ? '<button class="voltar" type="button">' + t('voltar','← voltar') + '</button>' : '');
+    // O nome aparece nas duas primeiras e volta na última: repetir em todas
+    // soa a mala direta, não a conversa.
+    var chamado = (nome && (passo === 0 || passo === perguntas.length - 1))
+      ? nome + ', ' + enunciado.charAt(0).toLowerCase() + enunciado.slice(1)
+      : enunciado;
+    tela.querySelector('h2').textContent = chamado;
+
+    var caixa = tela.querySelector('.opcoes');
+    opcoes.forEach(function(rotulo, i){
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'opcao' + (atual === i ? ' escolhida' : '');
+      b.innerHTML = '<span class="marca"></span><span></span>';
+      b.lastChild.textContent = rotulo;
+      b.onclick = function(){
+        caixa.querySelectorAll('.opcao').forEach(function(o){
+          o.classList.remove('escolhida');
+        });
+        b.classList.add('escolhida');
+        respostas[q.id] = i;
+        evento('answer', { pergunta: q.id, valor: i });
+        // A pausa existe para a pessoa VER que a escolha foi registrada antes
+        // de a tela trocar. Sem ela, parece que o toque falhou.
+        setTimeout(function(){ irPara(passo + 1); }, 300);
+      };
+      caixa.appendChild(b);
+    });
+
+    var voltar = tela.querySelector('.voltar');
+    if (voltar) voltar.onclick = function(){ irPara(passo - 1); };
+    if (passo === 0) {
+      var v = document.createElement('button');
+      v.type='button'; v.className='voltar'; v.textContent='← voltar';
+      v.onclick = telaNome; tela.appendChild(v);
+    }
+  }
+
+  function pedirContato(){
+    progresso.style.width = '100%';
+    var nome = primeiroNome();
+    tela.innerHTML =
+      '<p class="passo-n">' + t('contato_rotulo','Última pergunta') + '</p>' +
+      '<h1></h1>' +
+      '<p class="apoio">' + t('contato_apoio','A sua pontuação já está calculada.') + '</p>' +
+      '<label class="campo"><span>' + t('contato_campo','Seu WhatsApp') + '</span>' +
+        '<span class="fone-linha">' +
+        '<select id="ddi" aria-label="Código do país"></select>' +
+        '<input id="fone" type="tel" inputmode="numeric" autocomplete="tel" autofocus></span></label>' +
+      '<p class="dica" id="dica"></p>' +
+      '<button class="principal" id="enviar" disabled>' + t('contato_botao','Ver o meu resultado') + '</button>' +
+      '<div class="erro oculto" id="erro"></div>' +
+      '<button class="voltar" type="button">' + t('voltar','← voltar') + '</button>';
+    var pergTit = t('contato_titulo','Para onde envio o seu resultado?');
+    tela.querySelector('h1').textContent =
+      nome ? (nome + ', ' + pergTit.charAt(0).toLowerCase() + pergTit.slice(1)) : pergTit;
+
+    var sel = document.getElementById('ddi');
+    var fone = document.getElementById('fone');
+    var botao = document.getElementById('enviar');
+    var dica = document.getElementById('dica');
+
+    paises.forEach(function(pa){
+      var o = document.createElement('option');
+      o.value = pa.codigo;
+      o.textContent = pa.bandeira + '  +' + pa.ddi;
+      if (pa.codigo === (quiz.ddi_padrao || 'BR')) o.selected = true;
+      sel.appendChild(o);
+    });
+
+    function paisAtual(){
+      var c = sel.value;
+      return paises.filter(function(p){ return p.codigo === c; })[0] || null;
+    }
+
+    function validar(){
+      var pa = paisAtual();
+      var n = fone.value.replace(/\D/g, '').length;
+      if (!pa) { botao.disabled = true; return; }
+      // O texto de ajuda só aparece quando o número já foi começado: mostrar
+      // "faltam dígitos" num campo vazio é ruído, não ajuda.
+      var ok = n >= pa.min_digitos && n <= pa.max_digitos;
+      // Só avisa quantos dígitos onde a contagem foi verificada. Dica errada
+      // atrapalha mais que dica nenhuma.
+      dica.textContent = (n > 0 && !ok && pa.digitos_exatos)
+        ? (pa.min_digitos === pa.max_digitos
+             ? t('digitos_um','%s tem %d dígitos.').replace('%s',pa.nome).replace('%d',pa.min_digitos)
+             : t('digitos_dois','%s tem %d ou %d dígitos.').replace('%s',pa.nome)
+                 .replace('%d',pa.min_digitos).replace('%d',pa.max_digitos))
+        : '';
+      botao.disabled = !ok;
+    }
+    sel.onchange = function(){ pessoa.pais = paisAtual(); validar(); fone.focus(); };
+    pessoa.pais = paisAtual();
+    fone.oninput = validar;
+    fone.onkeydown = function(e){ if (e.key === 'Enter' && !botao.disabled) botao.click(); };
+    evento('contact');
+    setTimeout(function(){ fone.focus(); }, 60);
+
+    botao.onclick = function(){
+      botao.disabled = true;
+      botao.textContent = t('contato_enviando','Calculando…');
+      fetch(CFG.url + '/rest/v1/rpc/submit_quiz', {
+        method: 'POST',
+        headers: {
+          'apikey': CFG.anon,
+          'Authorization': 'Bearer ' + CFG.anon,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          p_slug: CFG.slug,
+          p_answers: respostas,
+          p_nome: pessoa.nome,
+          p_whatsapp: fone.value,
+          p_sexo: pessoa.sexo,
+          p_pais: pessoa.pais && pessoa.pais.codigo,
+          p_session_id: sessao,
+          p_utm: utm
+        })
+      })
+      .then(function(r){ return r.json(); })
+      .then(function(res){
+        if (!res || !res.ok) throw new Error((res && res.erro) || 'falhou');
+        mostrarResultado(res);
+      })
+      .catch(function(){
+        botao.disabled = false;
+        botao.textContent = t('contato_botao','Ver o meu resultado');
+        var e = document.getElementById('erro');
+        e.textContent = t('contato_erro','Não consegui enviar agora. Confira a conexão e toque de novo.');
+        e.classList.remove('oculto');
+      });
+    };
+
+    tela.querySelector('.voltar').onclick = function(){ irPara(perguntas.length - 1); };
+  }
+
+  function mostrarResultado(res){
+    var modelo = t('zap_texto','Oi! Fiz o teste da insônia e deu %d pontos: %s.');
+    var texto = encodeURIComponent(
+      modelo.replace('%d', res.score).replace('%s', tituloTraduzido(res.faixa) || res.titulo));
+    tela.innerHTML =
+      '<p class="passo-n">' + (primeiroNome() ? primeiroNome() + ', ' + t('resultado_rotulo','seu resultado') : t('resultado_rotulo','Seu resultado')) + '</p>' +
+      '<div class="nota">' + res.score + '<small> / ' + res.maximo + '</small></div>' +
+      '<div class="faixa"></div>' +
+      '<h1></h1>' +
+      '<p class="apoio">' + t('resultado_apoio','Este número descreve as suas duas últimas semanas.') + '</p>' +
+      '<a class="zap" href="https://wa.me/?text=' + texto + '">' + t('resultado_zap','Receber a leitura no WhatsApp') + '</a>' +
+      '<p class="aviso"></p>';
+    tela.querySelector('.faixa').textContent = tituloTraduzido(res.faixa) || res.titulo;
+    tela.querySelector('h1').textContent = tituloDaFaixa(res.faixa);
+    tela.querySelector('.aviso').textContent = res.aviso;
+  }
+
+  function telaAbertura(){
+    progresso.style.width = '0%';
+    tela.innerHTML =
+      '<p class="passo-n">Instituto AQS</p>' +
+      '<h1>' + t('abertura_titulo','Quanto a insônia está pesando na sua vida?') + '</h1>' +
+      '<p class="apoio">' + t('abertura_p1','Existe um questionário de sete perguntas usado em serviços do sono para medir exatamente isso.') + '</p>' +
+      '<p class="apoio">' + t('abertura_p2','Responda pensando nas <strong>duas últimas semanas</strong>.') + '</p>' +
+      '<button class="principal" id="comecar">' + t('abertura_botao','Começar o teste') + '</button>' +
+      '<p class="aviso">' + (quiz.schema['aviso_' + IDIOMA] || quiz.schema.aviso || '') + '</p>';
+    document.getElementById('comecar').onclick = function(){
+      evento('start');
+      telaSexo();
+    };
+  }
+
+  function telaSexo(){
+    progresso.style.width = '8%';
+    tela.innerHTML =
+      '<p class="passo-n">' + t('rotulo_inicio','Para começar') + '</p>' +
+      '<h2 class="pergunta">' + t('sexo_titulo','Você é homem ou mulher?') + '</h2>' +
+      '<p class="apoio">' + t('sexo_apoio','O sono muda bastante entre os dois, e as próximas perguntas se ajustam.') + '</p>' +
+      '<div class="opcoes"></div>';
+    var caixa = tela.querySelector('.opcoes');
+    [['f',t('sexo_f','Mulher')],['m',t('sexo_m','Homem')]].forEach(function(par){
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'opcao';
+      b.innerHTML = '<span class="marca"></span><span></span>';
+      b.lastChild.textContent = par[1];
+      b.onclick = function(){
+        caixa.querySelectorAll('.opcao').forEach(function(o){ o.classList.remove('escolhida'); });
+        b.classList.add('escolhida');
+        pessoa.sexo = par[0];
+        evento('answer', { pergunta: 'sexo', valor: par[0] });
+        setTimeout(telaNome, 300);
+      };
+      caixa.appendChild(b);
+    });
+  }
+
+  function telaNome(){
+    progresso.style.width = '16%';
+    tela.innerHTML =
+      '<p class="passo-n">' + t('rotulo_inicio','Para começar') + '</p>' +
+      '<h2 class="pergunta">' + t('nome_titulo','Como você se chama?') + '</h2>' +
+      '<p class="apoio">' + t('nome_apoio','Só para eu não te tratar por "você" o teste inteiro.') + '</p>' +
+      '<label class="campo"><input id="nome" type="text" autocomplete="given-name" placeholder="' + t('nome_placeholder','Seu primeiro nome') + '" autofocus></label>' +
+      '<button class="principal" id="seguir" disabled>' + t('nome_botao','Continuar') + '</button>' +
+      '<button class="voltar" type="button">' + t('voltar','← voltar') + '</button>';
+    var campo = document.getElementById('nome');
+    var botao = document.getElementById('seguir');
+    campo.value = pessoa.nome;
+    function validar(){ botao.disabled = campo.value.trim().length < 2; }
+    campo.oninput = validar; validar();
+    campo.onkeydown = function(e){ if (e.key === 'Enter' && !botao.disabled) botao.click(); };
+    botao.onclick = function(){
+      pessoa.nome = campo.value.trim();
+      evento('answer', { pergunta: 'nome' });
+      irPara(0);
+    };
+    tela.querySelector('.voltar').onclick = telaSexo;
+    setTimeout(function(){ campo.focus(); }, 60);
+  }
+
+  function tituloTraduzido(codigo){ return titulosFaixa[codigo] || null; }
+
+  function tituloDaFaixa(codigo){
+    if (faixaFrases[codigo]) return faixaFrases[codigo];
+    return {
+      grave:       'O seu sono precisa de atenção agora.',
+      moderada:    'Já não é só uma noite ruim.',
+      subclinica:  'Ainda dá para virar o jogo cedo.',
+      sem_insonia: 'O seu sono está em faixa saudável.'
+    }[codigo] || 'Resultado calculado.';
+  }
+
+  // ── Início ────────────────────────────────────────────────────────
+  Promise.all([
+    api('quiz_templates?select=id,title,schema,idioma,ddi_padrao&slug=eq.' + CFG.slug + '&active=eq.true'),
+    api('paises?select=codigo,nome,ddi,bandeira,min_digitos,max_digitos,digitos_exatos&ativo=eq.true&order=ordem&limit=300')
+  ])
+    .then(function(par){
+      var linhas = par[0];
+      paises = par[1] || [];
+      if (!linhas || !linhas.length) throw new Error('quiz não encontrado');
+      quiz = linhas[0];
+      IDIOMA = quiz.idioma || 'pt';
+      T = quiz.schema['textos_' + IDIOMA] || {};
+      faixaFrases = quiz.schema['faixa_frases_' + IDIOMA] || {};
+      (quiz.schema['faixas_' + IDIOMA] || []).forEach(function(x){
+        titulosFaixa[x.codigo] = x.titulo;
+      });
+      escalas  = quiz.schema['escalas_' + IDIOMA]     || quiz.schema.escalas   || {};
+      escalasF = quiz.schema['escalas_' + IDIOMA + '_f'] || quiz.schema.escalas_f || {};
+      document.documentElement.lang = IDIOMA;
+      perguntas = (quiz.schema.perguntas || []).filter(function(q){
+        return q.tipo === 'scale';
+      });
+      telaAbertura();
+      evento('page_view');
+    })
+    .catch(function(){
+      tela.innerHTML =
+        '<h1>' + t('erro_carregar','Não consegui carregar o teste') + '</h1>' +
+        '<p class="apoio">' + t('erro_recarregar','Recarregue a página em alguns instantes.') + '</p>';
+    });
+})();
+</script>
+</body>
+</html>
