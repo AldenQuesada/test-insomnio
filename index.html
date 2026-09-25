@@ -176,6 +176,19 @@ a.zap{
   var respostas = {}, passo = 0;
   var pessoa = { sexo: null, nome: '', pais: null };
   var paises = [];
+  var paisesPromessa = null;
+
+  // A lista de países pesa 32 KB e só é usada na última tela. Sai do
+  // carregamento inicial e é buscada quando o teste começa: a pessoa leva
+  // cerca de um minuto e meio nas sete perguntas, então ela sempre chega
+  // pronta, sem espera e sem peso na abertura.
+  function carregarPaises(){
+    if (paisesPromessa) return paisesPromessa;
+    paisesPromessa = api('paises?select=codigo,nome,ddi,bandeira,min_digitos,max_digitos,digitos_exatos&ativo=eq.true&order=ordem&limit=300')
+      .then(function(l){ paises = l || []; return paises; })
+      .catch(function(){ paises = []; return paises; });
+    return paisesPromessa;
+  }
 
   // Concordância de gênero: em português "cansada" e "cansado" são telas
   // diferentes, e errar isso faz a pessoa sentir que o teste não é sobre ela.
@@ -292,6 +305,12 @@ a.zap{
   }
 
   function pedirContato(){
+    // Se a lista ainda estiver a caminho, espera aqui em vez de desenhar um
+    // seletor vazio. Na prática nunca espera: foi pedida sete perguntas atrás.
+    carregarPaises().then(montarContato);
+  }
+
+  function montarContato(){
     progresso.style.width = '100%';
     var nome = primeiroNome();
     tela.innerHTML =
@@ -489,6 +508,7 @@ a.zap{
 
     botao.onclick = function(){
       evento('start');
+      carregarPaises();
       telaSexo();
     };
   }
@@ -556,13 +576,8 @@ a.zap{
   }
 
   // ── Início ────────────────────────────────────────────────────────
-  Promise.all([
-    api('quiz_templates?select=id,title,schema,idioma,ddi_padrao&slug=eq.' + CFG.slug + '&active=eq.true'),
-    api('paises?select=codigo,nome,ddi,bandeira,min_digitos,max_digitos,digitos_exatos&ativo=eq.true&order=ordem&limit=300')
-  ])
-    .then(function(par){
-      var linhas = par[0];
-      paises = par[1] || [];
+  api('quiz_templates?select=id,title,schema,idioma,ddi_padrao&slug=eq.' + CFG.slug + '&active=eq.true')
+    .then(function(linhas){
       if (!linhas || !linhas.length) throw new Error('quiz não encontrado');
       quiz = linhas[0];
       IDIOMA = quiz.idioma || 'pt';
