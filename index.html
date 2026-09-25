@@ -33,8 +33,11 @@ body{
 @media (prefers-reduced-motion:reduce){ .barra i{transition:none} }
 
 .palco{flex:1 1 auto; display:flex; align-items:center; justify-content:center;
-  padding:20px 16px 40px}
-.tela{width:100%; max-width:560px}
+  padding:20px 16px 0}
+.palco:has(.barra-cta){align-items:stretch}
+.tela{width:100%; max-width:560px; display:flex; flex-direction:column;
+  padding-bottom:28px}
+.tela:has(.barra-cta){padding-bottom:0}
 
 .passo-n{font-size:12.5px; color:var(--luz-3); letter-spacing:.06em;
   text-transform:uppercase; margin:0 0 10px}
@@ -113,6 +116,43 @@ a.zap{
 .fone-linha select:focus{outline:none; border-color:var(--lua)}
 .fone-linha input{flex:1 1 auto; min-width:0}
 .dica{font-size:13px; color:var(--luz-3); margin:-8px 0 14px}
+
+/* ── Tela de entrada ── */
+.entrada{padding-bottom:8px}
+.selos{display:flex; flex-wrap:wrap; gap:7px; margin:0 0 20px}
+.selo{
+  font-size:12.5px; color:var(--luz-2); background:var(--noite-2);
+  border:1px solid var(--linha); border-radius:20px; padding:4px 11px;
+  white-space:nowrap;
+}
+.capa{
+  position:relative; width:100%; overflow:hidden; margin:0 0 22px;
+  background:var(--noite-2); border:1px solid var(--linha);
+}
+.capa img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block}
+.checklist{list-style:none; margin:0 0 22px; padding:0}
+.checklist li{
+  display:flex; align-items:flex-start; gap:11px; padding:11px 0;
+  border-bottom:1px solid var(--linha); font-size:15.5px; line-height:1.42;
+}
+.checklist li:last-child{border-bottom:0}
+.checklist li::before{
+  content:""; flex:none; width:21px; height:21px; margin-top:1px; border-radius:50%;
+  background:var(--lua);
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E") center/13px no-repeat,
+          linear-gradient(#000,#000);
+  -webkit-mask-composite:xor; mask-composite:exclude;
+}
+
+/* O botão encosta no rodapé e o degradê faz o conteúdo sumir por baixo dele,
+   em vez de ser cortado por uma barra sólida. */
+.barra-cta{
+  position:sticky; bottom:0; margin-top:auto;
+  padding:14px 0 calc(10px + env(safe-area-inset-bottom,0px));
+  background:linear-gradient(180deg, rgba(17,21,29,0) 0%, var(--noite) 32%);
+  z-index:10;
+}
+.barra-cta .principal{margin-top:0}
 .oculto{display:none !important}
 </style>
 </head>
@@ -140,6 +180,11 @@ a.zap{
   // Toda string visível vem do banco quando o quiz está em espanhol. O
   // português continua embutido como padrão, para o quiz não ficar mudo se a
   // tradução faltar.
+  function esc(x){
+    return String(x == null ? '' : x)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
   function t(chave, padrao){ return T[chave] || padrao; }
   function es(){ return IDIOMA === 'es'; }
 
@@ -355,16 +400,70 @@ a.zap{
     tela.querySelector('.aviso').textContent = res.aviso;
   }
 
+  // ── Tela de entrada ────────────────────────────────────────────────
+  // Nada aqui é escrito no código: cada bloco lê o seu conteúdo de
+  // `schema.intro_<idioma>` e some se o campo estiver vazio. Até a ordem vem
+  // de lá, na lista `ordem`, porque reordenar landing é o que mais se faz.
+  var BLOCOS = {
+    headline: function(c){
+      return c.headline ? '<h1>' + esc(c.headline) + '</h1>' : '';
+    },
+    subheadline: function(c){
+      return c.subheadline ? '<p class="apoio">' + esc(c.subheadline) + '</p>' : '';
+    },
+    badges: function(c){
+      var b = c.badges || [];
+      if (!b.length) return '';
+      return '<div class="selos">' + b.map(function(x){
+        return '<span class="selo">' + esc(x) + '</span>';
+      }).join('') + '</div>';
+    },
+    imagem: function(c){
+      var im = c.imagem || {};
+      if (!im.url) return '';
+      var prop = { '16:9':'56.25%', '4:3':'75%', '1:1':'100%', '65':'65%', '9:16':'177%' };
+      return '<div class="capa" style="padding-top:' + (prop[im.aspecto] || '56.25%') +
+             ';border-radius:' + (im.raio || 12) + 'px">' +
+             '<img src="' + esc(im.url) + '" alt="" style="object-position:' +
+             esc(im.foco || 'center center') + '" loading="eager"></div>';
+    },
+    checklist: function(c){
+      var l = c.checklist || [];
+      if (!l.length) return '';
+      return '<ul class="checklist">' + l.map(function(x){
+        return '<li>' + esc(x) + '</li>';
+      }).join('') + '</ul>';
+    }
+  };
+
   function telaAbertura(){
     progresso.style.width = '0%';
+    var c = quiz.schema['intro_' + IDIOMA] || quiz.schema.intro || {};
+    var ordem = c.ordem || ['headline','subheadline','badges','imagem','checklist'];
+
+    var corpo = ordem.map(function(nome){
+      var montar = BLOCOS[nome];
+      return montar ? montar(c) : '';
+    }).join('');
+
+    var bt = c.botao || {};
     tela.innerHTML =
-      '<p class="passo-n">Instituto AQS</p>' +
-      '<h1>' + t('abertura_titulo','Quanto a insônia está pesando na sua vida?') + '</h1>' +
-      '<p class="apoio">' + t('abertura_p1','Existe um questionário de sete perguntas usado em serviços do sono para medir exatamente isso.') + '</p>' +
-      '<p class="apoio">' + t('abertura_p2','Responda pensando nas <strong>duas últimas semanas</strong>.') + '</p>' +
-      '<button class="principal" id="comecar">' + t('abertura_botao','Começar o teste') + '</button>' +
-      '<p class="aviso">' + (quiz.schema['aviso_' + IDIOMA] || quiz.schema.aviso || '') + '</p>';
-    document.getElementById('comecar').onclick = function(){
+      '<div class="entrada">' + corpo +
+      (c.rodape ? '<p class="aviso">' + esc(c.rodape) + '</p>' : '') +
+      '</div>';
+
+    // O botão vive fora do conteúdo que rola: fica colado no rodapé e só
+    // acompanha a rolagem até encostar ali.
+    var barra = document.createElement('div');
+    barra.className = 'barra-cta';
+    barra.innerHTML = '<button class="principal" id="comecar"></button>';
+    var botao = barra.querySelector('button');
+    botao.textContent = bt.texto || t('abertura_botao','Começar');
+    if (bt.cor) botao.style.background = bt.cor;
+    if (bt.cor_texto) botao.style.color = bt.cor_texto;
+    tela.appendChild(barra);
+
+    botao.onclick = function(){
       evento('start');
       telaSexo();
     };
