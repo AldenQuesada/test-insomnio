@@ -71,6 +71,20 @@ button.opcao.escolhida .marca{border-color:var(--lua); background:var(--lua)}
 button.opcao.escolhida .marca::after{content:""; width:8px; height:8px;
   border-radius:50%; background:var(--noite)}
 
+/* Escolha por retrato: dois cartões lado a lado, a marca no canto. Vale a
+   coluna dupla só porque são exatamente duas opções e as duas cabem em 360px. */
+.opcoes.retratos{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+.opcoes.retratos button.opcao{
+  position:relative; flex-direction:column; justify-content:center;
+  text-align:center; gap:11px; padding:20px 12px 17px; font-weight:600;
+}
+.opcoes.retratos button.opcao img{
+  width:88px; height:88px; border-radius:50%; display:block;
+  background:var(--noite); object-fit:cover;
+}
+.opcoes.retratos button.opcao .marca{position:absolute; top:11px; right:11px;
+  width:20px; height:20px}
+
 /* ── Campos ── */
 label.campo{display:block; margin-bottom:16px}
 label.campo span{display:block; font-size:13px; color:var(--luz-3);
@@ -192,7 +206,7 @@ a.zap{
 
   // Concordância de gênero: em português "cansada" e "cansado" são telas
   // diferentes, e errar isso faz a pessoa sentir que o teste não é sobre ela.
-  var IDIOMA = 'pt', T = {}, faixaFrases = {}, titulosFaixa = {};
+  var IDIOMA = 'pt', T = {}, faixaFrases = {}, titulosFaixa = {}, sexoOpcoes = [];
 
   // Toda string visível vem do banco quando o quiz está em espanhol. O
   // português continua embutido como padrão, para o quiz não ficar mudo se a
@@ -253,8 +267,17 @@ a.zap{
   function es(){ return IDIOMA === 'es'; }
 
   function f(){ return pessoa.sexo === 'f'; }
-  function oa(m, fem){ return f() ? fem : m; }
   function primeiroNome(){ return (pessoa.nome || '').trim().split(/\s+/)[0] || ''; }
+  // Emendar o nome antes da frase exige baixar a inicial dela. Em espanhol a
+  // frase abre com "¿" ou "¡", e baixar o caractere 0 não mexia na letra:
+  // saía "Alden, ¿A dónde…". Aqui a primeira LETRA é que desce.
+  function comNome(nome, frase){
+    if (!nome) return frase;
+    var i = frase.search(/\p{L}/u);
+    if (i < 0) return nome + ', ' + frase;
+    return nome + ', ' + frase.slice(0, i) +
+           frase.charAt(i).toLowerCase() + frase.slice(i + 1);
+  }
   var sessao = 's-' + Date.now() + '-' + Math.random().toString(36).slice(2,9);
 
   // A UTM vem do anúncio e precisa sobreviver até o lead: é ela que diz qual
@@ -319,7 +342,7 @@ a.zap{
     // O nome aparece nas duas primeiras e volta na última: repetir em todas
     // soa a mala direta, não a conversa.
     var chamado = (nome && (passo === 0 || passo === perguntas.length - 1))
-      ? nome + ', ' + enunciado.charAt(0).toLowerCase() + enunciado.slice(1)
+      ? comNome(nome, enunciado)
       : enunciado;
     tela.querySelector('h2').textContent = chamado;
 
@@ -377,7 +400,7 @@ a.zap{
       '<button class="voltar" type="button">' + t('voltar','← voltar') + '</button>';
     var pergTit = t('contato_titulo','Para onde envio o seu resultado?');
     tela.querySelector('h1').textContent =
-      nome ? (nome + ', ' + pergTit.charAt(0).toLowerCase() + pergTit.slice(1)) : pergTit;
+      comNome(nome, pergTit);
 
     var sel = document.getElementById('ddi');
     var fone = document.getElementById('fone');
@@ -470,7 +493,9 @@ a.zap{
     var texto = encodeURIComponent(
       modelo.replace('%d', res.score).replace('%s', tituloTraduzido(res.faixa) || res.titulo));
     tela.innerHTML =
-      '<p class="passo-n">' + (primeiroNome() ? primeiroNome() + ', ' + t('resultado_rotulo','seu resultado') : t('resultado_rotulo','Seu resultado')) + '</p>' +
+      // O nome saiu daqui porque agora abre a frase do h1. Repetido nos dois,
+      // e ainda em caixa alta pelo CSS do rótulo, viraria grito.
+      '<p class="passo-n">' + t('resultado_rotulo','seu resultado') + '</p>' +
       '<div class="nota">' + res.score + '<small> / ' + res.maximo + '</small></div>' +
       '<div class="faixa"></div>' +
       '<h1></h1>' +
@@ -580,17 +605,26 @@ a.zap{
       '<button class="voltar" type="button">' + t('voltar','← voltar') + '</button>';
     var caixa = tela.querySelector('.opcoes');
     tela.querySelector('.voltar').onclick = telaAbertura;
-    [['f',t('sexo_f','Mulher')],['m',t('sexo_m','Homem')]].forEach(function(par){
+    // A lista vem do banco com rótulo, retrato e ordem. Os dois rótulos soltos
+    // de `textos_es` continuam sendo o retorno seguro se a lista não vier.
+    var opcoes = sexoOpcoes.length ? sexoOpcoes
+      : [{ valor:'f', rotulo:t('sexo_f','Mulher') },
+         { valor:'m', rotulo:t('sexo_m','Homem') }];
+    if (opcoes.some(function(o){ return o.imagem; })) caixa.className = 'opcoes retratos';
+    opcoes.forEach(function(o){
       var b = document.createElement('button');
       b.type = 'button'; b.className = 'opcao';
-      b.innerHTML = '<span class="marca"></span><span></span>';
-      b.lastChild.textContent = par[1];
+      b.innerHTML = '<span class="marca"></span>' +
+        (o.imagem ? '<img src="' + esc(o.imagem) + '" alt="' + esc(o.alt || '') +
+                    '" width="88" height="88" loading="eager">' : '') +
+        '<span></span>';
+      b.lastChild.textContent = o.rotulo;
       b.onclick = function(){
-        caixa.querySelectorAll('.opcao').forEach(function(o){ o.classList.remove('escolhida'); });
+        caixa.querySelectorAll('.opcao').forEach(function(x){ x.classList.remove('escolhida'); });
         b.classList.add('escolhida');
-        pessoa.sexo = par[0];
-        evento('answer', { pergunta: 'sexo', valor: par[0] });
-        rastrear('sexo', { sexo: par[0] });
+        pessoa.sexo = o.valor;
+        evento('answer', { pergunta: 'sexo', valor: o.valor });
+        rastrear('sexo', { sexo: o.valor });
         setTimeout(telaNome, 300);
       };
       caixa.appendChild(b);
@@ -625,13 +659,17 @@ a.zap{
   function tituloTraduzido(codigo){ return titulosFaixa[codigo] || null; }
 
   function tituloDaFaixa(codigo){
-    if (faixaFrases[codigo]) return faixaFrases[codigo];
-    return {
+    var frase = faixaFrases[codigo] || {
       grave:       'O seu sono precisa de atenção agora.',
       moderada:    'Já não é só uma noite ruim.',
       subclinica:  'Ainda dá para virar o jogo cedo.',
       sem_insonia: 'O seu sono está em faixa saudável.'
     }[codigo] || 'Resultado calculado.';
+    var nome = primeiroNome();
+    if (nome) return frase.replace('%s', nome);
+    // Sem nome, tirar o "%s, " deixaria a frase começando em minúscula.
+    frase = frase.replace(/^%s,\s*/, '');
+    return frase.charAt(0).toUpperCase() + frase.slice(1);
   }
 
   // ── Início ────────────────────────────────────────────────────────
@@ -642,6 +680,7 @@ a.zap{
       IDIOMA = quiz.idioma || 'pt';
       T = quiz.schema['textos_' + IDIOMA] || {};
       faixaFrases = quiz.schema['faixa_frases_' + IDIOMA] || {};
+      sexoOpcoes  = quiz.schema['sexo_opcoes_' + IDIOMA] || [];
       (quiz.schema['faixas_' + IDIOMA] || []).forEach(function(x){
         titulosFaixa[x.codigo] = x.titulo;
       });
