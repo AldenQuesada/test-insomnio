@@ -545,8 +545,12 @@ a.zap{
     imagem: function(c){
       var im = c.imagem || {};
       if (!im.url) return '';
-      var prop = { '16:9':'56.25%', '4:3':'75%', '1:1':'100%', '65':'65%', '9:16':'177%' };
-      return '<div class="capa" style="padding-top:' + (prop[im.aspecto] || '56.25%') +
+      // A proporção vem escrita como "largura:altura" e vira altura em % da
+      // largura. Antes era uma tabela de proporções conhecidas aqui no código,
+      // e trocar a imagem por uma de outro formato exigia mexer no código.
+      var r = /^(\d+(?:\.\d+)?):(\d+(?:\.\d+)?)$/.exec(im.aspecto || '');
+      var alto = r ? (parseFloat(r[2]) / parseFloat(r[1]) * 100) : 56.25;
+      return '<div class="capa" style="padding-top:' + alto + '%' +
              ';border-radius:' + (im.raio || 12) + 'px">' +
              '<img src="' + esc(im.url) + '" alt="" style="object-position:' +
              esc(im.foco || 'center center') + '" loading="eager"></div>';
