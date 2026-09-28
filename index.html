@@ -43,8 +43,15 @@ body{
 .passo-n{font-size:12.5px; color:var(--luz-3); letter-spacing:.06em;
   text-transform:uppercase; margin:0 0 10px}
 h1{font-family:Fraunces,Georgia,serif; font-weight:700;
-  font-size:clamp(19px,5.8vw,36px); line-height:1.16; letter-spacing:-.022em;
+  font-size:clamp(18px,5.6vw,34px); line-height:1.3; letter-spacing:-.022em;
   margin:0 0 8px; text-wrap:balance}
+/* Realce do trecho marcado: abraça a frase, não vai de ponta a ponta.
+   `box-decoration-break:clone` é o que dá borda e respiro em CADA linha se o
+   trecho quebrar; sem ele a caixa fica aberta no meio da quebra. */
+h1 mark{
+  padding:.1em .3em; border-radius:7px; box-decoration-break:clone;
+  -webkit-box-decoration-break:clone;
+}
 h2.pergunta{font-family:Fraunces,Georgia,serif; font-weight:600;
   font-size:clamp(21px,4.6vw,29px); line-height:1.22; letter-spacing:-.015em;
   margin:0 0 22px; text-wrap:balance}
@@ -524,6 +531,24 @@ a.zap{
 
   // Alinhamento da headline e da subheadline, do banco. Sem a chave, segue
   // encostado à esquerda como sempre foi.
+  // Cor vinda do banco entra num atributo `style`, então só passa o que tem
+  // forma de cor. Sem isso um valor com aspas escaparia do atributo.
+  function cor(v, padrao){
+    return /^(#[0-9a-f]{3,8}|[a-z]+|rgba?\([\d\s,.%]+\))$/i.test(v || '') ? v : padrao;
+  }
+
+  // ==assim== marca o trecho realçado. A marca vive no texto do banco porque
+  // o que realçar muda a cada teste de anúncio, e escapar vem ANTES de trocar
+  // a marca: o conteúdo nunca consegue injetar HTML.
+  function realcar(txt, c){
+    var d = c.destaque || {};
+    var est = 'background:' + cor(d.fundo, '#00897b') +
+              ';color:' + cor(d.texto, '#ffffff');
+    return esc(txt).replace(/==([^=]+)==/g, function(_, t){
+      return '<mark style="' + est + '">' + t + '</mark>';
+    });
+  }
+
   function alinhar(c){
     var m = { centro:'center', direita:'right', esquerda:'left' };
     return m[c.alinhamento] ? ' style="text-align:' + m[c.alinhamento] + '"' : '';
@@ -534,7 +559,7 @@ a.zap{
       if (!c.headline) return '';
       // Uma quebra escrita no texto do banco parte a linha aqui: onde a frase
       // parte é decisão de copy, e ela muda a cada teste de anúncio.
-      return '<h1'+alinhar(c)+'>' + esc(c.headline).replace(/\n/g, '<br>') + '</h1>';
+      return '<h1'+alinhar(c)+'>' + realcar(c.headline, c).replace(/\n/g, '<br>') + '</h1>';
     },
     subheadline: function(c){
       return c.subheadline
