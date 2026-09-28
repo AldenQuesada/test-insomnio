@@ -43,7 +43,7 @@ body{
 .passo-n{font-size:12.5px; color:var(--luz-3); letter-spacing:.06em;
   text-transform:uppercase; margin:0 0 10px}
 h1{font-family:Fraunces,Georgia,serif; font-weight:700;
-  font-size:clamp(25px,5.6vw,36px); line-height:1.16; letter-spacing:-.02em;
+  font-size:clamp(19px,5.8vw,36px); line-height:1.16; letter-spacing:-.022em;
   margin:0 0 8px; text-wrap:balance}
 h2.pergunta{font-family:Fraunces,Georgia,serif; font-weight:600;
   font-size:clamp(21px,4.6vw,29px); line-height:1.22; letter-spacing:-.015em;
@@ -522,12 +522,23 @@ a.zap{
     shield:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>'
   };
 
+  // Alinhamento da headline e da subheadline, do banco. Sem a chave, segue
+  // encostado à esquerda como sempre foi.
+  function alinhar(c){
+    var m = { centro:'center', direita:'right', esquerda:'left' };
+    return m[c.alinhamento] ? ' style="text-align:' + m[c.alinhamento] + '"' : '';
+  }
+
   var BLOCOS = {
     headline: function(c){
-      return c.headline ? '<h1>' + esc(c.headline) + '</h1>' : '';
+      if (!c.headline) return '';
+      // Uma quebra escrita no texto do banco parte a linha aqui: onde a frase
+      // parte é decisão de copy, e ela muda a cada teste de anúncio.
+      return '<h1'+alinhar(c)+'>' + esc(c.headline).replace(/\n/g, '<br>') + '</h1>';
     },
     subheadline: function(c){
-      return c.subheadline ? '<p class="apoio">' + esc(c.subheadline) + '</p>' : '';
+      return c.subheadline
+        ? '<p class="apoio"'+alinhar(c)+'>' + esc(c.subheadline) + '</p>' : '';
     },
     badges: function(c){
       var b = (c.badges || []).filter(function(x){ return x && (x.texto || x.text); });
