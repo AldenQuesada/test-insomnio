@@ -129,6 +129,12 @@ a.cta-res{
   text-decoration:none; border-radius:11px; padding:17px; margin-top:24px;
 }
 
+.selo-previa{
+  font-size:11.5px; letter-spacing:.06em; color:var(--noite);
+  background:var(--lua); border-radius:5px; padding:5px 9px;
+  margin:0 0 16px; display:inline-block; font-weight:700;
+}
+
 /* ── Movimento do resultado ──
    Cada peça existe para mostrar que a conta aconteceu. Nada em laço: botão
    que pulsa sem parar lê como pressão e derruba a confiança na página. */
@@ -337,6 +343,11 @@ a.cta-res{
     medium:   url.get('utm_medium'),
     campaign: url.get('utm_campaign')
   };
+  // `?ver=<nota>` abre a tela de resultado direto, para conferir a copy de cada
+  // faixa sem responder o teste sete vezes. NÃO grava lead, NÃO grava evento e
+  // NÃO dispara pixel: é conferência, não tráfego.
+  var PREVIA = url.get('ver') !== null;
+
   // O clique do anúncio: é o que liga o lead de volta à peça que o trouxe.
   var fbclid = url.get('fbclid');
 
@@ -353,6 +364,7 @@ a.cta-res{
   }
 
   function evento(tipo, extra){
+    if (PREVIA) return;
     // Best-effort: se o registro de evento falhar, o quiz não pode parar.
     api('quiz_events', {
       quiz_id: quiz.id, session_id: sessao, tipo: tipo,
@@ -583,6 +595,42 @@ a.cta-res{
     return '<div class="escala surge"' + atraso + '><span class="marca"></span>' +
            '<div class="trilho">' + trechos + '</div>' +
            '<div class="limites"><span>0</span><span>' + maximo + '</span></div></div>';
+  }
+
+  // Conferência da tela de resultado sem passar pelo teste.
+  //   ?ver=19            nota
+  //   &sexo=m            para ver a concordância masculina (padrão: f)
+  //   &nome=Marta        (padrão: o que estiver em `resultado_rotulo`)
+  //   &peor=q3           força qual item aparece como o que mais pesou
+  // Nada daqui vai para o banco.
+  function conferir(){
+    var nota = Math.max(0, Math.min(28, parseInt(url.get('ver'), 10) || 0));
+    pessoa.sexo = url.get('sexo') === 'm' ? 'm' : 'f';
+    pessoa.nome = url.get('nome') || 'Alden';
+
+    // Espalha a nota pelas perguntas para a linha do "que mais pesa" ter o que
+    // apontar. O resto vai para o item pedido, ou para o último, e é ele que
+    // sobe ao topo.
+    var forcado = url.get('peor');
+    var alvo = perguntas.filter(function(q){ return q.id === forcado; })[0]
+               || perguntas[perguntas.length - 1];
+    var base = Math.min(4, Math.floor(nota / perguntas.length)), resto = nota;
+    perguntas.forEach(function(q){
+      if (q === alvo) return;
+      respostas[q.id] = Math.min(base, resto); resto -= respostas[q.id];
+    });
+    respostas[alvo.id] = Math.min(4, resto);
+
+    var f = faixas.filter(function(x){ return nota >= x.de && nota <= x.ate; })[0] || {};
+    mostrarResultado({
+      score: nota, maximo: 28, faixa: f.codigo, titulo: f.titulo,
+      aviso: quiz.schema['aviso_' + IDIOMA] || quiz.schema.aviso || ''
+    });
+
+    var selo = document.createElement('p');
+    selo.className = 'selo-previa';
+    selo.textContent = 'VISTA PREVIA · nada de esta pantalla se guarda';
+    tela.insertBefore(selo, tela.firstChild);
   }
 
   function mostrarResultado(res){
@@ -864,6 +912,7 @@ a.cta-res{
       perguntas = (quiz.schema.perguntas || []).filter(function(q){
         return q.tipo === 'scale';
       });
+      if (PREVIA) { conferir(); return; }
       telaAbertura();
       evento('page_view');
       rastrear('abertura', { content_name: quiz.slug || CFG.slug });
