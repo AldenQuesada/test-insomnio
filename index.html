@@ -397,7 +397,12 @@ a.cta-res{
   }
 
   function desenharPergunta(q){
-    var opcoes = (f() && escalasF[q.escala]) || escalas[q.escala] || [];
+    // Escala usa a lista compartilhada; escolha traz as opções dela mesma,
+    // porque rótulo de tempo não se repete em outra pergunta.
+    var proprias = q['opcoes_' + IDIOMA];
+    var opcoes = proprias
+      ? proprias.map(function(o){ return o.rotulo; })
+      : ((f() && escalasF[q.escala]) || escalas[q.escala] || []);
     var enunciado = (f() && q['texto_' + IDIOMA + '_f']) || q['texto_' + IDIOMA]
                     || (f() && q.texto_f) || q.texto;
     var nome = primeiroNome();
@@ -419,7 +424,8 @@ a.cta-res{
     opcoes.forEach(function(rotulo, i){
       var b = document.createElement('button');
       b.type = 'button';
-      b.className = 'opcao' + (atual === i ? ' escolhida' : '');
+      var esta = proprias ? (atual === proprias[i].valor) : (atual === i);
+      b.className = 'opcao' + (esta ? ' escolhida' : '');
       b.innerHTML = '<span class="marca"></span><span></span>';
       b.lastChild.textContent = rotulo;
       b.onclick = function(){
@@ -427,8 +433,10 @@ a.cta-res{
           o.classList.remove('escolhida');
         });
         b.classList.add('escolhida');
-        respostas[q.id] = i;
-        evento('answer', { pergunta: q.id, valor: i });
+        // Escala guarda o índice, que É a pontuação do item. Escolha guarda o
+        // código, que sobrevive a reordenar as opções; índice, não.
+        respostas[q.id] = proprias ? proprias[i].valor : i;
+        evento('answer', { pergunta: q.id, valor: respostas[q.id] });
         rastrear('pergunta', { passo: passo + 1, total: perguntas.length });
         // A pausa existe para a pessoa VER que a escolha foi registrada antes
         // de a tela trocar. Sem ela, parece que o toque falhou.
@@ -565,9 +573,16 @@ a.cta-res{
   // Qual pergunta puxou a nota para cima. Sai das respostas que já estão na
   // memória da página, então não custa nem uma consulta a mais. É a linha que
   // prova que o teste leu quem respondeu, e não devolveu um número qualquer.
+  // As perguntas que entram na nota. A duração está entre as perguntas da tela
+  // mas fora da conta, e confundir as duas coisas aqui elegeria como "o que
+  // mais pesa" um item que não pesa nada.
+  function pontuaveis(){
+    return perguntas.filter(function(q){ return q.pontua; });
+  }
+
   function piorItem(){
     var alvo = null, maior = 0;
-    perguntas.forEach(function(q){
+    pontuaveis().forEach(function(q){
       var v = respostas[q.id];
       if (typeof v === 'number' && v > maior) { maior = v; alvo = q; }
     });
@@ -620,10 +635,11 @@ a.cta-res{
     // apontar. O resto vai para o item pedido, ou para o último, e é ele que
     // sobe ao topo.
     var forcado = url.get('peor');
-    var alvo = perguntas.filter(function(q){ return q.id === forcado; })[0]
-               || perguntas[perguntas.length - 1];
-    var base = Math.min(4, Math.floor(nota / perguntas.length)), resto = nota;
-    perguntas.forEach(function(q){
+    var lista = pontuaveis();
+    var alvo = lista.filter(function(q){ return q.id === forcado; })[0]
+               || lista[lista.length - 1];
+    var base = Math.min(4, Math.floor(nota / lista.length)), resto = nota;
+    lista.forEach(function(q){
       if (q === alvo) return;
       respostas[q.id] = Math.min(base, resto); resto -= respostas[q.id];
     });
@@ -942,8 +958,11 @@ a.cta-res{
       EV = RAST.eventos || {};
       ligarPixelMeta(RAST.meta_pixel);
       ligarGA4(RAST.ga4);
+      // Entram as de escala e as de escolha. O que decide se a resposta soma
+      // na nota é a marca `pontua` no banco, e quem soma é a função: aqui a
+      // conta não é feita, então a tela não tem como desalinhar da nota.
       perguntas = (quiz.schema.perguntas || []).filter(function(q){
-        return q.tipo === 'scale';
+        return q.tipo === 'scale' || q.tipo === 'escolha';
       });
       if (PREVIA) { conferir(); return; }
       telaAbertura();
