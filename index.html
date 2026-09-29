@@ -123,6 +123,9 @@ button.voltar:hover{color:var(--luz)}
   font-size:13.5px; letter-spacing:.03em}
 .aviso{font-size:13.5px; color:var(--luz-3); border-left:2px solid var(--linha);
   padding-left:13px; margin-top:26px}
+p.chamada{
+  color:var(--luz); font-size:16.5px; line-height:1.5; margin:22px 0 0;
+}
 a.cta-res{
   display:flex; align-items:center; justify-content:center; gap:9px;
   background:var(--lua); color:var(--noite); font-weight:700; font-size:16.5px;
@@ -166,12 +169,17 @@ a.cta-res{
 .faixa{transition:background .35s ease, color .35s ease}
 .faixa.acesa{background:var(--lua); color:var(--noite); font-weight:600}
 
-/* Quem marca "reduzir movimento" no telefone faz isso porque animação lhe dá
-   enjoo ou enxaqueca. Aqui tudo chega pronto. */
+/* Quem marca "reduzir movimento" no telefone faz isso porque DESLOCAMENTO lhe
+   dá enjoo ou enxaqueca: deslizar, dar zoom, parallax. Trocar de cor e mudar
+   de opacidade não fazem mal a ninguém.
+   Então aqui some só o que anda: o bloco entra sem subir e o marcador aparece
+   já no lugar, sem percorrer a barra. A nota continua contando, que é a única
+   coisa nesta tela cujo trabalho é dizer "as suas respostas foram somadas". */
 @media (prefers-reduced-motion: reduce){
-  .surge{animation:none; opacity:1; transform:none}
-  .escala .marca, .escala .trilho i, .faixa{transition:none}
+  .surge{animation-name:surgir-parado}
+  .escala .marca{transition:background .35s ease}
 }
+@keyframes surgir-parado{from{opacity:0} to{opacity:1; transform:none}}
 .erro{color:#e38891; font-size:14.5px; margin-top:12px}
 .fone-linha{display:flex; align-items:stretch; gap:8px}
 .fone-linha select{
@@ -261,7 +269,7 @@ a.cta-res{
   // A barra da escala é desenhada com os limites de `faixas` e a cor e o rótulo
   // curto de `faixas_<idioma>`. Guardar a faixa inteira, e não só o título,
   // é o que permite desenhar sem cor nem número escritos no código.
-  var faixas = [], faixasIdioma = {}, faixaCorpo = {};
+  var faixas = [], faixasIdioma = {}, faixaCorpo = {}, faixaChamada = {};
 
   // Toda string visível vem do banco quando o quiz está em espanhol. O
   // português continua embutido como padrão, para o quiz não ficar mudo se a
@@ -569,7 +577,7 @@ a.cta-res{
   // Sobe de 0 até a nota em vez de aparecer pronta. Desacelera no fim, para o
   // número assentar em vez de parar seco.
   function contar(el, alvo){
-    if (semMovimento() || alvo <= 0) { el.textContent = alvo; return; }
+    if (alvo <= 0) { el.textContent = alvo; return; }
     var t0 = null;
     requestAnimationFrame(function passo(agora){
       if (t0 === null) t0 = agora;
@@ -621,6 +629,12 @@ a.cta-res{
     });
     respostas[alvo.id] = Math.min(4, resto);
 
+    // Na conferência o botão aparece mesmo sem a TSL pronta: é a copy da
+    // chamada e do botão que mais precisa ser lida ANTES de existir página
+    // para onde mandar.
+    var cta = quiz.schema.resultado_cta || (quiz.schema.resultado_cta = {});
+    if (!cta.url) cta.url = '#';
+
     var f = faixas.filter(function(x){ return nota >= x.de && nota <= x.ate; })[0] || {};
     mostrarResultado({
       score: nota, maximo: 28, faixa: f.codigo, titulo: f.titulo,
@@ -649,9 +663,12 @@ a.cta-res{
       '<h1 class="surge"' + atraso() + '></h1>' +
       (pior ? '<p class="pior surge"' + atraso() + '></p>' : '') +
       '<p class="apoio surge"' + atraso() + '></p>' +
-      // Sem a URL da TSL no banco o botão não existe. Botão que não leva a
-      // lugar nenhum custa mais do que botão nenhum.
-      (cta.url ? '<a class="cta-res surge"' + atraso() + ' href="' + esc(cta.url) + '">' +
+      // A chamada e o botão são uma peça só: a chamada manda tocar no botão,
+      // então sem botão ela não pode existir. E sem a URL da TSL no banco o
+      // botão não existe: botão que não leva a lugar nenhum custa mais do que
+      // botão nenhum.
+      (cta.url ? '<p class="chamada surge"' + atraso() + '></p>' +
+                 '<a class="cta-res surge"' + atraso() + ' href="' + esc(cta.url) + '">' +
                  esc(cta.texto || '') + '</a>' : '') +
       '<p class="aviso surge"' + atraso() + '></p>';
 
@@ -660,6 +677,10 @@ a.cta-res{
     tela.querySelector('h1').textContent = tituloDaFaixa(res.faixa);
     tela.querySelector('.apoio').textContent = faixaCorpo[res.faixa] || '';
     tela.querySelector('.aviso').textContent = res.aviso;
+    if (cta.url) {
+      tela.querySelector('.chamada').textContent =
+        preencherNome(faixaChamada[res.faixa] || '');
+    }
     if (pior) {
       tela.querySelector('.pior').innerHTML =
         esc(t('resultado_pior','O que mais pesa: %s.'))
@@ -675,9 +696,10 @@ a.cta-res{
     var passo = 2 + (res.score / res.maximo) * 96;
     function andar(){ marca.style.left = passo + '%'; marca.style.background = tom; }
     function acender(){ caixa.classList.add('chegou'); pilula.classList.add('acesa'); }
-    if (semMovimento()) { andar(); acender(); return; }
-    setTimeout(andar, 450);
-    setTimeout(acender, 1150);
+    // Com movimento reduzido o marcador não percorre a barra, mas ainda espera
+    // a nota parar: aparecer antes dela quebraria a leitura da conta.
+    setTimeout(andar, semMovimento() ? 900 : 450);
+    setTimeout(acender, semMovimento() ? 950 : 1150);
   }
 
   // ── Tela de entrada ────────────────────────────────────────────────
@@ -871,10 +893,16 @@ a.cta-res{
       subclinica:  'Ainda dá para virar o jogo cedo.',
       sem_insonia: 'O seu sono está em faixa saudável.'
     }[codigo] || 'Resultado calculado.';
+    return preencherNome(frase);
+  }
+
+  // Frase de banco que abre com "%s, ": o %s vira o primeiro nome. Sem nome a
+  // marca sai inteira, e a primeira letra volta a ser maiúscula, senão a frase
+  // começaria minúscula.
+  function preencherNome(frase){
     var nome = primeiroNome();
     if (nome) return frase.replace('%s', nome);
-    // Sem nome, tirar o "%s, " deixaria a frase começando em minúscula.
-    frase = frase.replace(/^%s,\s*/, '');
+    frase = String(frase).replace(/^%s,\s*/, '');
     return frase.charAt(0).toUpperCase() + frase.slice(1);
   }
 
@@ -888,7 +916,8 @@ a.cta-res{
       faixaFrases = quiz.schema['faixa_frases_' + IDIOMA] || {};
       sexoOpcoes  = quiz.schema['sexo_opcoes_' + IDIOMA] || [];
       faixas = quiz.schema.faixas || [];
-      faixaCorpo = quiz.schema['faixa_corpo_' + IDIOMA] || {};
+      faixaCorpo   = quiz.schema['faixa_corpo_' + IDIOMA] || {};
+      faixaChamada = quiz.schema['faixa_chamada_' + IDIOMA] || {};
       (quiz.schema['faixas_' + IDIOMA] || []).forEach(function(x){
         titulosFaixa[x.codigo] = x.titulo;
         faixasIdioma[x.codigo] = x;
