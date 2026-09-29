@@ -668,7 +668,11 @@ a.cta-res{
       // botão não existe: botão que não leva a lugar nenhum custa mais do que
       // botão nenhum.
       (cta.url ? '<p class="chamada surge"' + atraso() + '></p>' +
-                 '<a class="cta-res surge"' + atraso() + ' href="' + esc(cta.url) + '">' +
+                 '<a class="cta-res surge"' + atraso() + ' href="' + esc(cta.url) + '"' +
+                 // Destino externo abre em outra aba: o resultado dela continua
+                 // aberto atrás, e `noopener` impede que a página de destino
+                 // mexa nesta.
+                 ' target="_blank" rel="noopener">' +
                  esc(cta.texto || '') + '</a>' : '') +
       '<p class="aviso surge"' + atraso() + '></p>';
 
