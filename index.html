@@ -123,10 +123,48 @@ button.voltar:hover{color:var(--luz)}
   font-size:13.5px; letter-spacing:.03em}
 .aviso{font-size:13.5px; color:var(--luz-3); border-left:2px solid var(--linha);
   padding-left:13px; margin-top:26px}
-a.zap{
+a.cta-res{
   display:flex; align-items:center; justify-content:center; gap:9px;
-  background:var(--calmo); color:#08150f; font-weight:600; font-size:16.5px;
-  text-decoration:none; border-radius:11px; padding:16px; margin-top:22px;
+  background:var(--lua); color:var(--noite); font-weight:700; font-size:16.5px;
+  text-decoration:none; border-radius:11px; padding:17px; margin-top:24px;
+}
+
+/* ── Movimento do resultado ──
+   Cada peça existe para mostrar que a conta aconteceu. Nada em laço: botão
+   que pulsa sem parar lê como pressão e derruba a confiança na página. */
+.surge{opacity:0; transform:translateY(9px);
+  animation:surgir .42s cubic-bezier(.2,.7,.3,1) forwards}
+@keyframes surgir{to{opacity:1; transform:none}}
+
+.escala{position:relative; margin:20px 0 18px; padding-top:7px}
+.escala .trilho{display:flex; gap:3px; height:10px}
+.escala .trilho i{
+  height:100%; opacity:.28; transition:opacity .35s ease;
+  border-radius:3px;
+}
+.escala .trilho i:first-child{border-radius:6px 3px 3px 6px}
+.escala .trilho i:last-child{border-radius:3px 6px 6px 3px}
+.escala.chegou .trilho i.sua{opacity:1}
+/* O marcador parte de onde a pessoa começou o teste, zero, e caminha até a
+   nota dela. É esse trajeto que diz "as suas respostas foram somadas". */
+.escala .marca{
+  position:absolute; top:0; left:2%; width:24px; height:24px; margin-left:-12px;
+  border-radius:50%; border:3px solid var(--noite); background:var(--luz-3);
+  transition:left .75s cubic-bezier(.3,.85,.35,1), background .35s ease;
+}
+.escala .limites{display:flex; justify-content:space-between;
+  font-size:11.5px; color:var(--luz-3); margin-top:9px; letter-spacing:.04em}
+.pior{font-size:15.5px; color:var(--luz-2); margin:0 0 14px;
+  border-left:2px solid var(--lua); padding-left:13px}
+.pior b{color:var(--luz); font-weight:600}
+.faixa{transition:background .35s ease, color .35s ease}
+.faixa.acesa{background:var(--lua); color:var(--noite); font-weight:600}
+
+/* Quem marca "reduzir movimento" no telefone faz isso porque animação lhe dá
+   enjoo ou enxaqueca. Aqui tudo chega pronto. */
+@media (prefers-reduced-motion: reduce){
+  .surge{animation:none; opacity:1; transform:none}
+  .escala .marca, .escala .trilho i, .faixa{transition:none}
 }
 .erro{color:#e38891; font-size:14.5px; margin-top:12px}
 .fone-linha{display:flex; align-items:stretch; gap:8px}
@@ -214,6 +252,10 @@ a.zap{
   // Concordância de gênero: em português "cansada" e "cansado" são telas
   // diferentes, e errar isso faz a pessoa sentir que o teste não é sobre ela.
   var IDIOMA = 'pt', T = {}, faixaFrases = {}, titulosFaixa = {}, sexoOpcoes = [];
+  // A barra da escala é desenhada com os limites de `faixas` e a cor e o rótulo
+  // curto de `faixas_<idioma>`. Guardar a faixa inteira, e não só o título,
+  // é o que permite desenhar sem cor nem número escritos no código.
+  var faixas = [], faixasIdioma = {}, faixaCorpo = {};
 
   // Toda string visível vem do banco quando o quiz está em espanhol. O
   // português continua embutido como padrão, para o quiz não ficar mudo se a
@@ -495,23 +537,99 @@ a.zap{
     tela.querySelector('.voltar').onclick = function(){ irPara(perguntas.length - 1); };
   }
 
+  function semMovimento(){
+    try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
+    catch (e) { return false; }
+  }
+
+  // Qual pergunta puxou a nota para cima. Sai das respostas que já estão na
+  // memória da página, então não custa nem uma consulta a mais. É a linha que
+  // prova que o teste leu quem respondeu, e não devolveu um número qualquer.
+  function piorItem(){
+    var alvo = null, maior = 0;
+    perguntas.forEach(function(q){
+      var v = respostas[q.id];
+      if (typeof v === 'number' && v > maior) { maior = v; alvo = q; }
+    });
+    return alvo && maior ? (alvo['rotulo_' + IDIOMA] || '') : '';
+  }
+
+  // Sobe de 0 até a nota em vez de aparecer pronta. Desacelera no fim, para o
+  // número assentar em vez de parar seco.
+  function contar(el, alvo){
+    if (semMovimento() || alvo <= 0) { el.textContent = alvo; return; }
+    var t0 = null;
+    requestAnimationFrame(function passo(agora){
+      if (t0 === null) t0 = agora;
+      var k = Math.min(1, (agora - t0) / 900);
+      el.textContent = Math.round(alvo * (1 - Math.pow(1 - k, 3)));
+      if (k < 1) requestAnimationFrame(passo);
+    });
+  }
+
+  // Os limites de cada trecho vêm de `faixas`, a cor de `faixas_<idioma>`.
+  // Nenhum número e nenhuma cor da escala estão escritos aqui.
+  function barraEscala(faixa, maximo, atraso){
+    if (!faixas.length) return '';
+    var trechos = faixas.map(function(f){
+      var d = faixasIdioma[f.codigo] || {};
+      // O rótulo curto da faixa só existe para quem ouve a página: a barra é
+      // cor pura, e sem isso um leitor de tela não encontra nada aqui.
+      return '<i style="flex:' + (f.ate - f.de + 1) +
+             ';background:' + cor(d.cor, '#7f8a9c') + '"' +
+             ' aria-label="' + esc(d.rotulo || '') + ' (' + f.de + '-' + f.ate + ')"' +
+             (f.codigo === faixa ? ' class="sua"' : '') + '></i>';
+    }).join('');
+    return '<div class="escala surge"' + atraso + '><span class="marca"></span>' +
+           '<div class="trilho">' + trechos + '</div>' +
+           '<div class="limites"><span>0</span><span>' + maximo + '</span></div></div>';
+  }
+
   function mostrarResultado(res){
-    var modelo = t('zap_texto','Oi! Fiz o teste da insônia e deu %d pontos: %s.');
-    var texto = encodeURIComponent(
-      modelo.replace('%d', res.score).replace('%s', tituloTraduzido(res.faixa) || res.titulo));
+    var cta  = quiz.schema.resultado_cta || {};
+    var pior = piorItem();
+    var n = 0;
+    function atraso(){ return ' style="animation-delay:' + (n++ * 70) + 'ms"'; }
+
     tela.innerHTML =
-      // O nome saiu daqui porque agora abre a frase do h1. Repetido nos dois,
-      // e ainda em caixa alta pelo CSS do rótulo, viraria grito.
-      '<p class="passo-n">' + t('resultado_rotulo','seu resultado') + '</p>' +
-      '<div class="nota">' + res.score + '<small> / ' + res.maximo + '</small></div>' +
-      '<div class="faixa"></div>' +
-      '<h1></h1>' +
-      '<p class="apoio">' + t('resultado_apoio','Este número descreve as suas duas últimas semanas.') + '</p>' +
-      '<a class="zap" href="https://wa.me/?text=' + texto + '">' + t('resultado_zap','Receber a leitura no WhatsApp') + '</a>' +
-      '<p class="aviso"></p>';
-    tela.querySelector('.faixa').textContent = tituloTraduzido(res.faixa) || res.titulo;
+      '<p class="passo-n surge"' + atraso() + '>' +
+        esc(t('resultado_rotulo','seu resultado')) + '</p>' +
+      '<div class="nota surge"' + atraso() + '><span id="conta">0</span>' +
+        '<small> / ' + res.maximo + '</small></div>' +
+      barraEscala(res.faixa, res.maximo, atraso()) +
+      '<div class="faixa surge"' + atraso() + '></div>' +
+      '<h1 class="surge"' + atraso() + '></h1>' +
+      (pior ? '<p class="pior surge"' + atraso() + '></p>' : '') +
+      '<p class="apoio surge"' + atraso() + '></p>' +
+      // Sem a URL da TSL no banco o botão não existe. Botão que não leva a
+      // lugar nenhum custa mais do que botão nenhum.
+      (cta.url ? '<a class="cta-res surge"' + atraso() + ' href="' + esc(cta.url) + '">' +
+                 esc(cta.texto || '') + '</a>' : '') +
+      '<p class="aviso surge"' + atraso() + '></p>';
+
+    var pilula = tela.querySelector('.faixa');
+    pilula.textContent = tituloTraduzido(res.faixa) || res.titulo;
     tela.querySelector('h1').textContent = tituloDaFaixa(res.faixa);
+    tela.querySelector('.apoio').textContent = faixaCorpo[res.faixa] || '';
     tela.querySelector('.aviso').textContent = res.aviso;
+    if (pior) {
+      tela.querySelector('.pior').innerHTML =
+        esc(t('resultado_pior','O que mais pesa: %s.'))
+          .replace('%s', '<b>' + esc(pior) + '</b>');
+    }
+
+    contar(document.getElementById('conta'), res.score);
+
+    var caixa = tela.querySelector('.escala');
+    if (!caixa) return;
+    var marca = caixa.querySelector('.marca');
+    var tom   = cor((faixasIdioma[res.faixa] || {}).cor, '#7f8a9c');
+    var passo = 2 + (res.score / res.maximo) * 96;
+    function andar(){ marca.style.left = passo + '%'; marca.style.background = tom; }
+    function acender(){ caixa.classList.add('chegou'); pilula.classList.add('acesa'); }
+    if (semMovimento()) { andar(); acender(); return; }
+    setTimeout(andar, 450);
+    setTimeout(acender, 1150);
   }
 
   // ── Tela de entrada ────────────────────────────────────────────────
@@ -721,8 +839,11 @@ a.zap{
       T = quiz.schema['textos_' + IDIOMA] || {};
       faixaFrases = quiz.schema['faixa_frases_' + IDIOMA] || {};
       sexoOpcoes  = quiz.schema['sexo_opcoes_' + IDIOMA] || [];
+      faixas = quiz.schema.faixas || [];
+      faixaCorpo = quiz.schema['faixa_corpo_' + IDIOMA] || {};
       (quiz.schema['faixas_' + IDIOMA] || []).forEach(function(x){
         titulosFaixa[x.codigo] = x.titulo;
+        faixasIdioma[x.codigo] = x;
       });
       escalas  = quiz.schema['escalas_' + IDIOMA]     || quiz.schema.escalas   || {};
       escalasF = quiz.schema['escalas_' + IDIOMA + '_f'] || quiz.schema.escalas_f || {};
