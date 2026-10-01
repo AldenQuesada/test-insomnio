@@ -153,6 +153,16 @@ ul.itens li .marca svg{width:12px; height:12px; color:var(--noite)}
 .preco .por small{font-size:.35em}
 .preco .apoio{font-family:Montserrat,sans-serif; font-size:14px; margin-top:12px}
 
+/* Frase de passagem: na modelo ela é maior que um parágrafo e menor que um
+   título, e é o que separa a prova da história. */
+.transicao{font-family:Lora,Georgia,serif; font-size:21px; line-height:1.5;
+  max-width:760px; margin:0 auto; color:var(--clareza)}
+.at-preco{font-family:Montserrat,sans-serif; font-size:16px; letter-spacing:.04em;
+  text-transform:uppercase; margin:26px 0 6px}
+.at-preco b{font-family:"Bebas Neue",sans-serif; font-size:40px; color:var(--saude);
+  letter-spacing:.02em; margin-left:8px; vertical-align:-3px}
+@media (min-width:900px){ .transicao{font-size:25px} }
+
 /* ── bônus ──
    Card claro sobre a seção escura, como na página modelo. Lá a faixa é roxa e
    o preço é vermelho; aqui a faixa é a noite da marca e o papel do vermelho é
@@ -388,6 +398,39 @@ details p{margin-top:11px; font-size:15.5px}
       return secao((c.titulo ? '<h2>' + esc(c.titulo) + '</h2>' : '') +
         (c.imagem ? '<img src="' + esc(c.imagem) + '" alt="" style="width:100%;border-radius:12px;margin-bottom:18px">' : '') +
         (c.texto ? '<p>' + esc(c.texto) + '</p>' : ''), 'escura');
+    },
+    // Na página modelo o bloco de prova social aparece DUAS vezes, logo depois
+    // do herói e de novo antes do rodapé. Mesmo conteúdo, mesmo desenho.
+    prova_fim: function(c, T){ return BLOCOS.prova(T.prova || {}); },
+
+    // Frase curta de passagem entre a prova e a história. Na modelo é uma
+    // linha só, sem título e sem botão: serve de respiro e de promessa.
+    transicao: function(c){
+      if (!c.texto) return '';
+      return secao('<p class="transicao">' + esc(c.texto) + '</p>');
+    },
+
+    // Repetição da oferta no meio da página, como na modelo: ela não espera o
+    // fim para pedir a venda de novo.
+    oferta2: function(c){
+      if (!c.titulo && !c.texto) return '';
+      return secao(
+        (c.titulo ? '<h2>' + esc(c.titulo) + '</h2>' : '') +
+        (c.texto ? '<p>' + esc(c.texto) + '</p>' : '') +
+        botao(c.botao), 'escura');
+    },
+
+    // O atalho para quem rolou a página inteira sem ler. Na modelo é o bloco
+    // mais perto do fim e repete tudo em poucas linhas, com o preço junto.
+    atalho: function(c, T){
+      if (!c.titulo) return '';
+      var p = T.preco || {};
+      return secao(
+        '<h2>' + esc(c.titulo) + '</h2>' +
+        (c.texto || []).map(function(t){ return '<p>' + esc(t) + '</p>'; }).join('') +
+        (p.por ? '<p class="at-preco">' + esc(p.rotulo_por || '') + ' ' +
+                 '<b>' + esc(p.moeda || '') + ' ' + esc(p.por) + '</b></p>' : '') +
+        botao(c.botao));
     },
 
     mockups: function(c){
@@ -639,7 +682,9 @@ details p{margin-top:11px; font-size:15.5px}
     var html = '';
     (T.ordem || []).forEach(function(nome, i){
       if (i === 1) html += saudacao();
-      if (BLOCOS[nome]) html += BLOCOS[nome](T[nome] || {});
+      // O segundo argumento existe para os blocos que precisam olhar fora da
+      // própria chave: a prova repetida do fim e o atalho, que mostra o preço.
+      if (BLOCOS[nome]) html += BLOCOS[nome](T[nome] || {}, T);
     });
     document.getElementById('pagina').innerHTML = html;
     montarFolheto(T.previa || {});
