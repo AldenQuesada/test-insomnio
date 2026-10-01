@@ -153,6 +153,31 @@ ul.itens li .marca svg{width:12px; height:12px; color:var(--noite)}
 .preco .por small{font-size:.35em}
 .preco .apoio{font-family:Montserrat,sans-serif; font-size:14px; margin-top:12px}
 
+/* ── depoimentos ──
+   Carrossel nativo: a pista rola na horizontal e cada card encaixa no lugar.
+   Sem biblioteca, e com arrasto no dedo funcionando por padrão. */
+.dep{margin-top:34px}
+.dep-pista{display:flex; gap:18px; overflow-x:auto; scroll-snap-type:x mandatory;
+  scroll-behavior:smooth; scrollbar-width:none; -ms-overflow-style:none;
+  padding-bottom:4px}
+.dep-pista::-webkit-scrollbar{display:none}
+.dep-card{flex:0 0 100%; scroll-snap-align:center; background:var(--clareza);
+  border-radius:14px; overflow:hidden; text-align:left; display:flex;
+  flex-direction:column}
+.dep-foto{width:100%; aspect-ratio:4/3; object-fit:cover; display:block}
+.dep-corpo{padding:22px 22px 24px; display:flex; flex-direction:column; gap:14px;
+  flex:1}
+.dep-txt{font-family:Lora,Georgia,serif; font-size:16px; line-height:1.65;
+  color:#43484f; margin:0; flex:1}
+.dep-quem{font-family:Montserrat,sans-serif; font-size:13.5px; margin:0;
+  color:#6d7380}
+.dep-quem b{display:block; font-size:15px; color:var(--noite); margin-bottom:2px}
+.dep-passos{display:flex; align-items:center; justify-content:center; gap:20px;
+  margin-top:22px; font-family:Montserrat,sans-serif; font-size:14px;
+  color:var(--apoio); letter-spacing:.06em}
+@media (min-width:760px){ .dep-card{flex-basis:calc(50% - 9px)} }
+@media (min-width:1100px){ .dep-card{flex-basis:calc(33.333% - 12px)} }
+
 /* Frase de passagem: na modelo ela é maior que um parágrafo e menor que um
    título, e é o que separa a prova da história. */
 .transicao{font-family:Lora,Georgia,serif; font-size:21px; line-height:1.5;
@@ -403,6 +428,29 @@ details p{margin-top:11px; font-size:15.5px}
     // do herói e de novo antes do rodapé. Mesmo conteúdo, mesmo desenho.
     prova_fim: function(c, T){ return BLOCOS.prova(T.prova || {}); },
 
+    // Carrossel de depoimentos. Sem biblioteca: o scroll-snap do CSS já dá
+    // arrasto no dedo, inércia e parada no card certo, de graça. A biblioteca
+    // do folheável existe porque virar página é difícil; deslizar não é.
+    depoimentos: function(c){
+      var it = c.itens || [];
+      if (!it.length) return '';
+      return secao('<h2>' + esc(c.titulo || '') + '</h2>' +
+        (c.texto ? '<p>' + esc(c.texto) + '</p>' : '') +
+        '<div class="dep"><div class="dep-pista" id="dep-pista">' +
+        it.map(function(d){
+          return '<article class="dep-card">' +
+            (d.foto ? '<img class="dep-foto" src="' + esc(d.foto) + '" alt="" loading="lazy">' : '') +
+            '<div class="dep-corpo">' +
+              (d.texto ? '<p class="dep-txt">' + esc(d.texto) + '</p>' : '') +
+              '<p class="dep-quem"><b>' + esc(d.nome || '') + '</b>' +
+                (d.local ? '<span>' + esc(d.local) + '</span>' : '') + '</p>' +
+            '</div></article>';
+        }).join('') + '</div>' +
+        '<div class="dep-passos"><button class="pv" data-d="-1" aria-label="Anterior">&#8249;</button>' +
+        '<span id="dep-conta"></span>' +
+        '<button class="pv" data-d="1" aria-label="Siguiente">&#8250;</button></div></div>', 'escura');
+    },
+
     // Frase curta de passagem entre a prova e a história. Na modelo é uma
     // linha só, sem título e sem botão: serve de respiro e de promessa.
     transicao: function(c){
@@ -608,6 +656,54 @@ details p{margin-top:11px; font-size:15.5px}
     return secao('<p style="font-size:18px;color:var(--luz)">' + esc(t) + '</p>');
   }
 
+  // Mesma regra do folheável: anda sozinho, para no primeiro toque e não
+  // começa fora da tela.
+  function montarCarrossel(cfg){
+    var pista = document.getElementById('dep-pista');
+    if (!pista) return;
+    var cards = pista.querySelectorAll('.dep-card');
+    if (!cards.length) return;
+    var conta = document.getElementById('dep-conta');
+
+    function passo(){ return cards[0].getBoundingClientRect().width + 18; }
+    function atual(){
+      return Math.min(cards.length - 1, Math.round(pista.scrollLeft / passo()));
+    }
+    function visiveis(){
+      return Math.max(1, Math.round(pista.clientWidth / passo()));
+    }
+    function pintar(){
+      if (conta) conta.textContent = (atual() + 1) + ' / ' + cards.length;
+    }
+    function ir(d){
+      var alvo = atual() + d;
+      if (alvo < 0) alvo = cards.length - 1;
+      if (alvo > cards.length - visiveis()) alvo = 0;
+      pista.scrollTo({ left: alvo * passo(), behavior: 'smooth' });
+    }
+
+    pintar();
+    var t = null, ms = parseInt(cfg.auto, 10) || 0;
+    function parar(){ if (t) { clearInterval(t); t = null; } }
+    function andar(){ if (!t && ms) t = setInterval(function(){
+      if (!document.hidden) ir(1);
+    }, ms); }
+
+    document.querySelectorAll('.dep-passos .pv').forEach(function(b){
+      b.onclick = function(){ parar(); ir(+b.dataset.d); };
+    });
+    pista.addEventListener('pointerdown', parar);
+    pista.addEventListener('scroll', pintar, { passive: true });
+    try {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) ms = 0;
+    } catch (e) {}
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function(es){
+        es.forEach(function(e){ e.isIntersecting ? andar() : parar(); });
+      }, { threshold: .3 }).observe(pista);
+    } else { andar(); }
+  }
+
   function montarFolheto(cfg){
     var el = document.getElementById('folheto');
     if (!el || !window.St || !window.St.PageFlip) return;
@@ -688,6 +784,7 @@ details p{margin-top:11px; font-size:15.5px}
     });
     document.getElementById('pagina').innerHTML = html;
     montarFolheto(T.previa || {});
+    montarCarrossel(T.depoimentos || {});
   }).catch(function(e){
     document.getElementById('pagina').innerHTML =
       '<section class="faixa"><div class="dentro"><h2>No pude cargar la página</h2>' +
