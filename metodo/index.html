@@ -94,6 +94,9 @@ p:last-child{margin-bottom:0}
   border:2px solid var(--saude)}
 .citacao p{font-family:Lora,serif; font-size:15.5px; font-style:italic;
   color:var(--clareza); margin:0}
+/* A assinatura: mesma fonte e mesmo itálico da fala, porque é a mesma voz. */
+.citacao .assina{display:block; margin-top:9px; color:var(--saude);
+  font-weight:600}
 
 /* ── botão ── */
 a.cta{
@@ -127,6 +130,17 @@ a.cta:focus-visible{outline:3px solid var(--calma); outline-offset:3px}
 #folheto{margin:0 auto; max-width:1040px}
 #folheto .pagina{background:var(--clareza)}
 #folheto .pagina img{width:100%; height:100%; object-fit:cover}
+/* O convite na última página. Fica sobre o rodapé da folha, com um véu por
+   baixo para não brigar com o texto do miolo. */
+#folheto .pagina{position:relative}
+.pv-cta{position:absolute; left:8%; right:8%; bottom:7%;
+  display:block; text-align:center; text-decoration:none;
+  font-family:Montserrat,sans-serif; font-weight:700; font-size:14px;
+  letter-spacing:.06em; text-transform:uppercase;
+  background:var(--saude); color:var(--noite);
+  padding:13px 10px; border-radius:7px;
+  box-shadow:0 10px 30px rgba(12,20,38,.45)}
+.pv-cta:hover{background:var(--clareza)}
 .previa-passos{display:flex; align-items:center; justify-content:center; gap:20px;
   margin-top:22px; font-family:Montserrat,sans-serif; font-size:14px;
   letter-spacing:.1em; color:var(--apoio)}
@@ -436,7 +450,9 @@ details p{margin-top:11px; font-size:15.5px}
             ? '<div class="citacao">' +
               (c.citacao.foto ? '<img src="' + esc(c.citacao.foto) + '" alt="">' : '') +
               '<p>' + esc(c.citacao.texto)
-                .replace(/\*([^*]+)\*/g, '<b>$1</b>') + '</p></div>' : '') +
+                .replace(/\*([^*]+)\*/g, '<b>$1</b>') +
+              (c.citacao.assina ? '<span class="assina">' + esc(c.citacao.assina) + '</span>' : '') +
+              '</p></div>' : '') +
         '</div>' +
         (c.imagem ? '<div class="h-img h-img-desk"><img src="' + esc(c.imagem) +
                     '" alt="" width="573" height="860" loading="lazy"></div>' : ''),
@@ -530,8 +546,14 @@ details p{margin-top:11px; font-size:15.5px}
       return secao('<h2>' + esc(c.titulo || '') + '</h2>' +
         (c.texto ? '<p>' + esc(c.texto) + '</p>' : '') +
         '<div class="previa"><div id="folheto">' +
-        pgs.map(function(u){
-          return '<div class="pagina"><img src="' + esc(u) + '" alt="" loading="lazy"></div>';
+        pgs.map(function(u, i){
+          // Na última página entra o convite para seguir lendo. É o lugar
+          // natural: quem chegou até ali virou nove páginas de propósito.
+          var fim = (i === pgs.length - 1 && c.cta && CHECKOUT)
+            ? '<a class="pv-cta" href="' + esc(CHECKOUT) + '" rel="noopener">' +
+              esc(c.cta) + '</a>' : '';
+          return '<div class="pagina"><img src="' + esc(u) + '" alt="" loading="lazy">' +
+                 fim + '</div>';
         }).join('') + '</div>' +
         '<div class="previa-passos"><button class="pv" data-v="-1" aria-label="Anterior">&#8249;</button>' +
         '<span id="pv-conta"></span>' +
