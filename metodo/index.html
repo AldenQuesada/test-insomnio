@@ -153,6 +153,43 @@ ul.itens li .marca svg{width:12px; height:12px; color:var(--noite)}
 .preco .por small{font-size:.35em}
 .preco .apoio{font-family:Montserrat,sans-serif; font-size:14px; margin-top:12px}
 
+/* ── bônus ──
+   Card claro sobre a seção escura, como na página modelo. Lá a faixa é roxa e
+   o preço é vermelho; aqui a faixa é a noite da marca e o papel do vermelho é
+   do dourado, porque a folha de identidade dela não tem nem roxo nem vermelho. */
+.b-sub{display:inline-block; text-decoration:underline;
+  text-decoration-color:var(--saude); text-underline-offset:7px;
+  text-decoration-thickness:3px}
+.b-lista{display:flex; flex-direction:column; gap:26px; margin-top:34px;
+  max-width:620px; margin-left:auto; margin-right:auto}
+.b-card{background:var(--clareza); border-radius:14px; overflow:hidden;
+  text-align:center}
+.b-faixa{background:var(--noite); padding:18px 20px}
+.b-num{font-family:Montserrat,sans-serif; font-size:12px; font-weight:800;
+  letter-spacing:.2em; color:var(--saude); margin-bottom:7px}
+.b-tit{font-family:Montserrat,sans-serif; font-size:17px; font-weight:700;
+  line-height:1.3; color:var(--clareza); text-transform:uppercase;
+  letter-spacing:.02em}
+.b-corpo{padding:24px 22px 28px}
+.b-card p{color:#43484f}
+.b-aspas{font-family:Lora,Georgia,serif; font-style:italic; font-size:15.5px;
+  line-height:1.6}
+.b-img{width:100%; max-width:300px; margin:22px auto}
+.b-desc{font-family:Lora,Georgia,serif; font-size:15.5px; line-height:1.68}
+.b-desc b{color:var(--noite)}
+.b-preco{font-family:Montserrat,sans-serif; font-size:14px; font-weight:700;
+  margin-top:20px; color:#43484f}
+.b-preco s{color:#9a948a}
+.b-preco b{background:var(--saude); color:var(--noite); border-radius:5px;
+  padding:3px 9px; margin-left:3px}
+.b-fecho{font-family:Montserrat,sans-serif; font-size:13.5px; font-weight:800;
+  letter-spacing:.04em; text-transform:uppercase; color:var(--noite) !important;
+  margin-top:16px; line-height:1.45}
+@media (min-width:900px){
+  .b-tit{font-size:19px}
+  .b-corpo{padding:30px 40px 34px}
+}
+
 /* ── garantia ──
    Medida 1 a 1 na página modelo: selo 190, título 52/800 maiúsculo numa caixa
    de 740, texto 20/30 numa caixa de 640. Sem moldura: lá o bloco respira no
@@ -407,16 +444,36 @@ details p{margin-top:11px; font-size:15.5px}
         '</ul>', 'escura');
     },
 
+    // Card medido na página modelo, na ordem dela: faixa com número e título,
+    // aspas que respondem a uma objeção, imagem, texto com a transformação em
+    // negrito, preço riscado e fecho.
     bonus: function(c){
       var it = c.itens || [];
       if (!it.length) return '';
-      return secao('<h2>' + esc(c.titulo || '') + '</h2>' +
-        it.map(function(b){
-          return '<div style="border:1px solid var(--linha);border-radius:14px;padding:22px;margin-bottom:14px">' +
-            '<h3>' + esc(b.nome || '') + '</h3><p>' + esc(b.texto || '') + '</p>' +
-            (b.valor ? '<p style="color:var(--lua);font-weight:600;margin-top:10px">' +
-                       esc(b.valor) + '</p>' : '') + '</div>';
-        }).join(''));
+      // O número de bônus é contado, não escrito: ela ainda vai acrescentar
+      // mais um, e título que promete uma quantidade diferente da que está na
+      // tela é erro que ninguém revisa depois.
+      var tit = String(c.titulo || '').replace('%d', it.length);
+      return secao(
+        '<h2>' + esc(tit).replace(/\*([^*]+)\*/g, '<span class="b-sub">$1</span>') + '</h2>' +
+        '<div class="b-lista">' + it.map(function(b, i){
+          var n = String(c.rotulo || '').replace('%02d', (i + 1 < 10 ? '0' : '') + (i + 1));
+          return '<article class="b-card">' +
+            '<div class="b-faixa">' +
+              (n ? '<p class="b-num">' + esc(n) + '</p>' : '') +
+              '<h3 class="b-tit">' + esc(b.titulo || '') + '</h3>' +
+            '</div>' +
+            '<div class="b-corpo">' +
+              (b.aspas ? '<p class="b-aspas">' + esc(b.aspas) + '</p>' : '') +
+              (b.imagem ? '<img class="b-img" src="' + esc(b.imagem) + '" alt="" loading="lazy">' : '') +
+              (b.texto ? '<p class="b-desc">' + esc(b.texto)
+                  .replace(/\*([^*]+)\*/g, '<b>$1</b>') + '</p>' : '') +
+              (b.preco_de ? '<p class="b-preco">' + esc(c.etiqueta_preco || '') +
+                  ' <s>' + esc(b.preco_de) + '</s> ' +
+                  '<b>' + esc(c.preco_zero || '') + '</b></p>' : '') +
+              (c.fecho ? '<p class="b-fecho">' + esc(c.fecho) + '</p>' : '') +
+            '</div></article>';
+        }).join('') + '</div>', 'escura');
     },
 
     preco: function(c){
