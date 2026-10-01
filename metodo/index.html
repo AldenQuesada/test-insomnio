@@ -135,6 +135,13 @@ ul.itens li .marca svg{width:12px; height:12px; color:var(--noite)}
 .texto-longo{text-align:left}
 .texto-longo h2{text-align:left}
 .m-img img{width:100%; margin:0 auto 12px}
+/* No celular a faixa tem 40px de margem de cada lado, e isso tira 80px dos
+   390 da tela. Num mockup de cinco peças cada capa fica com menos de 70px e o
+   nome do livro some. Aqui ele fura a margem: o que precisa ser lido é a capa,
+   não o respiro. */
+@media (max-width:899px){
+  .m-img{width:calc(100% + 56px); margin-left:-28px; max-width:none}
+}
 
 /* ── preço ── */
 .preco .de{font-family:Montserrat,sans-serif; font-size:16px; color:var(--apoio);
