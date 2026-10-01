@@ -408,7 +408,8 @@ details p{margin-top:11px; font-size:15.5px}
           (c.citacao && c.citacao.texto
             ? '<div class="citacao">' +
               (c.citacao.foto ? '<img src="' + esc(c.citacao.foto) + '" alt="">' : '') +
-              '<p>' + esc(c.citacao.texto) + '</p></div>' : '') +
+              '<p>' + esc(c.citacao.texto)
+                .replace(/\*([^*]+)\*/g, '<b>$1</b>') + '</p></div>' : '') +
         '</div>' +
         (c.imagem ? '<div class="h-img h-img-desk"><img src="' + esc(c.imagem) +
                     '" alt="" width="573" height="860" loading="lazy"></div>' : ''),
