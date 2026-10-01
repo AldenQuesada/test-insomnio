@@ -204,8 +204,12 @@ details p{margin-top:11px; font-size:15.5px}
   color:var(--apoio); text-decoration:none}
 .r-link:hover{color:var(--saude)}
 @media (min-width:900px){
-  .r-grade{grid-template-columns:1.25fr 1fr 1fr; gap:0 48px; text-align:left;
+  /* Três colunas quando as três existem. Com a de links ainda sem endereço
+     seriam duas e um vão morto à direita, então a grade acompanha quantas
+     colunas de fato nasceram. */
+  .r-grade{grid-template-columns:1.25fr 1fr; gap:0 48px; text-align:left;
     align-items:start}
+  .r-grade:has(.r-col:nth-child(3)){grid-template-columns:1.25fr 1fr 1fr}
   .rodape .r-seguro{justify-content:flex-start}
   .r-pagos,.r-links{justify-content:flex-start; align-items:flex-start}
 }
