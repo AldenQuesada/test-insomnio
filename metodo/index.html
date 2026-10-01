@@ -15,6 +15,10 @@
   --roxo:#7a2ff5; --ouro:#ffd04b; --branco:#fff; --cinza:#cfc6d4;
 }
 *{margin:0; padding:0; box-sizing:border-box}
+/* Trava geral: a imagem dos dispositivos saiu do style embutido e
+   passou a estourar 1100px de largura num telefone de 390. */
+img{max-width:100%; height:auto; display:block}
+.m-img img{width:100%; margin:0 auto 12px}
 html{scroll-behavior:smooth}
 body{
   font-family:Sora,-apple-system,BlinkMacSystemFont,sans-serif;
@@ -117,6 +121,36 @@ details p{margin-top:11px; font-size:15.5px}
 .rodape p{font-size:13px; color:#8a8192; max-width:520px; margin:0 auto 9px}
 .rodape .marca{font-size:14px; color:var(--cinza); font-weight:700; margin-bottom:11px}
 
+/* ── desktop ──
+   A página modelo muda de comportamento aqui, e eu só tinha olhado o celular:
+   o herói vira duas colunas com o texto à ESQUERDA e alinhado à esquerda, os
+   blocos de imagem alternam o lado, os textos longos ficam numa coluna de 780
+   e as listas e a FAQ abrem em duas colunas. */
+@media (min-width:900px){
+  .faixa{padding:80px 40px}
+  .dentro{max-width:1180px}
+
+  .heroi .dentro{
+    display:grid; grid-template-columns:1.05fr .95fr; gap:16px 60px;
+    grid-template-areas:"a img" "b img"; align-items:center; text-align:left;
+  }
+  .heroi .h-a{grid-area:a} .heroi .h-b{grid-area:b} .heroi .h-img{grid-area:img}
+  .heroi img{max-width:430px; margin:0}
+  .heroi h1{font-size:46px}
+  .heroi .chamada{font-size:18px}
+
+  .duas .dentro{display:grid; grid-template-columns:1fr 1fr; gap:56px;
+    align-items:center; text-align:left}
+  .duas img{width:100%; margin:0}
+
+  .texto-longo .dentro{max-width:780px}
+  ul.itens{display:grid; grid-template-columns:1fr 1fr; gap:0 44px}
+  ul.itens li{border-bottom:0; padding-bottom:0; margin-bottom:26px}
+  .faq-grid{display:grid; grid-template-columns:1fr 1fr; gap:0 44px}
+  a.cta{max-width:560px; margin-left:auto; margin-right:auto}
+  .garantia{max-width:760px; margin:0 auto}
+}
+
 .aviso-previa{background:var(--ouro); color:#221225; text-align:center;
   font-weight:800; font-size:12.5px; letter-spacing:.05em; padding:9px 16px}
 .oculto{display:none}
@@ -163,13 +197,17 @@ details p{margin-top:11px; font-size:15.5px}
     heroi: function(c){
       if (!c.titulo) return '';
       return secao(
-        (c.sobretitulo ? '<p class="sobretitulo">' + esc(c.sobretitulo) + '</p>' : '') +
-        (c.chamada ? '<p class="chamada">' + esc(c.chamada) + '</p>' : '') +
-        '<h1>' + esc(c.titulo) + '</h1>' +
-        (c.imagem ? '<img src="' + esc(c.imagem) + '" alt="" width="330" height="495">' : '') +
-        (c.pos_titulo ? '<h2>' + esc(c.pos_titulo) + '</h2>' : '') +
-        (c.subtitulo ? '<p class="sub">' + esc(c.subtitulo) + '</p>' : '') +
-        (c.selo ? '<span class="selo">' + esc(c.selo) + '</span>' : ''), 'heroi ameixa');
+        '<div class="h-a">' +
+          (c.sobretitulo ? '<p class="sobretitulo">' + esc(c.sobretitulo) + '</p>' : '') +
+          (c.chamada ? '<p class="chamada">' + esc(c.chamada) + '</p>' : '') +
+          '<h1>' + esc(c.titulo) + '</h1></div>' +
+        (c.imagem ? '<div class="h-img"><img src="' + esc(c.imagem) +
+                    '" alt="" width="330" height="495"></div>' : '') +
+        '<div class="h-b">' +
+          (c.pos_titulo ? '<h2>' + esc(c.pos_titulo) + '</h2>' : '') +
+          (c.subtitulo ? '<p class="sub">' + esc(c.subtitulo) + '</p>' : '') +
+          (c.selo ? '<span class="selo">' + esc(c.selo) + '</span>' : '') +
+        '</div>', 'heroi ameixa');
     },
     cta1: function(c){ return secao(botao(c)); },
     cta2: function(c){ return secao(botao(c)); },
@@ -185,11 +223,12 @@ details p{margin-top:11px; font-size:15.5px}
     mockups: function(c){
       var ims = c.imagens || [];
       if (!ims.length) return '';
-      return secao('<h2>' + esc(c.titulo || '') + '</h2>' +
-        (c.texto ? '<p>' + esc(c.texto) + '</p>' : '') +
-        ims.map(function(u){
-          return '<img src="' + esc(u) + '" alt="" style="width:100%;border-radius:12px;margin-bottom:14px">';
-        }).join(''));
+      return secao(
+        '<div class="m-img">' + ims.map(function(u){
+          return '<img src="' + esc(u) + '" alt="">';
+        }).join('') + '</div>' +
+        '<div class="m-txt"><h2>' + esc(c.titulo || '') + '</h2>' +
+        (c.texto ? '<p>' + esc(c.texto) + '</p>' : '') + '</div>', 'duas');
     },
 
     autor: function(c){
@@ -257,10 +296,10 @@ details p{margin-top:11px; font-size:15.5px}
     faq: function(c){
       var it = c.itens || [];
       if (!it.length) return '';
-      return secao('<h2>' + esc(c.titulo || '') + '</h2>' +
+      return secao('<h2>' + esc(c.titulo || '') + '</h2><div class="faq-grid">' +
         it.map(function(q){
           return '<details><summary>' + esc(q.p) + '</summary><p>' + esc(q.r) + '</p></details>';
-        }).join(''));
+        }).join('') + '</div>');
     },
 
     rodape: function(c){
