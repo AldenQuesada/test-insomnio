@@ -476,9 +476,12 @@ details p{margin-top:11px; font-size:15.5px}
     // Na conferência os botões aparecem mesmo sem checkout: é essa copy que
     // mais precisa ser lida antes de existir para onde mandar.
     if (PREVIA && !CHECKOUT) CHECKOUT = '#';
-    if (PREVIA) {
+    // O texto da tarja mora no banco: escrito aqui ele envelhece sozinho, e
+    // foi o que aconteceu com a bio, que continuou listada como pendente
+    // depois de pronta. Vazio no banco = tarja não aparece.
+    if (PREVIA && T.aviso_previa) {
       var av = document.getElementById('previa');
-      av.textContent = 'VISTA PREVIA · faltan bonos, testimonios, bio y checkout';
+      av.textContent = T.aviso_previa;
       av.classList.remove('oculto');
     }
     var html = '';
