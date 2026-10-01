@@ -312,7 +312,9 @@ details p{margin-top:11px; font-size:15.5px}
   .heroi .h-b{grid-area:b; align-self:start; margin-top:26px}
   .heroi .h-img-cel{display:none}
   .heroi .h-img-desk{grid-area:img; display:block}
-  .heroi img{max-width:573px; width:100%; margin:0}
+  /* Só o mockup, não qualquer imagem do herói: sem o `.h-img` esta regra
+     engolia a foto de 74px da citação e a esticava para 573. */
+  .heroi .h-img img{max-width:573px; width:100%; margin:0}
   .duas .dentro{display:grid; grid-template-columns:1fr 1fr; gap:56px;
     align-items:center; text-align:left}
   .duas img{width:100%; margin:0}
