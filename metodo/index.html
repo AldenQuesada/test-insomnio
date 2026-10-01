@@ -28,8 +28,19 @@ body{
 }
 .faixa{padding:86px 40px; text-align:center}
 .dentro{width:100%; max-width:1280px; margin:0 auto}
+/* Ritmo das dobras. Antes cada bloco pedia a própria cor e dava oito faixas
+   seguidas no mesmo tom: a página inteira virava um bloco só. Agora a
+   alternância é do lugar, não do bloco, então ela sobrevive a mudar a ordem no
+   banco. Os dois tons são os da folha dela, usados nos extremos para render o
+   máximo de contraste que a paleta permite. */
+#pagina > section.faixa:nth-of-type(odd){background:var(--noite-3)}
+#pagina > section.faixa:nth-of-type(even){background:var(--noite-2)}
+#pagina > section.faixa + section.faixa{border-top:1px solid rgba(244,240,232,.07)}
+#pagina > section.heroi{background:var(--noite); border-top:0}
 .escura{background:var(--noite-3)}
 .ameixa{background:var(--noite)}
+.o2-img{width:100%; max-width:330px; margin:26px auto 4px}
+@media (min-width:900px){ .o2-img{max-width:400px} }
 .roxo{background:var(--noite-2); position:relative; padding-top:68px}
 .roxo::before{
   content:""; position:absolute; top:0; left:50%; transform:translateX(-50%);
@@ -479,8 +490,9 @@ details p{margin-top:11px; font-size:15.5px}
       if (!c.titulo && !c.texto) return '';
       return secao(
         (c.titulo ? '<h2>' + esc(c.titulo) + '</h2>' : '') +
+        (c.imagem ? '<img class="o2-img" src="' + esc(c.imagem) + '" alt="" loading="lazy">' : '') +
         (c.texto ? '<p>' + esc(c.texto) + '</p>' : '') +
-        botao(c.botao), 'escura');
+        botao(c.botao));
     },
 
     // O atalho para quem rolou a página inteira sem ler. Na modelo é o bloco
