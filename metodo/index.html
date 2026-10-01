@@ -169,6 +169,23 @@ details p{margin-top:11px; font-size:15.5px}
 .rodape p{font-family:Montserrat,sans-serif; font-size:13px; color:#7f879b;
   max-width:520px; margin:0 auto 9px}
 .rodape .marca{font-size:14px; color:var(--apoio); font-weight:600; margin-bottom:11px}
+.rodape .r-seguro{display:flex; align-items:center; justify-content:center; gap:7px;
+  color:var(--apoio)}
+.r-cad{width:15px; height:15px; flex:0 0 15px}
+.r-cols{display:flex; flex-wrap:wrap; justify-content:center; gap:30px 64px;
+  margin:30px auto 26px; max-width:620px}
+.r-tit{font-family:Montserrat,sans-serif; font-size:11px; font-weight:700;
+  letter-spacing:.16em; color:var(--saude); margin-bottom:12px !important}
+.r-col{display:flex; flex-direction:column; align-items:center; gap:8px}
+.r-pago{font-family:Montserrat,sans-serif; font-size:12.5px; color:#9aa2b6;
+  border:1px solid #39415a; border-radius:5px; padding:5px 13px}
+.r-link{font-family:Montserrat,sans-serif; font-size:13px; color:#9aa2b6;
+  text-decoration:none; border-bottom:1px solid #39415a}
+.r-link:hover{color:var(--clareza); border-bottom-color:var(--saude)}
+/* O aviso do Facebook é texto legal: tem que estar legível e tem que ficar
+   claro que não é argumento de venda. */
+.rodape .r-legal{max-width:760px; font-size:11.5px; line-height:1.65;
+  color:#6b7389; text-align:left; margin-top:26px}
 
 @media (min-width:900px){
   .heroi .dentro{
@@ -237,6 +254,8 @@ details p{margin-top:11px; font-size:15.5px}
       .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
   var TIQUE = '<span class="marca"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2"><polyline points="20 6 9 17 4 12"/></svg></span>';
+
+  var CADEADO = '<svg class="r-cad" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
 
   function secao(conteudo, classe){
     return conteudo
@@ -397,9 +416,30 @@ details p{margin-top:11px; font-size:15.5px}
     },
 
     rodape: function(c){
+      // Colunas: só entra a que tem conteúdo. Item de link SEM url não vira
+      // link, porque link morto no rodapé derruba justamente a seriedade que
+      // o rodapé existe para passar.
+      function coluna(b, montar){
+        var itens = (b && b.itens || []).map(montar).filter(Boolean);
+        if (!itens.length) return '';
+        return '<div class="r-col"><p class="r-tit">' + esc(b.titulo || '') + '</p>' +
+               itens.join('') + '</div>';
+      }
+      var pagos = coluna(c.pagamentos, function(t){
+        return '<span class="r-pago">' + esc(t) + '</span>';
+      });
+      var links = coluna(c.links, function(l){
+        return l && l.url
+          ? '<a class="r-link" href="' + esc(l.url) + '">' + esc(l.texto || '') + '</a>'
+          : '';
+      });
       return '<section class="rodape"><div class="dentro">' +
         (c.marca ? '<p class="marca">' + esc(c.marca) + '</p>' : '') +
+        (c.direitos ? '<p>' + esc(c.direitos) + '</p>' : '') +
+        (c.seguro ? '<p class="r-seguro">' + CADEADO + esc(c.seguro) + '</p>' : '') +
         (c.cnpj ? '<p>' + esc(c.cnpj) + '</p>' : '') +
+        (pagos || links ? '<div class="r-cols">' + pagos + links + '</div>' : '') +
+        (c.legal ? '<p class="r-legal">' + esc(c.legal) + '</p>' : '') +
         (c.aviso ? '<p>' + esc(c.aviso) + '</p>' : '') + '</div></section>';
     }
   };
