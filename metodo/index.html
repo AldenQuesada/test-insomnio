@@ -152,6 +152,18 @@ ul.itens li .marca svg{width:12px; height:12px; color:var(--noite)}
   color:var(--saude); line-height:1; letter-spacing:.01em}
 .preco .por small{font-size:.35em}
 .preco .apoio{font-family:Montserrat,sans-serif; font-size:14px; margin-top:12px}
+/* A pilha: nome à esquerda, valor à direita, com um pontilhado ligando os dois.
+   É o pontilhado que faz a coluna da direita virar uma soma aos olhos. */
+.pilha{list-style:none; max-width:620px; margin:30px auto 10px; text-align:left}
+.pilha li{display:flex; align-items:baseline; gap:10px; padding:13px 0;
+  border-bottom:1px solid rgba(244,240,232,.13); font-family:Montserrat,sans-serif;
+  font-size:15.5px; line-height:1.45}
+.pilha .marca{flex:none}
+.p-nome{flex:1; border-bottom:1px dotted rgba(244,240,232,.25); padding-bottom:3px}
+.p-val{flex:none; font-weight:700; color:var(--saude); white-space:nowrap}
+.preco .de s{text-decoration-thickness:2px; opacity:.75}
+.preco .reducao{font-family:Montserrat,sans-serif; font-weight:700; font-size:16px;
+  color:var(--saude); margin-top:10px}
 
 /* ── depoimentos ──
    Carrossel nativo: a pista rola na horizontal e cada card encaixa no lugar.
@@ -600,12 +612,30 @@ details p{margin-top:11px; font-size:15.5px}
 
     contador: function(c){ return c.titulo && c.ate ? secao('<h2>' + esc(c.titulo) + '</h2>') : ''; },
 
-    resumo: function(c){
+    // O empilhamento de oferta. Cada peça com o seu valor, o total somado, a
+    // quebra, o preço e a redução por noite, nessa ordem e num bloco só, que é
+    // como a página modelo faz e como a técnica pede: a pilha é a ÚLTIMA coisa
+    // antes do preço, senão o preço vira o número que a pessoa compara.
+    resumo: function(c, T){
       var it = c.itens || [];
       if (!it.length) return '';
-      return secao('<h2>' + esc(c.titulo || '') + '</h2><ul class="itens">' +
-        it.map(function(t){ return '<li>' + TIQUE + esc(t) + '</li>'; }).join('') +
-        '</ul>', 'escura');
+      var p = (T && T.preco) || {};
+      var m = p.moeda ? esc(p.moeda) + ' ' : '';
+      return secao('<h2>' + esc(c.titulo || '') + '</h2>' +
+        (c.texto ? '<p>' + esc(c.texto) + '</p>' : '') +
+        '<ul class="pilha">' + it.map(function(t){
+          var nome = typeof t === 'string' ? t : (t.nome || '');
+          var val  = typeof t === 'string' ? '' : (t.valor || '');
+          return '<li>' + TIQUE + '<span class="p-nome">' + esc(nome) + '</span>' +
+                 (val ? '<span class="p-val">' + m + esc(val) + '</span>' : '') + '</li>';
+        }).join('') + '</ul>' +
+        '<div class="preco">' +
+          (p.de ? '<p class="de">' + esc(p.rotulo_de || '') + ' <s>' + m + esc(p.de) + '</s></p>' : '') +
+          (p.por ? '<p class="rot">' + esc(p.rotulo_por || '') + '</p>' +
+                   '<div class="por"><small>' + esc(p.moeda || '') + '</small> ' + esc(p.por) + '</div>' : '') +
+          (p.reducao ? '<p class="reducao">' + esc(p.reducao) + '</p>' : '') +
+          (p.apoio ? '<p class="apoio">' + esc(p.apoio) + '</p>' : '') +
+        '</div>' + botao(c.botao), 'escura');
     },
 
     faq: function(c){
