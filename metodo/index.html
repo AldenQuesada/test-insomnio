@@ -174,7 +174,9 @@ ul.itens li .marca svg{width:12px; height:12px; color:var(--noite)}
 .b-card p{color:#43484f}
 .b-aspas{font-family:Lora,Georgia,serif; font-style:italic; font-size:15.5px;
   line-height:1.6}
-.b-img{width:100%; max-width:300px; margin:22px auto}
+/* Mockup de três volumes tem o título em metade da largura da peça do meio.
+   Em 300px o nome do bônus não se lê, que foi o mesmo erro da segunda dobra. */
+.b-img{width:100%; max-width:380px; margin:22px auto}
 .b-desc{font-family:Lora,Georgia,serif; font-size:15.5px; line-height:1.68}
 .b-desc b{color:var(--noite)}
 .b-preco{font-family:Montserrat,sans-serif; font-size:14px; font-weight:700;
@@ -188,6 +190,7 @@ ul.itens li .marca svg{width:12px; height:12px; color:var(--noite)}
 @media (min-width:900px){
   .b-tit{font-size:19px}
   .b-corpo{padding:30px 40px 34px}
+  .b-img{max-width:440px}
 }
 
 /* ── garantia ──
