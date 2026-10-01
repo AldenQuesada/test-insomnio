@@ -193,6 +193,20 @@ details p{margin-top:11px; font-size:15.5px}
   .garantia{max-width:760px; margin:0 auto}
 }
 
+/* Autor. No celular a foto vira uma faixa de retrato acima do texto; a partir
+   de 900px o `.duas` já põe os dois lado a lado. */
+.autor-foto{max-width:300px; margin:0 auto 26px}
+.autor-foto img{width:100%; display:block; border-radius:10px;
+  border:1px solid rgba(216,184,121,.4)}
+.autor .rotulo{font-family:Montserrat,sans-serif; font-weight:700; font-size:12px;
+  letter-spacing:.16em; text-transform:uppercase; color:var(--saude);
+  margin-bottom:10px}
+@media (min-width:900px){
+  .autor .dentro{grid-template-columns:minmax(0,420px) minmax(0,1fr); align-items:start}
+  .autor-foto{max-width:none; margin:0}
+  .autor-texto h2{margin-top:0}
+}
+
 .aviso-previa{background:var(--saude); color:var(--noite); text-align:center;
   font-family:Montserrat,sans-serif; font-weight:700; font-size:12.5px;
   letter-spacing:.05em; padding:9px 16px}
@@ -303,12 +317,17 @@ details p{margin-top:11px; font-size:15.5px}
         'escura');
     },
 
+    // Foto de retrato, não medalhão. Quem vende método sem remédio vende
+    // confiança, e confiança não cabe num círculo de 148px.
     autor: function(c){
       if (!c.bio) return '';
       return secao(
-        (c.foto ? '<img src="' + esc(c.foto) + '" alt="" style="width:148px;height:148px;border-radius:50%;object-fit:cover;margin-bottom:20px">' : '') +
+        (c.foto ? '<div class="autor-foto"><img src="' + esc(c.foto) + '" alt="' + esc(c.nome || '') + '" loading="lazy"></div>' : '') +
+        '<div class="autor-texto">' +
+        (c.rotulo ? '<p class="rotulo">' + esc(c.rotulo) + '</p>' : '') +
         '<h2>' + esc(c.nome || '') + '</h2>' +
-        c.bio.split('\n').map(function(p){ return '<p>' + esc(p) + '</p>'; }).join(''), 'escura');
+        c.bio.split('\n').map(function(p){ return '<p>' + esc(p) + '</p>'; }).join('') +
+        '</div>', 'escura duas autor');
     },
 
     revelacao: function(c){
@@ -396,10 +415,14 @@ details p{margin-top:11px; font-size:15.5px}
     if (!el || !window.St || !window.St.PageFlip) return;
     var paginas = el.querySelectorAll('.pagina');
     if (!paginas.length) return;
+    // A proporção da folha é propriedade do livro, não do código: trocou o
+    // miolo, trocou a medida, e isso vem do banco junto com as imagens.
+    var larg = parseInt(cfg.largura, 10) || 350;
+    var alt  = parseInt(cfg.altura, 10) || 509;
     var largo = window.innerWidth >= 900;
     var f = new window.St.PageFlip(el, {
-      width: 350, height: 509, size: 'stretch',
-      minWidth: 200, maxWidth: 520, minHeight: 290, maxHeight: 760,
+      width: larg, height: alt, size: 'stretch',
+      minWidth: 200, maxWidth: 520, minHeight: 290, maxHeight: Math.round(520 * alt / larg),
       usePortrait: !largo, showCover: true, maxShadowOpacity: .5,
       mobileScrollSupport: true, drawShadow: true
     });
