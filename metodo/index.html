@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="es">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Venciendo el Insomnio en 7 días · Dr. Alden J. Quesada</title>
+<meta name="description" content="El método completo del Dr. Alden J. Quesada para volver a dormir la noche entera, sin depender de medicamentos controlados.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Mesma paleta e mesma dupla tipográfica do quiz: quem chega aqui acabou de
+   sair de lá, e trocar de identidade no meio do funil custa confiança. */
+:root{
+  --noite:#11151d; --noite-2:#1a2130; --noite-3:#252e40;
+  --luz:#f4f1ea; --luz-2:#cdd3de; --luz-3:#8d97a8;
+  --linha:#2d3648; --lua:#e2a04a; --calmo:#57c193;
+}
+*{margin:0; padding:0; box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,sans-serif;
+  background:var(--noite); color:var(--luz); line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+.faixa{padding:56px 20px; border-bottom:1px solid var(--linha)}
+.faixa:last-of-type{border-bottom:0}
+.dentro{width:100%; max-width:680px; margin:0 auto}
+.escura{background:var(--noite-2)}
+
+h1,h2,h3{font-family:Fraunces,Georgia,serif; letter-spacing:-.02em; line-height:1.14}
+h1{font-size:clamp(27px,6.4vw,44px); font-weight:700; text-wrap:balance}
+h2{font-size:clamp(23px,5.2vw,33px); font-weight:700; margin-bottom:18px; text-wrap:balance}
+h3{font-size:19px; font-weight:600; color:var(--lua); margin-bottom:7px}
+p{font-size:17px; color:var(--luz-2); margin-bottom:16px}
+p:last-child{margin-bottom:0}
+
+/* ── herói ── */
+.heroi{text-align:center; padding-top:40px}
+.heroi img{width:100%; max-width:380px; display:block; margin:0 auto 10px}
+.heroi .selo{
+  display:inline-block; margin-top:20px; padding:7px 15px; border-radius:30px;
+  border:1px solid var(--linha); background:var(--noite-2);
+  font-size:13.5px; color:var(--luz-2); letter-spacing:.02em;
+}
+.heroi p.sub{font-size:19px; color:var(--luz); margin-top:16px}
+
+/* ── botão ── */
+a.cta{
+  display:block; text-align:center; text-decoration:none; width:100%;
+  background:var(--lua); color:var(--noite); font-weight:700; font-size:17.5px;
+  letter-spacing:.02em; border-radius:12px; padding:20px 16px; margin-top:26px;
+  box-shadow:0 10px 30px -12px rgba(226,160,74,.6);
+}
+a.cta:active{transform:translateY(1px)}
+.cta-apoio{text-align:center; font-size:14px; color:var(--luz-3); margin-top:11px}
+
+/* ── listas ── */
+ul.itens{list-style:none}
+ul.itens li{
+  position:relative; padding:0 0 17px 34px; font-size:16.5px; color:var(--luz-2);
+  border-bottom:1px solid var(--linha); margin-bottom:17px;
+}
+ul.itens li:last-child{border-bottom:0; margin-bottom:0; padding-bottom:0}
+ul.itens li::before{
+  content:""; position:absolute; left:0; top:4px; width:20px; height:20px;
+  border-radius:50%; background:var(--lua);
+  -webkit-mask:var(--tique) center/11px no-repeat; mask:var(--tique) center/11px no-repeat;
+  background-image:none;
+}
+ul.itens li .marca{
+  position:absolute; left:0; top:3px; width:21px; height:21px; border-radius:50%;
+  background:var(--lua); display:grid; place-items:center;
+}
+ul.itens li .marca svg{width:12px; height:12px; color:var(--noite)}
+
+/* ── preço ── */
+.preco{text-align:center}
+.preco .de{font-size:16px; color:var(--luz-3); text-decoration:line-through}
+.preco .rot{font-size:13px; color:var(--luz-3); letter-spacing:.09em;
+  text-transform:uppercase; margin-top:14px}
+.preco .por{font-family:Fraunces,serif; font-weight:700; font-size:clamp(46px,12vw,66px);
+  color:var(--lua); line-height:1; letter-spacing:-.03em}
+.preco .por small{font-size:24px; color:var(--luz-3)}
+.preco .apoio{font-size:14.5px; color:var(--luz-3); margin-top:14px}
+
+/* ── garantia ── */
+.garantia{border:1px solid var(--lua); border-radius:16px; padding:30px 24px; text-align:center}
+.garantia .carimbo{
+  width:84px; height:84px; margin:0 auto 18px; border-radius:50%;
+  border:2px solid var(--lua); display:grid; place-items:center;
+  font-family:Fraunces,serif; font-weight:700; font-size:21px; color:var(--lua);
+  line-height:1.05;
+}
+
+/* ── faq ── */
+details{border-bottom:1px solid var(--linha); padding:18px 0}
+details:last-of-type{border-bottom:0}
+summary{
+  font-size:17px; font-weight:600; color:var(--luz); cursor:pointer;
+  list-style:none; display:flex; justify-content:space-between; gap:14px;
+}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+"; color:var(--lua); font-size:22px; line-height:1}
+details[open] summary::after{content:"−"}
+details p{margin-top:12px; font-size:16px}
+
+/* ── rodapé ── */
+.rodape{padding:40px 20px 56px; text-align:center}
+.rodape p{font-size:13.5px; color:var(--luz-3); max-width:540px; margin:0 auto 10px}
+.rodape .marca{font-size:14px; color:var(--luz-2); font-weight:600; margin-bottom:12px}
+
+.aviso-previa{
+  background:var(--lua); color:var(--noite); text-align:center; font-weight:700;
+  font-size:13px; letter-spacing:.05em; padding:9px 16px;
+}
+.oculto{display:none}
+</style>
+
+<div id="previa" class="aviso-previa oculto"></div>
+<main id="pagina"></main>
+
+<script src="../config.js"></script>
+<script>
+(function(){
+  var CFG = window.QUIZ_CONFIG || {};
+  var url = new URLSearchParams(location.search);
+  // Dados que o resultado do quiz passa adiante: a página abre falando do caso
+  // dela, não de uma dor genérica.
+  var pessoa = { nome: url.get('n') || '', faixa: url.get('f') || '', pior: url.get('p') || '' };
+  var PREVIA = url.get('ver') !== null;
+  var T = {}, CHECKOUT = '';
+
+  function esc(x){
+    return String(x == null ? '' : x)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  var TIQUE = '<span class="marca"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2"><polyline points="20 6 9 17 4 12"/></svg></span>';
+
+  function secao(conteudo, classe){
+    return conteudo
+      ? '<section class="faixa ' + (classe || '') + '"><div class="dentro">' +
+        conteudo + '</div></section>'
+      : '';
+  }
+
+  function botao(b){
+    // Sem link de checkout o botão não existe. Botão que não leva a lugar
+    // nenhum custa mais caro que botão nenhum.
+    if (!b || !b.texto || !CHECKOUT) return '';
+    return '<a class="cta" href="' + esc(CHECKOUT) + '" rel="noopener">' +
+      esc(b.texto) + '</a>' +
+      (b.apoio ? '<p class="cta-apoio">' + esc(b.apoio) + '</p>' : '');
+  }
+
+  var BLOCOS = {
+    heroi: function(c){
+      if (!c.titulo) return '';
+      return secao(
+        (c.imagem ? '<img src="' + esc(c.imagem) + '" alt="" width="380" height="570">' : '') +
+        '<h1>' + esc(c.titulo) + '</h1>' +
+        (c.subtitulo ? '<p class="sub">' + esc(c.subtitulo) + '</p>' : '') +
+        (c.selo ? '<span class="selo">' + esc(c.selo) + '</span>' : ''), 'heroi');
+    },
+    cta1: function(c){ return secao(botao(c)); },
+    cta2: function(c){ return secao(botao(c)); },
+    cta3: function(c){ return secao(botao(c)); },
+
+    prova: function(c){
+      if (!c.texto && !c.imagem) return '';
+      return secao((c.titulo ? '<h2>' + esc(c.titulo) + '</h2>' : '') +
+        (c.imagem ? '<img src="' + esc(c.imagem) + '" alt="" style="width:100%;border-radius:12px;margin-bottom:18px">' : '') +
+        (c.texto ? '<p>' + esc(c.texto) + '</p>' : ''), 'escura');
+    },
+
+    mockups: function(c){
+      var ims = c.imagens || [];
+      if (!ims.length) return '';
+      return secao('<h2>' + esc(c.titulo || '') + '</h2>' +
+        (c.texto ? '<p>' + esc(c.texto) + '</p>' : '') +
+        ims.map(function(u){
+          return '<img src="' + esc(u) + '" alt="" style="width:100%;border-radius:12px;margin-bottom:14px">';
+        }).join(''));
+    },
+
+    autor: function(c){
+      if (!c.bio) return '';
+      return secao(
+        (c.foto ? '<img src="' + esc(c.foto) + '" alt="" style="width:148px;height:148px;border-radius:50%;object-fit:cover;margin-bottom:20px">' : '') +
+        '<h2>' + esc(c.nome || '') + '</h2>' +
+        c.bio.split('\n').map(function(p){ return '<p>' + esc(p) + '</p>'; }).join(''), 'escura');
+    },
+
+    revelacao: function(c){
+      if (!c.texto) return '';
+      return secao('<h2>' + esc(c.titulo || '') + '</h2>' +
+        c.texto.split('\n').map(function(p){ return '<p>' + esc(p) + '</p>'; }).join(''));
+    },
+
+    beneficios: function(c){
+      var it = c.itens || [];
+      if (!it.length) return '';
+      return secao('<h2>' + esc(c.titulo || '') + '</h2><ul class="itens">' +
+        it.map(function(t){ return '<li>' + TIQUE + esc(t) + '</li>'; }).join('') +
+        '</ul>', 'escura');
+    },
+
+    bonus: function(c){
+      var it = c.itens || [];
+      if (!it.length) return '';
+      return secao('<h2>' + esc(c.titulo || '') + '</h2>' +
+        it.map(function(b){
+          return '<div style="border:1px solid var(--linha);border-radius:14px;padding:22px;margin-bottom:14px">' +
+            '<h3>' + esc(b.nome || '') + '</h3><p>' + esc(b.texto || '') + '</p>' +
+            (b.valor ? '<p style="color:var(--lua);font-weight:600;margin-top:10px">' +
+                       esc(b.valor) + '</p>' : '') + '</div>';
+        }).join(''));
+    },
+
+    preco: function(c){
+      if (!c.por) return '';
+      return secao('<div class="preco">' +
+        (c.de ? '<p class="de">' + esc(c.rotulo_de || '') + ' ' + esc(c.de) + '</p>' : '') +
+        '<p class="rot">' + esc(c.rotulo_por || '') + '</p>' +
+        '<div class="por"><small>' + esc(c.moeda || '') + '</small> ' + esc(c.por) + '</div>' +
+        (c.apoio ? '<p class="apoio">' + esc(c.apoio) + '</p>' : '') +
+        '</div>', 'escura');
+    },
+
+    garantia: function(c){
+      if (!c.texto) return '';
+      return secao('<div class="garantia">' +
+        (c.selo ? '<div class="carimbo">' + esc(c.selo).replace(' ', '<br>') + '</div>' : '') +
+        '<h2>' + esc(c.titulo || '') + '</h2><p>' + esc(c.texto) + '</p></div>');
+    },
+
+    contador: function(c){ return c.titulo && c.ate ? secao('<h2>' + esc(c.titulo) + '</h2>') : ''; },
+
+    resumo: function(c){
+      var it = c.itens || [];
+      if (!it.length) return '';
+      return secao('<h2>' + esc(c.titulo || '') + '</h2><ul class="itens">' +
+        it.map(function(t){ return '<li>' + TIQUE + esc(t) + '</li>'; }).join('') +
+        '</ul>', 'escura');
+    },
+
+    faq: function(c){
+      var it = c.itens || [];
+      if (!it.length) return '';
+      return secao('<h2>' + esc(c.titulo || '') + '</h2>' +
+        it.map(function(q){
+          return '<details><summary>' + esc(q.p) + '</summary><p>' + esc(q.r) + '</p></details>';
+        }).join(''));
+    },
+
+    rodape: function(c){
+      return '<section class="rodape"><div class="dentro">' +
+        (c.marca ? '<p class="marca">' + esc(c.marca) + '</p>' : '') +
+        (c.cnpj ? '<p>' + esc(c.cnpj) + '</p>' : '') +
+        (c.aviso ? '<p>' + esc(c.aviso) + '</p>' : '') + '</div></section>';
+    }
+  };
+
+  // Abertura falando do caso dela, quando o quiz mandou os dados.
+  function saudacao(){
+    if (!pessoa.nome && !pessoa.faixa) return '';
+    var t = pessoa.nome ? pessoa.nome + ', ' : '';
+    if (pessoa.pior) t += 'lo que más te pesa es ' + pessoa.pior + '. ';
+    t += 'Esto fue escrito exactamente para eso.';
+    return secao('<p style="font-size:18px;color:var(--luz)">' + esc(t) + '</p>');
+  }
+
+  fetch(CFG.url + '/rest/v1/quiz_templates?select=schema&slug=eq.' + CFG.slug + '&active=eq.true', {
+    headers: { apikey: CFG.anon, Authorization: 'Bearer ' + CFG.anon }
+  }).then(function(r){ return r.json(); }).then(function(linhas){
+    if (!linhas || !linhas.length) throw new Error('página no encontrada');
+    T = linhas[0].schema.tsl_es || {};
+    CHECKOUT = T.checkout || '';
+    // Na conferência os botões aparecem mesmo sem checkout: é essa copy que
+    // mais precisa ser lida antes de existir para onde mandar.
+    if (PREVIA && !CHECKOUT) CHECKOUT = '#';
+    if (PREVIA) {
+      var av = document.getElementById('previa');
+      av.textContent = 'VISTA PREVIA · faltan bonos, testimonios, bio y checkout';
+      av.classList.remove('oculto');
+    }
+    var html = '';
+    (T.ordem || []).forEach(function(nome, i){
+      if (i === 1) html += saudacao();
+      if (BLOCOS[nome]) html += BLOCOS[nome](T[nome] || {});
+    });
+    document.getElementById('pagina').innerHTML = html;
+  }).catch(function(e){
+    document.getElementById('pagina').innerHTML =
+      '<section class="faixa"><div class="dentro"><h2>No pude cargar la página</h2>' +
+      '<p>Recarga en unos instantes.</p></div></section>';
+  });
+})();
+</script>
