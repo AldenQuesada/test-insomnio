@@ -453,7 +453,10 @@ details p{margin-top:11px; font-size:15.5px}
       // O número de bônus é contado, não escrito: ela ainda vai acrescentar
       // mais um, e título que promete uma quantidade diferente da que está na
       // tela é erro que ninguém revisa depois.
-      var tit = String(c.titulo || '').replace('%d', it.length);
+      // `{s}` some quando é um só: contar certo e escrever "1 bonos" seria
+      // trocar um erro por outro.
+      var tit = String(c.titulo || '').replace('%d', it.length)
+        .replace(/\{s\}/g, it.length === 1 ? '' : 's');
       return secao(
         '<h2>' + esc(tit).replace(/\*([^*]+)\*/g, '<span class="b-sub">$1</span>') + '</h2>' +
         '<div class="b-lista">' + it.map(function(b, i){
