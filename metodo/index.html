@@ -5,113 +5,120 @@
 <title>Venciendo el Insomnio en 7 días · Dr. Alden J. Quesada</title>
 <meta name="description" content="El método completo del Dr. Alden J. Quesada para volver a dormir la noche entera, sin depender de medicamentos controlados.">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap">
 <style>
-/* Mesma paleta e mesma dupla tipográfica do quiz: quem chega aqui acabou de
-   sair de lá, e trocar de identidade no meio do funil custa confiança. */
+/* Diagramação modelada na página de referência: fundo ameixa, roxo vivo nas
+   seções de oferta, ouro nos títulos e nos botões, Sora em peso pesado e
+   tudo centralizado. As cores saíram medidas da própria página. */
 :root{
-  --noite:#11151d; --noite-2:#1a2130; --noite-3:#252e40;
-  --luz:#f4f1ea; --luz-2:#cdd3de; --luz-3:#8d97a8;
-  --linha:#2d3648; --lua:#e2a04a; --calmo:#57c193;
+  --fundo:#120914; --fundo-2:#221225; --preto:#0c0c0c;
+  --roxo:#7a2ff5; --ouro:#ffd04b; --branco:#fff; --cinza:#cfc6d4;
 }
 *{margin:0; padding:0; box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{
-  font-family:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,sans-serif;
-  background:var(--noite); color:var(--luz); line-height:1.6;
+  font-family:Sora,-apple-system,BlinkMacSystemFont,sans-serif;
+  background:var(--fundo); color:var(--branco); line-height:1.55;
   -webkit-font-smoothing:antialiased;
 }
-.faixa{padding:56px 20px; border-bottom:1px solid var(--linha)}
-.faixa:last-of-type{border-bottom:0}
-.dentro{width:100%; max-width:680px; margin:0 auto}
-.escura{background:var(--noite-2)}
+.faixa{padding:48px 22px; text-align:center}
+.dentro{width:100%; max-width:620px; margin:0 auto}
+.escura{background:var(--preto)}
+.ameixa{background:var(--fundo-2)}
+/* O roxo entra com a seta recortada no topo, como na página modelo: é ela que
+   marca a virada do conteúdo para a oferta. */
+.roxo{background:var(--roxo); position:relative; padding-top:68px}
+.roxo::before{
+  content:""; position:absolute; top:0; left:50%; transform:translateX(-50%);
+  border-left:72px solid transparent; border-right:72px solid transparent;
+  border-top:36px solid var(--fundo);
+}
 
-h1,h2,h3{font-family:Fraunces,Georgia,serif; letter-spacing:-.02em; line-height:1.14}
-h1{font-size:clamp(27px,6.4vw,44px); font-weight:700; text-wrap:balance}
-h2{font-size:clamp(23px,5.2vw,33px); font-weight:700; margin-bottom:18px; text-wrap:balance}
-h3{font-size:19px; font-weight:600; color:var(--lua); margin-bottom:7px}
-p{font-size:17px; color:var(--luz-2); margin-bottom:16px}
+h1,h2{font-weight:800; line-height:1.1; letter-spacing:-.01em; text-transform:uppercase}
+h1{font-size:clamp(28px,7.6vw,42px); color:var(--ouro); text-wrap:balance}
+h2{font-size:clamp(22px,5.8vw,31px); margin-bottom:18px; text-wrap:balance}
+h3{font-size:18px; font-weight:700; color:var(--ouro); margin-bottom:8px;
+  text-transform:none}
+p{font-size:16.5px; color:var(--cinza); margin-bottom:15px}
 p:last-child{margin-bottom:0}
+.roxo p, .roxo h2{color:var(--branco)}
+.sobretitulo{color:var(--ouro); font-size:16px; font-weight:600; margin-bottom:12px}
+.chamada{font-size:17px; font-weight:600; color:var(--branco);
+  text-transform:uppercase; line-height:1.35; margin-bottom:18px}
 
 /* ── herói ── */
-.heroi{text-align:center; padding-top:40px}
-.heroi img{width:100%; max-width:380px; display:block; margin:0 auto 10px}
+.heroi img{width:100%; max-width:330px; display:block; margin:22px auto 6px}
 .heroi .selo{
-  display:inline-block; margin-top:20px; padding:7px 15px; border-radius:30px;
-  border:1px solid var(--linha); background:var(--noite-2);
-  font-size:13.5px; color:var(--luz-2); letter-spacing:.02em;
+  display:inline-block; margin-top:18px; padding:8px 16px; border-radius:6px;
+  background:rgba(255,208,75,.12); border:1px solid rgba(255,208,75,.35);
+  font-size:13.5px; font-weight:600; color:var(--ouro);
 }
-.heroi p.sub{font-size:19px; color:var(--luz); margin-top:16px}
+.heroi p.sub{font-size:17px; color:var(--branco); margin-top:14px; font-weight:600}
 
 /* ── botão ── */
 a.cta{
-  display:block; text-align:center; text-decoration:none; width:100%;
-  background:var(--lua); color:var(--noite); font-weight:700; font-size:17.5px;
-  letter-spacing:.02em; border-radius:12px; padding:20px 16px; margin-top:26px;
-  box-shadow:0 10px 30px -12px rgba(226,160,74,.6);
+  display:block; text-decoration:none; width:100%;
+  background:linear-gradient(180deg,#ffd964,#f0b320);
+  color:#221225; font-weight:800; font-size:17px; text-transform:uppercase;
+  line-height:1.25; border-radius:5px; padding:19px 14px; margin-top:22px;
+  box-shadow:0 8px 26px -10px rgba(255,208,75,.75);
 }
 a.cta:active{transform:translateY(1px)}
-.cta-apoio{text-align:center; font-size:14px; color:var(--luz-3); margin-top:11px}
+.cta-apoio{font-size:13.5px; color:var(--cinza); margin-top:10px}
 
 /* ── listas ── */
-ul.itens{list-style:none}
+ul.itens{list-style:none; text-align:left}
 ul.itens li{
-  position:relative; padding:0 0 17px 34px; font-size:16.5px; color:var(--luz-2);
-  border-bottom:1px solid var(--linha); margin-bottom:17px;
+  position:relative; padding:0 0 15px 33px; font-size:16px; color:var(--cinza);
+  margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,.1);
 }
 ul.itens li:last-child{border-bottom:0; margin-bottom:0; padding-bottom:0}
-ul.itens li::before{
-  content:""; position:absolute; left:0; top:4px; width:20px; height:20px;
-  border-radius:50%; background:var(--lua);
-  -webkit-mask:var(--tique) center/11px no-repeat; mask:var(--tique) center/11px no-repeat;
-  background-image:none;
-}
 ul.itens li .marca{
-  position:absolute; left:0; top:3px; width:21px; height:21px; border-radius:50%;
-  background:var(--lua); display:grid; place-items:center;
+  position:absolute; left:0; top:2px; width:21px; height:21px; border-radius:50%;
+  background:var(--ouro); display:grid; place-items:center;
 }
-ul.itens li .marca svg{width:12px; height:12px; color:var(--noite)}
+ul.itens li .marca svg{width:12px; height:12px; color:#221225}
+.roxo ul.itens li{color:var(--branco)}
+
+/* ── blocos longos de texto ── */
+.texto-longo{text-align:left}
+.texto-longo h2{text-align:left}
 
 /* ── preço ── */
-.preco{text-align:center}
-.preco .de{font-size:16px; color:var(--luz-3); text-decoration:line-through}
-.preco .rot{font-size:13px; color:var(--luz-3); letter-spacing:.09em;
-  text-transform:uppercase; margin-top:14px}
-.preco .por{font-family:Fraunces,serif; font-weight:700; font-size:clamp(46px,12vw,66px);
-  color:var(--lua); line-height:1; letter-spacing:-.03em}
-.preco .por small{font-size:24px; color:var(--luz-3)}
-.preco .apoio{font-size:14.5px; color:var(--luz-3); margin-top:14px}
+.preco .de{font-size:16px; color:var(--cinza); text-decoration:line-through}
+.preco .rot{font-size:13px; letter-spacing:.12em; text-transform:uppercase;
+  margin-top:12px; color:var(--branco); font-weight:600}
+.preco .por{font-weight:800; font-size:clamp(44px,12vw,62px); color:var(--ouro);
+  line-height:1; letter-spacing:-.02em}
+.preco .por small{font-size:23px}
+.preco .apoio{font-size:14px; margin-top:12px}
 
 /* ── garantia ── */
-.garantia{border:1px solid var(--lua); border-radius:16px; padding:30px 24px; text-align:center}
+.garantia{background:var(--fundo-2); border:2px solid var(--ouro);
+  border-radius:10px; padding:32px 24px}
 .garantia .carimbo{
-  width:84px; height:84px; margin:0 auto 18px; border-radius:50%;
-  border:2px solid var(--lua); display:grid; place-items:center;
-  font-family:Fraunces,serif; font-weight:700; font-size:21px; color:var(--lua);
-  line-height:1.05;
+  width:92px; height:92px; margin:0 auto 18px; border-radius:50%;
+  border:3px solid var(--ouro); display:grid; place-items:center;
+  font-weight:800; font-size:21px; color:var(--ouro); line-height:1.05;
+  text-transform:uppercase;
 }
 
 /* ── faq ── */
-details{border-bottom:1px solid var(--linha); padding:18px 0}
+details{border-bottom:1px solid rgba(255,255,255,.14); padding:17px 0; text-align:left}
 details:last-of-type{border-bottom:0}
-summary{
-  font-size:17px; font-weight:600; color:var(--luz); cursor:pointer;
-  list-style:none; display:flex; justify-content:space-between; gap:14px;
-}
+summary{font-size:16.5px; font-weight:700; color:var(--branco); cursor:pointer;
+  list-style:none; display:flex; justify-content:space-between; gap:14px}
 summary::-webkit-details-marker{display:none}
-summary::after{content:"+"; color:var(--lua); font-size:22px; line-height:1}
-details[open] summary::after{content:"−"}
-details p{margin-top:12px; font-size:16px}
+summary::after{content:"+"; color:var(--ouro); font-size:22px; line-height:1}
+details[open] summary::after{content:"\2212"}
+details p{margin-top:11px; font-size:15.5px}
 
-/* ── rodapé ── */
-.rodape{padding:40px 20px 56px; text-align:center}
-.rodape p{font-size:13.5px; color:var(--luz-3); max-width:540px; margin:0 auto 10px}
-.rodape .marca{font-size:14px; color:var(--luz-2); font-weight:600; margin-bottom:12px}
+.rodape{padding:38px 22px 52px; text-align:center; background:var(--preto)}
+.rodape p{font-size:13px; color:#8a8192; max-width:520px; margin:0 auto 9px}
+.rodape .marca{font-size:14px; color:var(--cinza); font-weight:700; margin-bottom:11px}
 
-.aviso-previa{
-  background:var(--lua); color:var(--noite); text-align:center; font-weight:700;
-  font-size:13px; letter-spacing:.05em; padding:9px 16px;
-}
+.aviso-previa{background:var(--ouro); color:#221225; text-align:center;
+  font-weight:800; font-size:12.5px; letter-spacing:.05em; padding:9px 16px}
 .oculto{display:none}
 </style>
 
@@ -156,10 +163,13 @@ details p{margin-top:12px; font-size:16px}
     heroi: function(c){
       if (!c.titulo) return '';
       return secao(
-        (c.imagem ? '<img src="' + esc(c.imagem) + '" alt="" width="380" height="570">' : '') +
+        (c.sobretitulo ? '<p class="sobretitulo">' + esc(c.sobretitulo) + '</p>' : '') +
+        (c.chamada ? '<p class="chamada">' + esc(c.chamada) + '</p>' : '') +
         '<h1>' + esc(c.titulo) + '</h1>' +
+        (c.imagem ? '<img src="' + esc(c.imagem) + '" alt="" width="330" height="495">' : '') +
+        (c.pos_titulo ? '<h2>' + esc(c.pos_titulo) + '</h2>' : '') +
         (c.subtitulo ? '<p class="sub">' + esc(c.subtitulo) + '</p>' : '') +
-        (c.selo ? '<span class="selo">' + esc(c.selo) + '</span>' : ''), 'heroi');
+        (c.selo ? '<span class="selo">' + esc(c.selo) + '</span>' : ''), 'heroi ameixa');
     },
     cta1: function(c){ return secao(botao(c)); },
     cta2: function(c){ return secao(botao(c)); },
@@ -193,7 +203,8 @@ details p{margin-top:12px; font-size:16px}
     revelacao: function(c){
       if (!c.texto) return '';
       return secao('<h2>' + esc(c.titulo || '') + '</h2>' +
-        c.texto.split('\n').map(function(p){ return '<p>' + esc(p) + '</p>'; }).join(''));
+        c.texto.split('\n').map(function(p){ return '<p>' + esc(p) + '</p>'; }).join(''),
+        'escura texto-longo');
     },
 
     beneficios: function(c){
@@ -223,7 +234,7 @@ details p{margin-top:12px; font-size:16px}
         '<p class="rot">' + esc(c.rotulo_por || '') + '</p>' +
         '<div class="por"><small>' + esc(c.moeda || '') + '</small> ' + esc(c.por) + '</div>' +
         (c.apoio ? '<p class="apoio">' + esc(c.apoio) + '</p>' : '') +
-        '</div>', 'escura');
+        '</div>', 'roxo');
     },
 
     garantia: function(c){
