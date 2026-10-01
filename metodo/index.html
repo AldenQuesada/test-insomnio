@@ -61,7 +61,7 @@ p:last-child{margin-bottom:0}
 
 /* ── botão ── */
 a.cta{
-  display:block; text-decoration:none; width:100%;
+  display:block; text-decoration:none; width:100%; text-align:center;
   background:linear-gradient(180deg,#ffd964,#f0b320);
   color:#221225; font-weight:800; font-size:17px; text-transform:uppercase;
   line-height:1.25; border-radius:5px; padding:19px 14px; margin-top:22px;
@@ -147,6 +147,7 @@ details p{margin-top:11px; font-size:15.5px}
   ul.itens{display:grid; grid-template-columns:1fr 1fr; gap:0 44px}
   ul.itens li{border-bottom:0; padding-bottom:0; margin-bottom:26px}
   .faq-grid{display:grid; grid-template-columns:1fr 1fr; gap:0 44px}
+  .heroi a.cta{max-width:none; margin-left:0; margin-right:0}
   a.cta{max-width:560px; margin-left:auto; margin-right:auto}
   .garantia{max-width:760px; margin:0 auto}
 }
@@ -207,9 +208,10 @@ details p{margin-top:11px; font-size:15.5px}
           (c.pos_titulo ? '<h2>' + esc(c.pos_titulo) + '</h2>' : '') +
           (c.subtitulo ? '<p class="sub">' + esc(c.subtitulo) + '</p>' : '') +
           (c.selo ? '<span class="selo">' + esc(c.selo) + '</span>' : '') +
+          botao(T.cta1) +
         '</div>', 'heroi ameixa');
     },
-    cta1: function(c){ return secao(botao(c)); },
+    cta1: function(){ return ''; },
     cta2: function(c){ return secao(botao(c)); },
     cta3: function(c){ return secao(botao(c)); },
 
