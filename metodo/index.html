@@ -36,7 +36,9 @@ body{
 #pagina > section.faixa:nth-of-type(odd){background:var(--noite-3)}
 #pagina > section.faixa:nth-of-type(even){background:var(--noite-2)}
 #pagina > section.faixa + section.faixa{border-top:1px solid rgba(244,240,232,.07)}
-#pagina > section.heroi{background:var(--noite); border-top:0}
+/* `.faixa` junto para empatar com a regra da alternância acima: sem ele a
+   pseudo-classe ganhava e o herói perdia a própria cor. */
+#pagina > section.faixa.heroi{background:var(--noite); border-top:0}
 .escura{background:var(--noite-3)}
 .ameixa{background:var(--noite)}
 .o2-img{width:100%; max-width:330px; margin:26px auto 4px}
