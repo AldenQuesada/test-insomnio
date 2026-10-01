@@ -5,154 +5,172 @@
 <title>Venciendo el Insomnio en 7 días · Dr. Alden J. Quesada</title>
 <meta name="description" content="El método completo del Dr. Alden J. Quesada para volver a dormir la noche entera, sin depender de medicamentos controlados.">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&family=Sora:wght@300;400;600;700;800;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Lora:ital,wght@0,400;0,600;1,400;1,600&family=Montserrat:wght@300;400;500;600;700&display=swap">
 <style>
-/* Diagramação modelada na página de referência: fundo ameixa, roxo vivo nas
-   seções de oferta, ouro nos títulos e nos botões, Sora em peso pesado e
-   tudo centralizado. As cores saíram medidas da própria página. */
+/* Identidade da marca, da folha dela. A paleta anterior era a da página que
+   serviu de modelo de ESTRUTURA, não de marca, e isso eu tinha misturado. */
 :root{
-  --fundo:#120914; --fundo-2:#221225; --preto:#0c0c0c;
-  --roxo:#7a2ff5; --ouro:#ffd04b; --branco:#fff; --cinza:#cfc6d4;
+  --noite:#111b32;        /* confiança, profundidade */
+  --noite-2:#17223d;
+  --noite-3:#0c1426;
+  --clareza:#f4f0e8;      /* clareza, equilíbrio, paz */
+  --saude:#d8b879;        /* vitalidade, esperança */
+  --calma:#b7aacd;        /* tranquilidade, harmonia */
+  --apoio:#c3c9d8;
 }
 *{margin:0; padding:0; box-sizing:border-box}
-/* Trava geral: a imagem dos dispositivos saiu do style embutido e
-   passou a estourar 1100px de largura num telefone de 390. */
 img{max-width:100%; height:auto; display:block}
-.m-img img{width:100%; margin:0 auto 12px}
 html{scroll-behavior:smooth}
 body{
-  font-family:Sora,-apple-system,BlinkMacSystemFont,sans-serif;
-  background:var(--fundo); color:var(--branco); line-height:1.55;
+  font-family:Montserrat,-apple-system,BlinkMacSystemFont,sans-serif;
+  background:var(--noite); color:var(--clareza); line-height:1.55;
   -webkit-font-smoothing:antialiased;
 }
-.faixa{padding:48px 22px; text-align:center}
-.dentro{width:100%; max-width:620px; margin:0 auto}
-.escura{background:var(--preto)}
-.ameixa{background:var(--fundo-2)}
-/* O roxo entra com a seta recortada no topo, como na página modelo: é ela que
-   marca a virada do conteúdo para a oferta. */
-.roxo{background:var(--roxo); position:relative; padding-top:68px}
+.faixa{padding:86px 40px; text-align:center}
+.dentro{width:100%; max-width:1280px; margin:0 auto}
+.escura{background:var(--noite-3)}
+.ameixa{background:var(--noite)}
+.roxo{background:var(--noite-2); position:relative; padding-top:68px}
 .roxo::before{
   content:""; position:absolute; top:0; left:50%; transform:translateX(-50%);
   border-left:72px solid transparent; border-right:72px solid transparent;
-  border-top:36px solid var(--fundo);
+  border-top:36px solid var(--noite);
 }
 
-h1,h2{font-weight:800; line-height:1.1; letter-spacing:-.01em; text-transform:uppercase}
-h1{font-size:clamp(31px,4.72vw,68px); font-weight:900; line-height:1.04;
-  letter-spacing:normal; color:var(--ouro); text-transform:none; text-wrap:balance}
-h2{font-size:clamp(20px,1.67vw,24px); font-weight:600; line-height:1.5;
-  margin-bottom:14px; text-wrap:balance}
-h3{font-size:18px; font-weight:700; color:var(--ouro); margin-bottom:8px;
-  text-transform:none}
-p{font-size:16.5px; color:var(--cinza); margin-bottom:15px}
+/* O título monta o bloco da capa: apoio em Montserrat e a palavra forte em
+   Bebas Neue, que é o tipo condensado da marca. */
+h1{
+  font-family:Montserrat,sans-serif; font-weight:300;
+  font-size:clamp(28px,3.6vw,52px); line-height:1.08; letter-spacing:-.01em;
+  color:var(--clareza); text-transform:none; text-wrap:balance;
+}
+h1 .forte{
+  font-family:"Bebas Neue",Impact,sans-serif; font-weight:400;
+  font-size:1.5em; letter-spacing:.01em; color:var(--saude);
+  line-height:.92; display:inline-block; vertical-align:-.06em;
+}
+h2{font-family:Montserrat,sans-serif; font-size:clamp(20px,1.67vw,24px);
+  font-weight:600; line-height:1.5; margin-bottom:14px; text-transform:uppercase;
+  letter-spacing:.01em; text-wrap:balance}
+h3{font-family:Lora,Georgia,serif; font-size:19px; font-weight:600;
+  color:var(--saude); margin-bottom:8px}
+/* O corpo é Lora, que é o tipo de leitura da marca. */
+p{font-family:Lora,Georgia,serif; font-size:17px; color:var(--apoio); margin-bottom:15px}
 p:last-child{margin-bottom:0}
-.roxo p, .roxo h2{color:var(--branco)}
-.sobretitulo{color:#ffdf00; font-size:clamp(16px,1.39vw,20px); font-weight:300;
-  line-height:1.2; margin-bottom:14px}
-.chamada{font-size:clamp(15px,1.25vw,18px); font-weight:400; color:var(--branco);
-  text-transform:uppercase; line-height:1.33; margin-bottom:20px}
+.sobretitulo{font-family:Montserrat,sans-serif; color:var(--saude);
+  font-size:clamp(16px,1.39vw,20px); font-weight:300; letter-spacing:.14em;
+  text-transform:uppercase; line-height:1.3; margin-bottom:16px}
+.chamada{font-family:Montserrat,sans-serif; font-size:clamp(15px,1.25vw,18px);
+  font-weight:400; color:var(--clareza); text-transform:uppercase;
+  letter-spacing:.02em; line-height:1.4; margin-bottom:22px}
 
 /* ── herói ── */
-.heroi img{width:100%; max-width:330px; display:block; margin:22px auto 6px}
+.heroi .h-b{margin-top:30px}
+.heroi img{margin:24px auto 0}
+.heroi p.sub{font-family:Lora,serif; font-size:clamp(15.5px,1.25vw,18px);
+  font-weight:400; line-height:1.45; color:var(--clareza); margin-top:0}
 .heroi .selo{
-  display:inline-block; margin-top:18px; padding:8px 16px; border-radius:6px;
-  background:rgba(255,208,75,.12); border:1px solid rgba(255,208,75,.35);
-  font-size:13.5px; font-weight:600; color:var(--ouro);
+  display:inline-block; margin-top:18px; padding:8px 16px; border-radius:4px;
+  background:rgba(216,184,121,.12); border:1px solid rgba(216,184,121,.4);
+  font-family:Montserrat,sans-serif; font-size:13px; font-weight:500;
+  letter-spacing:.06em; text-transform:uppercase; color:var(--saude);
 }
-.heroi p.sub{font-size:clamp(15.5px,1.25vw,18px); font-weight:400; line-height:1.3;
-  color:var(--branco); margin-top:0}
-
-.citacao{display:flex; gap:16px; align-items:center; margin-top:22px; text-align:left}
-.citacao img{width:72px; height:72px; border-radius:50%; object-fit:cover; flex:none;
-  border:2px solid var(--ouro)}
-.citacao p{font-size:15px; font-style:italic; font-weight:600; color:var(--branco); margin:0}
+.h-img-desk{display:none}
+.citacao{display:flex; gap:16px; align-items:center; margin-top:24px; text-align:left}
+.citacao img{width:74px; height:74px; border-radius:50%; object-fit:cover; flex:none;
+  border:2px solid var(--saude)}
+.citacao p{font-family:Lora,serif; font-size:15.5px; font-style:italic;
+  color:var(--clareza); margin:0}
 
 /* ── botão ── */
 a.cta{
   display:block; text-decoration:none; width:100%; text-align:center;
-  background:linear-gradient(180deg,#ffd964,#f0b320);
-  font-family:Poppins,Sora,sans-serif; color:#221225; font-weight:700;
-  font-size:clamp(17px,1.81vw,26px); text-transform:uppercase; line-height:1.15;
-  border-radius:5px; padding:22px 16px; margin-top:24px;
-  box-shadow:0 8px 26px -10px rgba(255,208,75,.75);
+  font-family:Montserrat,sans-serif; font-weight:700;
+  font-size:clamp(16px,1.6vw,23px); letter-spacing:.03em;
+  background:var(--saude); color:var(--noite);
+  text-transform:uppercase; line-height:1.18; border-radius:5px;
+  padding:22px 16px; margin-top:26px;
+  box-shadow:0 10px 30px -12px rgba(216,184,121,.7);
+  transition:transform .18s ease, box-shadow .18s ease, background .18s ease;
 }
-a.cta:active{transform:translateY(1px)}
-.cta-apoio{font-size:13.5px; color:var(--cinza); margin-top:10px}
+a.cta:hover{background:#e7cb92; transform:translateY(-2px);
+  box-shadow:0 16px 38px -12px rgba(216,184,121,.85)}
+a.cta:active{transform:translateY(0)}
+a.cta:focus-visible{outline:3px solid var(--calma); outline-offset:3px}
+.cta-apoio{font-family:Montserrat,sans-serif; font-size:13.5px;
+  color:var(--apoio); margin-top:11px}
+
+/* O livro respira de leve, como quem dorme. Pausa para quem pediu menos
+   movimento no sistema: animação em laço é o que mais incomoda. */
+@keyframes respira{from{transform:translateY(0)} to{transform:translateY(-14px)}}
+.heroi img, .m-img img{animation:respira 4.5s ease-in-out infinite alternate}
+@media (prefers-reduced-motion:reduce){
+  .heroi img, .m-img img{animation:none}
+  a.cta{transition:none}
+}
 
 /* ── listas ── */
 ul.itens{list-style:none; text-align:left}
-ul.itens li{
-  position:relative; padding:0 0 15px 33px; font-size:16px; color:var(--cinza);
-  margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,.1);
-}
+ul.itens li{position:relative; padding:0 0 15px 34px; font-family:Lora,serif;
+  font-size:16px; color:var(--apoio); margin-bottom:15px;
+  border-bottom:1px solid rgba(244,240,232,.1)}
 ul.itens li:last-child{border-bottom:0; margin-bottom:0; padding-bottom:0}
-ul.itens li .marca{
-  position:absolute; left:0; top:2px; width:21px; height:21px; border-radius:50%;
-  background:var(--ouro); display:grid; place-items:center;
-}
-ul.itens li .marca svg{width:12px; height:12px; color:#221225}
-.roxo ul.itens li{color:var(--branco)}
+ul.itens li .marca{position:absolute; left:0; top:2px; width:21px; height:21px;
+  border-radius:50%; background:var(--saude); display:grid; place-items:center}
+ul.itens li .marca svg{width:12px; height:12px; color:var(--noite)}
 
-/* ── blocos longos de texto ── */
 .texto-longo{text-align:left}
 .texto-longo h2{text-align:left}
+.m-img img{width:100%; margin:0 auto 12px}
 
 /* ── preço ── */
-.preco .de{font-size:16px; color:var(--cinza); text-decoration:line-through}
-.preco .rot{font-size:13px; letter-spacing:.12em; text-transform:uppercase;
-  margin-top:12px; color:var(--branco); font-weight:600}
-.preco .por{font-weight:800; font-size:clamp(44px,12vw,62px); color:var(--ouro);
-  line-height:1; letter-spacing:-.02em}
-.preco .por small{font-size:23px}
-.preco .apoio{font-size:14px; margin-top:12px}
+.preco .de{font-family:Montserrat,sans-serif; font-size:16px; color:var(--apoio);
+  text-decoration:line-through}
+.preco .rot{font-family:Montserrat,sans-serif; font-size:13px; letter-spacing:.14em;
+  text-transform:uppercase; margin-top:12px; color:var(--calma); font-weight:500}
+.preco .por{font-family:"Bebas Neue",sans-serif; font-size:clamp(52px,9vw,86px);
+  color:var(--saude); line-height:1; letter-spacing:.01em}
+.preco .por small{font-size:.35em}
+.preco .apoio{font-family:Montserrat,sans-serif; font-size:14px; margin-top:12px}
 
 /* ── garantia ── */
-.garantia{background:var(--fundo-2); border:2px solid var(--ouro);
-  border-radius:10px; padding:32px 24px}
-.garantia .carimbo{
-  width:92px; height:92px; margin:0 auto 18px; border-radius:50%;
-  border:3px solid var(--ouro); display:grid; place-items:center;
-  font-weight:800; font-size:21px; color:var(--ouro); line-height:1.05;
-  text-transform:uppercase;
-}
+.garantia{background:var(--noite-2); border:2px solid var(--saude);
+  border-radius:10px; padding:34px 26px}
+.garantia .carimbo{width:94px; height:94px; margin:0 auto 20px; border-radius:50%;
+  border:3px solid var(--saude); display:grid; place-items:center;
+  font-family:"Bebas Neue",sans-serif; font-size:25px; color:var(--saude);
+  line-height:1; letter-spacing:.03em}
 
 /* ── faq ── */
-details{border-bottom:1px solid rgba(255,255,255,.14); padding:17px 0; text-align:left}
+details{border-bottom:1px solid rgba(244,240,232,.14); padding:17px 0; text-align:left}
 details:last-of-type{border-bottom:0}
-summary{font-size:16.5px; font-weight:700; color:var(--branco); cursor:pointer;
-  list-style:none; display:flex; justify-content:space-between; gap:14px}
+summary{font-family:Montserrat,sans-serif; font-size:16.5px; font-weight:600;
+  color:var(--clareza); cursor:pointer; list-style:none;
+  display:flex; justify-content:space-between; gap:14px}
 summary::-webkit-details-marker{display:none}
-summary::after{content:"+"; color:var(--ouro); font-size:22px; line-height:1}
+summary::after{content:"+"; color:var(--saude); font-size:22px; line-height:1}
 details[open] summary::after{content:"\2212"}
 details p{margin-top:11px; font-size:15.5px}
 
-.rodape{padding:38px 22px 52px; text-align:center; background:var(--preto)}
-.rodape p{font-size:13px; color:#8a8192; max-width:520px; margin:0 auto 9px}
-.rodape .marca{font-size:14px; color:var(--cinza); font-weight:700; margin-bottom:11px}
+.rodape{padding:40px 22px 54px; text-align:center; background:var(--noite-3)}
+.rodape p{font-family:Montserrat,sans-serif; font-size:13px; color:#7f879b;
+  max-width:520px; margin:0 auto 9px}
+.rodape .marca{font-size:14px; color:var(--apoio); font-weight:600; margin-bottom:11px}
 
-/* ── desktop ──
-   A página modelo muda de comportamento aqui, e eu só tinha olhado o celular:
-   o herói vira duas colunas com o texto à ESQUERDA e alinhado à esquerda, os
-   blocos de imagem alternam o lado, os textos longos ficam numa coluna de 780
-   e as listas e a FAQ abrem em duas colunas. */
 @media (min-width:900px){
-  .faixa{padding:86px 40px}
-  .dentro{max-width:1280px}
-
   .heroi .dentro{
-    display:grid; grid-template-columns:minmax(0,649px) minmax(0,573px); gap:0 38px;
-    justify-content:start;
-    grid-template-areas:"a img" "b img"; align-items:center; text-align:left;
+    display:grid; grid-template-columns:minmax(0,649px) minmax(0,573px);
+    gap:0 38px; justify-content:start; align-items:center; text-align:left;
+    grid-template-areas:"a img" "b img";
   }
-  .heroi .h-a{grid-area:a} .heroi .h-b{grid-area:b} .heroi .h-img{grid-area:img}
+  .heroi .h-a{grid-area:a; align-self:end}
+  .heroi .h-b{grid-area:b; align-self:start; margin-top:26px}
+  .heroi .h-img-cel{display:none}
+  .heroi .h-img-desk{grid-area:img; display:block}
   .heroi img{max-width:573px; width:100%; margin:0}
-  .heroi .chamada{font-size:18px}
-
   .duas .dentro{display:grid; grid-template-columns:1fr 1fr; gap:56px;
     align-items:center; text-align:left}
   .duas img{width:100%; margin:0}
-
   .texto-longo .dentro{max-width:780px}
   ul.itens{display:grid; grid-template-columns:1fr 1fr; gap:0 44px}
   ul.itens li{border-bottom:0; padding-bottom:0; margin-bottom:26px}
@@ -162,8 +180,9 @@ details p{margin-top:11px; font-size:15.5px}
   .garantia{max-width:760px; margin:0 auto}
 }
 
-.aviso-previa{background:var(--ouro); color:#221225; text-align:center;
-  font-weight:800; font-size:12.5px; letter-spacing:.05em; padding:9px 16px}
+.aviso-previa{background:var(--saude); color:var(--noite); text-align:center;
+  font-family:Montserrat,sans-serif; font-weight:700; font-size:12.5px;
+  letter-spacing:.05em; padding:9px 16px}
 .oculto{display:none}
 </style>
 
@@ -211,8 +230,10 @@ details p{margin-top:11px; font-size:15.5px}
         '<div class="h-a">' +
           (c.sobretitulo ? '<p class="sobretitulo">' + esc(c.sobretitulo) + '</p>' : '') +
           (c.chamada ? '<p class="chamada">' + esc(c.chamada) + '</p>' : '') +
-          '<h1>' + esc(c.titulo) + '</h1></div>' +
-        (c.imagem ? '<div class="h-img"><img src="' + esc(c.imagem) +
+          '<h1>' + esc(c.titulo).replace(/\*([^*]+)\*/g,
+            function(_, t){ return '<span class="forte">' + t + '</span>'; })
+          .replace(/\n/g, '<br>') + '</h1></div>' +
+        (c.imagem ? '<div class="h-img h-img-cel"><img src="' + esc(c.imagem) +
                     '" alt="" width="330" height="495"></div>' : '') +
         '<div class="h-b">' +
           (c.pos_titulo ? '<h2>' + esc(c.pos_titulo) + '</h2>' : '') +
@@ -223,7 +244,10 @@ details p{margin-top:11px; font-size:15.5px}
             ? '<div class="citacao">' +
               (c.citacao.foto ? '<img src="' + esc(c.citacao.foto) + '" alt="">' : '') +
               '<p>' + esc(c.citacao.texto) + '</p></div>' : '') +
-        '</div>', 'heroi ameixa');
+        '</div>' +
+        (c.imagem ? '<div class="h-img h-img-desk"><img src="' + esc(c.imagem) +
+                    '" alt="" width="573" height="860" loading="lazy"></div>' : ''),
+        'heroi ameixa');
     },
     cta1: function(){ return ''; },
     cta2: function(c){ return secao(botao(c)); },
