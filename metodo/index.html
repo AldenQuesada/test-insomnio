@@ -186,6 +186,9 @@ ul.itens li .marca svg{width:12px; height:12px; color:var(--noite)}
   border-bottom:1px solid rgba(244,240,232,.13); font-family:Montserrat,sans-serif;
   font-size:15.5px; line-height:1.45}
 .pilha .marca{flex:none}
+.pilha li.com-capa{align-items:center; padding:16px 0}
+.p-capa{width:46px; height:auto; flex:none; border-radius:3px;
+  box-shadow:0 4px 14px rgba(0,0,0,.45)}
 .p-nome{flex:1; border-bottom:1px dotted rgba(244,240,232,.25); padding-bottom:3px}
 .p-val{flex:none; font-weight:700; color:var(--saude); white-space:nowrap}
 .preco .de s{text-decoration-thickness:2px; opacity:.75}
@@ -665,7 +668,12 @@ details p{margin-top:11px; font-size:15.5px}
         '<ul class="pilha">' + it.map(function(t){
           var nome = typeof t === 'string' ? t : (t.nome || '');
           var val  = typeof t === 'string' ? '' : (t.valor || '');
-          return '<li>' + TIQUE + '<span class="p-nome">' + esc(nome) + '</span>' +
+          var img  = typeof t === 'string' ? '' : (t.imagem || '');
+          // A capa no lugar do tique quando o item é um livro: a pilha deixa de
+          // ser lista e passa a parecer o que a pessoa vai receber.
+          return '<li' + (img ? ' class="com-capa"' : '') + '>' +
+                 (img ? '<img class="p-capa" src="' + esc(img) + '" alt="" loading="lazy">' : TIQUE) +
+                 '<span class="p-nome">' + esc(nome) + '</span>' +
                  (val ? '<span class="p-val">' + m + esc(val) + '</span>' : '') + '</li>';
         }).join('') + '</ul>' +
         '<div class="preco">' +
