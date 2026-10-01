@@ -146,9 +146,20 @@ ul.itens li .marca svg{width:12px; height:12px; color:var(--noite)}
 .preco .por small{font-size:.35em}
 .preco .apoio{font-family:Montserrat,sans-serif; font-size:14px; margin-top:12px}
 
-/* ── garantia ── */
-.garantia{background:var(--noite-2); border:2px solid var(--saude);
-  border-radius:10px; padding:34px 26px}
+/* ── garantia ──
+   Medida 1 a 1 na página modelo: selo 190, título 52/800 maiúsculo numa caixa
+   de 740, texto 20/30 numa caixa de 640. Sem moldura: lá o bloco respira no
+   fundo da seção, e é a moldura que fazia o meu parecer um aviso. */
+.garantia{text-align:center}
+.g-selo{width:150px; height:150px; margin:0 auto 26px; display:block}
+.garantia .g-tit{font-size:34px; line-height:1.2; text-transform:uppercase;
+  max-width:740px; margin:0 auto 24px}
+.garantia .g-txt{font-size:17px; line-height:1.6; max-width:640px; margin:0 auto}
+@media (min-width:900px){
+  .g-selo{width:190px; height:190px; margin-bottom:34px}
+  .garantia .g-tit{font-size:52px}
+  .garantia .g-txt{font-size:20px; line-height:1.5}
+}
 .garantia .carimbo{width:94px; height:94px; margin:0 auto 20px; border-radius:50%;
   border:3px solid var(--saude); display:grid; place-items:center;
   font-family:"Bebas Neue",sans-serif; font-size:25px; color:var(--saude);
@@ -165,30 +176,45 @@ summary::after{content:"+"; color:var(--saude); font-size:22px; line-height:1}
 details[open] summary::after{content:"\2212"}
 details p{margin-top:11px; font-size:15.5px}
 
-.rodape{padding:40px 22px 54px; text-align:center; background:var(--noite-3)}
+/* ── rodapé ──
+   Medido a 1440px na página modelo: TRÊS colunas alinhadas à esquerda, numa
+   caixa de 1140, e só o aviso legal embaixo é que é centralizado e estreito.
+   Pilha centralizada é o que eu tinha feito e não é o que está lá. */
+.rodape{padding:46px 22px 54px; background:var(--noite-3)}
 .rodape p{font-family:Montserrat,sans-serif; font-size:13px; color:#7f879b;
-  max-width:520px; margin:0 auto 9px}
-.rodape .marca{font-size:14px; color:var(--apoio); font-weight:600; margin-bottom:11px}
-.rodape .r-seguro{display:flex; align-items:center; justify-content:center; gap:7px;
-  color:var(--apoio)}
+  margin:0 0 9px}
+.rodape .marca{font-size:16px; color:var(--clareza); font-weight:600;
+  margin-bottom:12px}
+.rodape .r-dir{font-size:14px}
+.rodape .r-cnpj{font-size:14px; color:var(--apoio)}
+.rodape .r-seguro{display:flex; align-items:center; gap:7px; color:var(--apoio);
+  font-size:14px}
 .r-cad{width:15px; height:15px; flex:0 0 15px}
-.r-cols{display:flex; flex-wrap:wrap; justify-content:center; gap:30px 64px;
-  margin:30px auto 26px; max-width:620px}
-.r-tit{font-family:Montserrat,sans-serif; font-size:11px; font-weight:700;
-  letter-spacing:.16em; color:var(--saude); margin-bottom:12px !important}
-.r-col{display:flex; flex-direction:column; align-items:center}
+
+.r-grade{display:grid; gap:34px; max-width:1140px; margin:0 auto; text-align:center}
+.r-tit{font-family:Montserrat,sans-serif; font-size:13px; font-weight:800;
+  letter-spacing:.14em; color:var(--clareza); margin-bottom:15px !important}
+.r-col{min-width:0}
 /* Pagamento é selo, fica em linha; link é lista, fica em coluna. */
-.r-pagos{display:flex; flex-wrap:wrap; justify-content:center; gap:9px}
-.r-links{display:flex; flex-direction:column; align-items:center; gap:9px}
+.r-pagos{display:flex; flex-wrap:wrap; gap:9px; justify-content:center}
+.r-links{display:flex; flex-direction:column; gap:9px; align-items:center}
 .r-pago{font-family:Montserrat,sans-serif; font-size:12.5px; color:#9aa2b6;
   border:1px solid #39415a; border-radius:5px; padding:5px 13px}
-.r-link{font-family:Montserrat,sans-serif; font-size:13px; color:#9aa2b6;
-  text-decoration:none; border-bottom:1px solid #39415a}
-.r-link:hover{color:var(--clareza); border-bottom-color:var(--saude)}
+.r-link{font-family:Montserrat,sans-serif; font-size:14px; font-weight:300;
+  color:var(--apoio); text-decoration:none}
+.r-link:hover{color:var(--saude)}
+@media (min-width:900px){
+  .r-grade{grid-template-columns:1.25fr 1fr 1fr; gap:0 48px; text-align:left;
+    align-items:start}
+  .rodape .r-seguro{justify-content:flex-start}
+  .r-pagos,.r-links{justify-content:flex-start; align-items:flex-start}
+}
 /* O aviso do Facebook é texto legal: tem que estar legível e tem que ficar
    claro que não é argumento de venda. */
-.rodape .r-legal{max-width:760px; font-size:11.5px; line-height:1.65;
-  color:#6b7389; text-align:left; margin-top:26px}
+.rodape .r-legal{max-width:870px; font-size:11.5px; line-height:1.7;
+  color:#6b7389; text-align:center; margin:44px auto 0; padding-top:30px;
+  border-top:1px solid rgba(244,240,232,.09)}
+.rodape .r-aviso{max-width:870px; margin:14px auto 0; text-align:center}
 
 @media (min-width:900px){
   .heroi .dentro{
@@ -392,11 +418,16 @@ details p{margin-top:11px; font-size:15.5px}
         '</div>', 'roxo');
     },
 
+    // Medida a 1440px na página modelo: selo 190px, título 52px/800 em caixa
+    // de 740, texto 20px em caixa de 640. Tudo centralizado, sem moldura.
     garantia: function(c){
       if (!c.texto) return '';
       return secao('<div class="garantia">' +
-        (c.selo ? '<div class="carimbo">' + esc(c.selo).replace(' ', '<br>') + '</div>' : '') +
-        '<h2>' + esc(c.titulo || '') + '</h2><p>' + esc(c.texto) + '</p></div>');
+        (c.selo_img
+          ? '<img class="g-selo" src="' + esc(c.selo_img) + '" alt="" width="190" height="190" loading="lazy">'
+          : (c.selo ? '<div class="carimbo">' + esc(c.selo).replace(' ', '<br>') + '</div>' : '')) +
+        '<h2 class="g-tit">' + esc(c.titulo || '') + '</h2>' +
+        '<p class="g-txt">' + esc(c.texto) + '</p></div>', 'escura');
     },
 
     contador: function(c){ return c.titulo && c.ate ? secao('<h2>' + esc(c.titulo) + '</h2>') : ''; },
@@ -436,14 +467,18 @@ details p{margin-top:11px; font-size:15.5px}
           ? '<a class="r-link" href="' + esc(l.url) + '">' + esc(l.texto || '') + '</a>'
           : '';
       });
-      return '<section class="rodape"><div class="dentro">' +
+      var identidade =
         (c.marca ? '<p class="marca">' + esc(c.marca) + '</p>' : '') +
-        (c.direitos ? '<p>' + esc(c.direitos) + '</p>' : '') +
+        (c.direitos ? '<p class="r-dir">' + esc(c.direitos) + '</p>' : '') +
         (c.seguro ? '<p class="r-seguro">' + CADEADO + esc(c.seguro) + '</p>' : '') +
-        (c.cnpj ? '<p>' + esc(c.cnpj) + '</p>' : '') +
-        (pagos || links ? '<div class="r-cols">' + pagos + links + '</div>' : '') +
+        (c.cnpj ? '<p class="r-cnpj">' + esc(c.cnpj) + '</p>' : '');
+      return '<section class="rodape"><div class="dentro">' +
+        '<div class="r-grade">' +
+          (identidade ? '<div class="r-col r-id">' + identidade + '</div>' : '') +
+          pagos + links +
+        '</div>' +
         (c.legal ? '<p class="r-legal">' + esc(c.legal) + '</p>' : '') +
-        (c.aviso ? '<p>' + esc(c.aviso) + '</p>' : '') + '</div></section>';
+        (c.aviso ? '<p class="r-aviso">' + esc(c.aviso) + '</p>' : '') + '</div></section>';
     }
   };
 
