@@ -543,8 +543,11 @@ details p{margin-top:11px; font-size:15.5px}
     previa: function(c){
       var pgs = c.paginas || [];
       if (!pgs.length) return '';
+      // A quantidade é contada, não escrita: o texto dizia «seis páginas» com
+      // dez na tela, porque eu troquei as imagens e esqueci a legenda.
+      var sub = String(c.texto || '').replace('%d', pgs.length);
       return secao('<h2>' + esc(c.titulo || '') + '</h2>' +
-        (c.texto ? '<p>' + esc(c.texto) + '</p>' : '') +
+        (sub ? '<p>' + esc(sub) + '</p>' : '') +
         '<div class="previa"><div id="folheto">' +
         pgs.map(function(u, i){
           // Na última página entra o convite para seguir lendo. É o lugar
