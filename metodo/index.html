@@ -252,7 +252,7 @@ body.com-letreiro{padding-top:38px}
   margin-bottom:13px}
 .conta-cxs{display:flex; gap:12px; justify-content:center}
 .heroi .conta-cxs{justify-content:center}
-.conta-cx{background:var(--noite-3); border:1px solid rgba(216,184,121,.4);
+.conta-cx{text-align:center; background:var(--noite-3); border:1px solid rgba(216,184,121,.4);
   border-radius:9px; padding:11px 0 9px; min-width:92px}
 .conta-cx b{display:block; font-family:"Bebas Neue",sans-serif; font-size:42px;
   line-height:1; color:var(--clareza); letter-spacing:.03em;
@@ -544,6 +544,7 @@ details p{margin-top:11px; font-size:15.5px}
     return '<div class="conta">' +
       (c.titulo ? '<p class="conta-tit">' + esc(c.titulo) + '</p>' : '') +
       '<div class="conta-cxs">' +
+        '<div class="conta-cx"><b data-u="h">00</b><span>' + esc(r.horas || '') + '</span></div>' +
         '<div class="conta-cx"><b data-u="m">--</b><span>' + esc(r.minutos || '') + '</span></div>' +
         '<div class="conta-cx"><b data-u="s">--</b><span>' + esc(r.segundos || '') + '</span></div>' +
       '</div></div>';
@@ -566,9 +567,11 @@ details p{margin-top:11px; font-size:15.5px}
 
     function pintar(){
       var s = Math.max(0, Math.floor((ate - Date.now()) / 1000));
-      var mm = String(Math.floor(s / 60)).padStart(2, '0');
+      var hh = String(Math.floor(s / 3600)).padStart(2, '0');
+      var mm = String(Math.floor((s % 3600) / 60)).padStart(2, '0');
       var ss = String(s % 60).padStart(2, '0');
       cxs.forEach(function(n){
+        n.querySelector('[data-u="h"]').textContent = hh;
         n.querySelector('[data-u="m"]').textContent = mm;
         n.querySelector('[data-u="s"]').textContent = ss;
         n.classList.toggle('zerado', s === 0);
