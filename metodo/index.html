@@ -244,8 +244,9 @@ body.com-letreiro{padding-top:38px}
 .letreiro.parado .le-pista [aria-hidden]{display:none}
 @media (min-width:900px){ .le-fita{font-size:14px} }
 
-.cta-preco .hoy{font-weight:700; color:var(--saude); text-transform:uppercase;
-  font-size:12px; letter-spacing:.1em; margin-left:4px}
+/* Sem caixa alta aqui: o destaque pedido é o «Hoy» com maiúscula, e
+   tudo em maiúsculas apagaria justamente essa diferença. */
+.cta-preco .hoy{font-weight:700; color:var(--saude); margin-left:4px}
 .barra-txt s{opacity:.65}
 
 /* ── barra fixa do celular ── */
