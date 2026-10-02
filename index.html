@@ -551,6 +551,7 @@ a.cta-res{
         // gravou. Disparar no clique contaria lead que nunca existiu.
         rastrear('final', { content_name: 'quiz-' + CFG.slug,
                             value: res.score, currency: 'USD' });
+        guardarResultado(res);
         mostrarResultado(res);
       })
       .catch(function(){
@@ -661,6 +662,33 @@ a.cta-res{
     selo.className = 'selo-previa';
     selo.textContent = 'VISTA PREVIA · nada de esta pantalla se guarda';
     tela.insertBefore(selo, tela.firstChild);
+  }
+
+  // Guarda o resultado NO APARELHO dela, para a página do método poder
+  // continuar a conversa em vez de recomeçar do zero.
+  //
+  // Fica só no navegador: nota de insônia e tempo de sintoma são dado de
+  // saúde, e por isso NÃO vão na URL. Na URL eles apareceriam na barra de
+  // endereço, no cabeçalho de referência e em tudo que a página de destino
+  // carregar, inclusive os pixels de anúncio. A política de privacidade diz
+  // que dado de saúde não é usado para segmentar, e isso aqui é o que faz a
+  // frase ser verdade.
+  //
+  // `dur` é o código da resposta de tempo, não a classificação: quem lê
+  // traduz pelo mesmo `schema`, que é a única fonte dessa tabela.
+  function guardarResultado(res){
+    try {
+      localStorage.setItem('insonia_resultado', JSON.stringify({
+        v: 1,
+        nota:   res.score,
+        maximo: res.maximo,
+        faixa:  res.faixa,
+        dur:    respostas.dur || '',
+        nome:   pessoa.nome || '',
+        sexo:   pessoa.sexo || '',
+        quando: Date.now()
+      }));
+    } catch (e) {}   // janela anônima, armazenamento bloqueado, cota cheia
   }
 
   function mostrarResultado(res){
