@@ -224,6 +224,24 @@ ul.itens li .marca svg{width:12px; height:12px; color:var(--noite)}
    título, e é o que separa a prova da história. */
 .transicao{font-family:Lora,Georgia,serif; font-size:21px; line-height:1.5;
   max-width:760px; margin:0 auto; color:var(--clareza)}
+/* ── contador ── */
+.conta{margin:26px auto 0; max-width:420px}
+.heroi .conta{margin:22px 0 24px}
+.conta-tit{font-family:Montserrat,sans-serif; font-size:13px; font-weight:700;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--saude);
+  margin-bottom:13px}
+.conta-cxs{display:flex; gap:12px; justify-content:center}
+.heroi .conta-cxs{justify-content:center}
+.conta-cx{background:var(--noite-3); border:1px solid rgba(216,184,121,.4);
+  border-radius:9px; padding:11px 0 9px; min-width:92px}
+.conta-cx b{display:block; font-family:"Bebas Neue",sans-serif; font-size:42px;
+  line-height:1; color:var(--clareza); letter-spacing:.03em;
+  font-variant-numeric:tabular-nums}
+.conta-cx span{display:block; font-family:Montserrat,sans-serif; font-size:11px;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--apoio); margin-top:5px}
+.conta.zerado .conta-cx b{color:var(--apoio)}
+@media (min-width:900px){ .heroi .conta-cxs{justify-content:flex-start} }
+
 /* O riscado embaixo do botão, a partir do segundo. */
 .cta-preco{font-family:Montserrat,sans-serif; font-size:15px; margin-top:13px;
   color:var(--apoio)}
@@ -425,6 +443,53 @@ details p{margin-top:11px; font-size:15.5px}
       : '';
   }
 
+  // Marcação do contador. Só o desenho: a conta roda em `ligarContagem`.
+  function contagem(c){
+    if (!c || !c.minutos) return '';
+    var r = c.rotulos || {};
+    return '<div class="conta">' +
+      (c.titulo ? '<p class="conta-tit">' + esc(c.titulo) + '</p>' : '') +
+      '<div class="conta-cxs">' +
+        '<div class="conta-cx"><b data-u="m">--</b><span>' + esc(r.minutos || '') + '</span></div>' +
+        '<div class="conta-cx"><b data-u="s">--</b><span>' + esc(r.segundos || '') + '</span></div>' +
+      '</div></div>';
+  }
+
+  // O prazo nasce na primeira visita e fica guardado no navegador. Recarregar
+  // não devolve tempo: contador que se renova a cada F5 qualquer pessoa
+  // desmonta em dois segundos.
+  function ligarContagem(c){
+    var cxs = document.querySelectorAll('.conta');
+    if (!cxs.length || !c || !c.minutos) return;
+    var ate = 0;
+    try {
+      ate = parseInt(localStorage.getItem('oferta_ate'), 10) || 0;
+      if (!ate) {
+        ate = Date.now() + parseInt(c.minutos, 10) * 60000;
+        localStorage.setItem('oferta_ate', String(ate));
+      }
+    } catch (e) { ate = Date.now() + parseInt(c.minutos, 10) * 60000; }
+
+    function pintar(){
+      var s = Math.max(0, Math.floor((ate - Date.now()) / 1000));
+      var mm = String(Math.floor(s / 60)).padStart(2, '0');
+      var ss = String(s % 60).padStart(2, '0');
+      cxs.forEach(function(n){
+        n.querySelector('[data-u="m"]').textContent = mm;
+        n.querySelector('[data-u="s"]').textContent = ss;
+        n.classList.toggle('zerado', s === 0);
+        if (s === 0 && c.expirado) {
+          var t = n.querySelector('.conta-tit');
+          if (t) t.textContent = c.expirado;
+        }
+      });
+      return s;
+    }
+    if (pintar() > 0) {
+      var t = setInterval(function(){ if (pintar() === 0) clearInterval(t); }, 1000);
+    }
+  }
+
   function botao(b){
     // Sem link de checkout o botão não existe. Botão que não leva a lugar
     // nenhum custa mais caro que botão nenhum.
@@ -458,6 +523,7 @@ details p{margin-top:11px; font-size:15.5px}
           (c.pos_titulo ? '<h2>' + esc(c.pos_titulo) + '</h2>' : '') +
           (c.subtitulo ? '<p class="sub">' + esc(c.subtitulo) + '</p>' : '') +
           (c.selo ? '<span class="selo">' + esc(c.selo) + '</span>' : '') +
+          (c.contador ? contagem(T.contador || {}) : '') +
           botao(T.cta1) +
           (c.citacao && c.citacao.texto
             ? '<div class="citacao">' +
@@ -484,6 +550,12 @@ details p{margin-top:11px; font-size:15.5px}
     // Na página modelo o bloco de prova social aparece DUAS vezes, logo depois
     // do herói e de novo antes do rodapé. Mesmo conteúdo, mesmo desenho.
     prova_fim: function(c, T){ return BLOCOS.prova(T.prova || {}); },
+
+    // Contador. Aparece no herói e depois do último botão, e os dois leem a
+    // mesma chave e o mesmo prazo: dois relógios marcando horas diferentes na
+    // mesma página é o que denuncia que o prazo não existe.
+    contador: function(c){ return c && c.minutos ? secao(contagem(c)) : ''; },
+    contador_fim: function(c, T){ return BLOCOS.contador(T.contador || {}); },
 
     // Carrossel de depoimentos. Sem biblioteca: o scroll-snap do CSS já dá
     // arrasto no dedo, inércia e parada no card certo, de graça. A biblioteca
@@ -874,6 +946,7 @@ details p{margin-top:11px; font-size:15.5px}
     document.getElementById('pagina').innerHTML = html;
     montarFolheto(T.previa || {});
     montarCarrossel(T.depoimentos || {});
+    ligarContagem(T.contador || {});
   }).catch(function(e){
     document.getElementById('pagina').innerHTML =
       '<section class="faixa"><div class="dentro"><h2>No pude cargar la página</h2>' +
