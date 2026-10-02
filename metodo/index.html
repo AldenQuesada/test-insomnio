@@ -224,10 +224,12 @@ ul.itens li .marca svg{width:12px; height:12px; color:var(--noite)}
    título, e é o que separa a prova da história. */
 .transicao{font-family:Lora,Georgia,serif; font-size:21px; line-height:1.5;
   max-width:760px; margin:0 auto; color:var(--clareza)}
-.at-preco{font-family:Montserrat,sans-serif; font-size:16px; letter-spacing:.04em;
-  text-transform:uppercase; margin:26px 0 6px}
-.at-preco b{font-family:"Bebas Neue",sans-serif; font-size:40px; color:var(--saude);
-  letter-spacing:.02em; margin-left:8px; vertical-align:-3px}
+/* O riscado embaixo do botão, a partir do segundo. */
+.cta-preco{font-family:Montserrat,sans-serif; font-size:15px; margin-top:13px;
+  color:var(--apoio)}
+.cta-preco s{opacity:.7; text-decoration-thickness:2px; margin-right:6px}
+.cta-preco b{font-family:"Bebas Neue",sans-serif; font-size:30px;
+  color:var(--saude); letter-spacing:.02em; vertical-align:-3px}
 @media (min-width:900px){ .transicao{font-size:25px} }
 
 /* ── bônus ──
@@ -427,8 +429,16 @@ details p{margin-top:11px; font-size:15.5px}
     // Sem link de checkout o botão não existe. Botão que não leva a lugar
     // nenhum custa mais caro que botão nenhum.
     if (!b || !b.texto || !CHECKOUT) return '';
+    // O riscado embaixo do botão só entra onde o bloco pedir. No herói não
+    // entra: ali a pessoa ainda não sabe o que está comprando, e preço antes
+    // do valor é só um número.
+    var p = T.preco || {}, m = p.moeda ? p.moeda + ' ' : '';
+    var risco = (b.preco && p.por)
+      ? '<p class="cta-preco">' +
+        (p.de ? '<s>' + esc(m + p.de) + '</s> ' : '') +
+        '<b>' + esc(m + p.por) + '</b></p>' : '';
     return '<a class="cta" href="' + esc(CHECKOUT) + '" rel="noopener">' +
-      esc(b.texto) + '</a>' +
+      esc(b.texto) + '</a>' + risco +
       (b.apoio ? '<p class="cta-apoio">' + esc(b.apoio) + '</p>' : '');
   }
 
@@ -518,14 +528,13 @@ details p{margin-top:11px; font-size:15.5px}
 
     // O atalho para quem rolou a página inteira sem ler. Na modelo é o bloco
     // mais perto do fim e repete tudo em poucas linhas, com o preço junto.
-    atalho: function(c, T){
+    // O preço aqui vem do próprio botão, com o riscado, como em todos os
+    // outros a partir do segundo.
+    atalho: function(c){
       if (!c.titulo) return '';
-      var p = T.preco || {};
       return secao(
         '<h2>' + esc(c.titulo) + '</h2>' +
         (c.texto || []).map(function(t){ return '<p>' + esc(t) + '</p>'; }).join('') +
-        (p.por ? '<p class="at-preco">' + esc(p.rotulo_por || '') + ' ' +
-                 '<b>' + esc(p.moeda || '') + ' ' + esc(p.por) + '</b></p>' : '') +
         botao(c.botao));
     },
 
