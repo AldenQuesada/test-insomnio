@@ -483,13 +483,17 @@ details p{margin-top:11px; font-size:15.5px}
   function enfeixar(r){
     var d = { nome: (r.nome || '').split(' ')[0], nota: r.nota, maximo: r.maximo,
               faixa: '', clase: '' };
+    // Os rótulos vêm do PDF, onde são TÍTULO e por isso começam em maiúscula.
+    // Aqui entram no meio da frase, e em espanhol «tu insomnio es Crónico» é
+    // erro. A primeira letra desce; o resto fica como está.
+    function corrido(t){ t = String(t || ''); return t.charAt(0).toLowerCase() + t.slice(1); }
     (ESQ.faixas_es || []).forEach(function(f){
-      if (f.codigo === r.faixa) d.faixa = f.rotulo || f.titulo || '';
+      if (f.codigo === r.faixa) d.faixa = corrido(f.titulo || f.rotulo);
     });
     var q = (ESQ.perguntas || []).filter(function(x){ return x.id === 'dur'; })[0];
     var o = ((q && q.opcoes_es) || []).filter(function(x){ return x.valor === r.dur; })[0];
     var cl = (ESQ.pdf_es || {}).p4_clases || {};
-    if (o && cl[o.clase]) d.clase = cl[o.clase].nome || '';
+    if (o && cl[o.clase]) d.clase = corrido(cl[o.clase].nome);
     return d;
   }
 
