@@ -595,9 +595,12 @@ details p{margin-top:11px; font-size:15.5px}
     // entra: ali a pessoa ainda não sabe o que está comprando, e preço antes
     // do valor é só um número.
     var p = T.preco || {}, m = p.moeda ? p.moeda + ' ' : '';
+    // `preco_de` no próprio botão vence o total: antes da pilha a pessoa
+    // ainda não viu o valor dos bônus, então ali o riscado é só o do livro.
+    var de = b.preco_de || p.de;
     var risco = (b.preco && p.por)
       ? '<p class="cta-preco">' +
-        (p.de ? '<s>' + esc(m + p.de) + '</s> ' : '') +
+        (de ? '<s>' + esc(m + de) + '</s> ' : '') +
         '<b>' + esc(m + p.por) + '</b></p>' : '';
     return '<a class="cta" href="' + esc(CHECKOUT) + '" rel="noopener">' +
       esc(b.texto) + '</a>' + risco +
