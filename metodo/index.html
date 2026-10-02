@@ -244,6 +244,10 @@ body.com-letreiro{padding-top:38px}
 .letreiro.parado .le-pista [aria-hidden]{display:none}
 @media (min-width:900px){ .le-fita{font-size:14px} }
 
+.cta-preco .hoy{font-weight:700; color:var(--saude); text-transform:uppercase;
+  font-size:12px; letter-spacing:.1em; margin-left:4px}
+.barra-txt s{opacity:.65}
+
 /* ── barra fixa do celular ── */
 .barra{display:none}
 @media (max-width:899px){
@@ -567,7 +571,9 @@ details p{margin-top:11px; font-size:15.5px}
     if (!c || !c.botao || !CHECKOUT) return;
     var p = T.preco || {};
     var preco = (p.moeda ? p.moeda + ' ' : '') + (p.por || '');
-    var txt = esc(c.texto || '').replace('%preco%', '<b>' + esc(preco) + '</b>');
+    var de = (p.moeda ? p.moeda + ' ' : '') + (c.de || '');
+    var txt = esc(c.texto || '').replace('%preco%', '<b>' + esc(preco) + '</b>')
+                                 .replace('%de%', '<s>' + esc(de) + '</s>');
     var el = document.createElement('div');
     el.className = 'barra';
     el.innerHTML = '<div class="barra-esq"><p class="barra-txt">' + txt + '</p>' +
@@ -649,8 +655,9 @@ details p{margin-top:11px; font-size:15.5px}
     var de = b.preco_de || p.de;
     var risco = (b.preco && p.por)
       ? '<p class="cta-preco">' +
-        (de ? '<s>' + esc(m + de) + '</s> ' : '') +
-        '<b>' + esc(m + p.por) + '</b></p>' : '';
+        (de ? esc(p.txt_de || '') + ' <s>' + esc(m + de) + '</s> ' : '') +
+        esc(p.txt_por || '') + ' <b>' + esc(m + p.por) + '</b> ' +
+        '<span class="hoy">' + esc(p.txt_hoy || '') + '</span></p>' : '';
     return '<a class="cta" href="' + esc(CHECKOUT) + '" rel="noopener">' +
       esc(b.texto) + '</a>' + risco +
       (b.apoio ? '<p class="cta-apoio">' + esc(b.apoio) + '</p>' : '');
@@ -853,8 +860,8 @@ details p{margin-top:11px; font-size:15.5px}
               (b.texto ? '<p class="b-desc">' + esc(b.texto)
                   .replace(/\*([^*]+)\*/g, '<b>$1</b>') + '</p>' : '') +
               (b.preco_de ? '<p class="b-preco">' + esc(c.etiqueta_preco || '') +
-                  ' <s>' + esc(b.preco_de) + '</s> ' +
-                  '<b>' + esc(c.preco_zero || '') + '</b></p>' : '') +
+                  ' <s>' + esc(b.preco_de) + '</s> ' + esc(c.conector || '') +
+                  ' <b>' + esc(c.preco_zero || '') + '</b> ' + esc(c.sufixo || '') + '</p>' : '') +
               (c.fecho ? '<p class="b-fecho">' + esc(c.fecho) + '</p>' : '') +
             '</div></article>';
         }).join('') + '</div>', 'escura');
