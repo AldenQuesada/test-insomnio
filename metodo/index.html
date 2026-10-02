@@ -252,6 +252,9 @@ body.com-letreiro{padding-top:38px}
     border-top:1px solid rgba(216,184,121,.35);
     padding:11px 14px calc(11px + env(safe-area-inset-bottom, 0px))}
   body.com-barra{padding-bottom:78px}
+  /* Mesmo corte da barra: quando ela existe, o relógio dela basta. Os dois
+     contadores grandes só repetiriam a mesma hora na mesma tela. */
+  body.com-barra .conta{display:none}
   .barra-esq{flex:1; min-width:0}
   .barra-txt{font-family:Montserrat,sans-serif; font-size:12.5px; line-height:1.3;
     color:var(--clareza); margin:0}
