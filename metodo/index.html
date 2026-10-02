@@ -224,6 +224,26 @@ ul.itens li .marca svg{width:12px; height:12px; color:var(--noite)}
    título, e é o que separa a prova da história. */
 .transicao{font-family:Lora,Georgia,serif; font-size:21px; line-height:1.5;
   max-width:760px; margin:0 auto; color:var(--clareza)}
+/* ── letreiro do topo ──
+   Faixa fixa, o texto correndo como em telejornal. Fica por cima de tudo e o
+   corpo ganha a altura dela de recuo, senão o herói nasce escondido. */
+.letreiro{position:fixed; top:0; left:0; right:0; z-index:60; height:38px;
+  display:flex; align-items:center; overflow:hidden;
+  background:var(--noite-3); border-bottom:1px solid rgba(216,184,121,.35)}
+body.com-letreiro{padding-top:38px}
+.le-pista{display:flex; white-space:nowrap; will-change:transform;
+  animation:correr linear infinite}
+.le-fita{font-family:Montserrat,sans-serif; font-size:13px; font-weight:600;
+  letter-spacing:.03em; color:var(--clareza); padding-right:0}
+.le-fita i{font-style:normal; color:var(--saude); margin:0 6px}
+@keyframes correr{ from{transform:translateX(0)} to{transform:translateX(-50%)} }
+/* Letreiro correndo sem parar é exatamente o que dispara enjoo de movimento.
+   Quem marca a opção continua com a faixa, parada e arrastável. */
+.letreiro.parado{overflow-x:auto; scrollbar-width:none}
+.letreiro.parado::-webkit-scrollbar{display:none}
+.letreiro.parado .le-pista [aria-hidden]{display:none}
+@media (min-width:900px){ .le-fita{font-size:14px} }
+
 /* ── contador ── */
 .conta{margin:26px auto 0; max-width:420px}
 .heroi .conta{margin:22px 0 24px}
@@ -412,6 +432,7 @@ details p{margin-top:11px; font-size:15.5px}
 .oculto{display:none}
 </style>
 
+<div id="letreiro" class="letreiro" hidden></div>
 <div id="previa" class="aviso-previa oculto"></div>
 <main id="pagina"></main>
 
@@ -425,7 +446,7 @@ details p{margin-top:11px; font-size:15.5px}
   // dela, não de uma dor genérica.
   var pessoa = { nome: url.get('n') || '', faixa: url.get('f') || '', pior: url.get('p') || '' };
   var PREVIA = url.get('ver') !== null;
-  var T = {}, CHECKOUT = '';
+  var T = {}, ESQ = {}, CHECKOUT = '';
 
   function esc(x){
     return String(x == null ? '' : x)
@@ -441,6 +462,75 @@ details p{margin-top:11px; font-size:15.5px}
       ? '<section class="faixa ' + (classe || '') + '"><div class="dentro">' +
         conteudo + '</div></section>'
       : '';
+  }
+
+  // ── letreiro do topo ──────────────────────────────────────────────
+  // Quem respondeu o quiz deixou o resultado no próprio aparelho. Aqui a
+  // página lê de lá para continuar a conversa em vez de recomeçar do zero.
+  // Nada disso veio pela URL, de propósito: é dado de saúde.
+  function lerResultado(){
+    try {
+      var r = JSON.parse(localStorage.getItem('insonia_resultado') || 'null');
+      if (!r || r.v !== 1) return null;
+      // Resultado velho descreve uma noite que já passou. Trinta dias.
+      if (Date.now() - (r.quando || 0) > 2592000000) return null;
+      return r;
+    } catch (e) { return null; }
+  }
+
+  // Traduz os códigos guardados usando o MESMO schema que o quiz usa. A
+  // tabela de classificação existe num lugar só, e é lá.
+  function enfeixar(r){
+    var d = { nome: (r.nome || '').split(' ')[0], nota: r.nota, maximo: r.maximo,
+              faixa: '', clase: '' };
+    (ESQ.faixas_es || []).forEach(function(f){
+      if (f.codigo === r.faixa) d.faixa = f.rotulo || f.titulo || '';
+    });
+    var q = (ESQ.perguntas || []).filter(function(x){ return x.id === 'dur'; })[0];
+    var o = ((q && q.opcoes_es) || []).filter(function(x){ return x.valor === r.dur; })[0];
+    var cl = (ESQ.pdf_es || {}).p4_clases || {};
+    if (o && cl[o.clase]) d.clase = cl[o.clase].nome || '';
+    return d;
+  }
+
+  function montarLetreiro(c){
+    if (!c) return;
+    var r = lerResultado();
+    var msgs = ((r ? c.com_resultado : c.sem_resultado) || []).slice();
+    if (r) {
+      var d = enfeixar(r);
+      msgs = msgs.map(function(t){
+        return String(t).replace(/%nome%/g, d.nome).replace(/%nota%/g, d.nota)
+          .replace(/%maximo%/g, d.maximo).replace(/%faixa%/g, d.faixa)
+          .replace(/%clase%/g, d.clase);
+      // Sem nome, sem classificação: a frase que dependia disso não entra em
+      // vez de entrar pela metade.
+      }).filter(function(t){ return t.indexOf('%') < 0 && !/\s,|,\s*:/ .test(t); });
+    }
+    if (!msgs.length) return;
+
+    var el = document.getElementById('letreiro');
+    var sep = ' <i>' + esc(c.separador || '·') + '</i> ';
+    var fita = msgs.map(esc).join(sep) + sep;
+    // A fita entra duas vezes: a segunda cópia entra na tela enquanto a
+    // primeira sai, e por isso a volta não tem buraco.
+    el.innerHTML = '<div class="le-pista"><span class="le-fita">' + fita +
+                   '</span><span class="le-fita" aria-hidden="true">' + fita + '</span></div>';
+    el.hidden = false;
+    document.body.classList.add('com-letreiro');
+
+    // Velocidade constante: a duração sai da largura. Sem isso, mensagem
+    // curta voa e mensagem longa se arrasta.
+    var pista = el.querySelector('.le-pista');
+    var px = el.querySelector('.le-fita').getBoundingClientRect().width;
+    var vel = parseInt(c.velocidade, 10) || 70;   // pixels por segundo
+    pista.style.animationDuration = Math.max(8, px / vel) + 's';
+    try {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        pista.style.animation = 'none';
+        el.classList.add('parado');
+      }
+    } catch (e) {}
   }
 
   // Marcação do contador. Só o desenho: a conta roda em `ligarContagem`.
@@ -921,7 +1011,8 @@ details p{margin-top:11px; font-size:15.5px}
     headers: { apikey: CFG.anon, Authorization: 'Bearer ' + CFG.anon }
   }).then(function(r){ return r.json(); }).then(function(linhas){
     if (!linhas || !linhas.length) throw new Error('página no encontrada');
-    T = linhas[0].schema.tsl_es || {};
+    ESQ = linhas[0].schema || {};
+    T = ESQ.tsl_es || {};
     CHECKOUT = T.checkout || '';
     // Na conferência os botões aparecem mesmo sem checkout: é essa copy que
     // mais precisa ser lida antes de existir para onde mandar.
@@ -945,6 +1036,7 @@ details p{margin-top:11px; font-size:15.5px}
     montarFolheto(T.previa || {});
     montarCarrossel(T.depoimentos || {});
     ligarContagem(T.contador || {});
+    montarLetreiro(T.cabecalho);
   }).catch(function(e){
     document.getElementById('pagina').innerHTML =
       '<section class="faixa"><div class="dentro"><h2>No pude cargar la página</h2>' +
