@@ -244,6 +244,27 @@ body.com-letreiro{padding-top:38px}
 .letreiro.parado .le-pista [aria-hidden]{display:none}
 @media (min-width:900px){ .le-fita{font-size:14px} }
 
+/* ── barra fixa do celular ── */
+.barra{display:none}
+@media (max-width:899px){
+  .barra{display:flex; align-items:center; gap:12px; position:fixed; left:0; right:0;
+    bottom:0; z-index:70; background:var(--noite-3);
+    border-top:1px solid rgba(216,184,121,.35);
+    padding:11px 14px calc(11px + env(safe-area-inset-bottom, 0px))}
+  body.com-barra{padding-bottom:78px}
+  .barra-esq{flex:1; min-width:0}
+  .barra-txt{font-family:Montserrat,sans-serif; font-size:12.5px; line-height:1.3;
+    color:var(--clareza); margin:0}
+  .barra-txt b{color:var(--saude); font-weight:800}
+  .barra-rel{font-family:Montserrat,sans-serif; font-weight:800; font-size:17px;
+    letter-spacing:.04em; color:var(--saude); margin:3px 0 0;
+    font-variant-numeric:tabular-nums}
+  .barra-btn{flex:none; background:var(--saude); color:var(--noite);
+    font-family:Montserrat,sans-serif; font-weight:800; font-size:13.5px;
+    letter-spacing:.03em; text-decoration:none; padding:14px 18px;
+    border-radius:999px; box-shadow:0 0 22px rgba(216,184,121,.35)}
+}
+
 /* ── contador ── */
 .conta{margin:26px auto 0; max-width:420px}
 .heroi .conta{margin:22px 0 24px}
@@ -535,6 +556,31 @@ details p{margin-top:11px; font-size:15.5px}
         el.classList.add('parado');
       }
     } catch (e) {}
+  }
+
+  // Barra fixa no rodapé do celular: oferta e prazo à esquerda, botão à
+  // direita, sempre onde o polegar está. Lê o MESMO prazo dos contadores.
+  function montarBarra(c){
+    if (!c || !c.botao || !CHECKOUT) return;
+    var p = T.preco || {};
+    var preco = (p.moeda ? p.moeda + ' ' : '') + (p.por || '');
+    var txt = esc(c.texto || '').replace('%preco%', '<b>' + esc(preco) + '</b>');
+    var el = document.createElement('div');
+    el.className = 'barra';
+    el.innerHTML = '<div class="barra-esq"><p class="barra-txt">' + txt + '</p>' +
+      '<p class="barra-rel" id="barra-rel">00:15:00</p></div>' +
+      '<a class="barra-btn" href="' + esc(CHECKOUT) + '" rel="noopener">' + esc(c.botao) + '</a>';
+    document.body.appendChild(el);
+    document.body.classList.add('com-barra');
+    var rel = document.getElementById('barra-rel');
+    function pintar(){
+      var ate = 0; try { ate = parseInt(localStorage.getItem('oferta_ate'), 10) || 0; } catch (e) {}
+      if (!ate) return;
+      var s = Math.max(0, Math.floor((ate - Date.now()) / 1000));
+      rel.textContent = [Math.floor(s/3600), Math.floor((s%3600)/60), s%60]
+        .map(function(n){ return String(n).padStart(2,'0'); }).join(':');
+    }
+    pintar(); setInterval(pintar, 1000);
   }
 
   // Marcação do contador. Só o desenho: a conta roda em `ligarContagem`.
@@ -1047,6 +1093,7 @@ details p{margin-top:11px; font-size:15.5px}
     montarCarrossel(T.depoimentos || {});
     ligarContagem(T.contador || {});
     montarLetreiro(T.cabecalho);
+    montarBarra(T.barra);
   }).catch(function(e){
     document.getElementById('pagina').innerHTML =
       '<section class="faixa"><div class="dentro"><h2>No pude cargar la página</h2>' +
