@@ -1092,9 +1092,10 @@ details p{margin-top:11px; font-size:15.5px}
     var f = new window.St.PageFlip(el, {
       width: larg, height: alt, size: 'stretch',
       minWidth: 200, maxWidth: 520, minHeight: 290, maxHeight: Math.round(520 * alt / larg),
-      // No celular a capa não vira como «tampa dura»: nesse modo o verso dela
-      // é vazio, e a virada mostrava um bloco escuro do tamanho da página.
-      usePortrait: !largo, showCover: largo, maxShadowOpacity: .18,
+      // Capa dura em todos os tamanhos. O bloco escuro que aparecia na
+      // virada da capa no celular não era ela: era a cópia temporária da folha
+      // caindo fora da pilha, por uma regra minha de CSS já removida.
+      usePortrait: !largo, showCover: true, maxShadowOpacity: .18,
       mobileScrollSupport: true, drawShadow: true
     });
     f.loadFromHTML(paginas);
