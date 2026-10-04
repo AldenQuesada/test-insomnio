@@ -130,7 +130,9 @@ a.cta:focus-visible{outline:3px solid var(--calma); outline-offset:3px}
 .previa{margin-top:26px}
 #folheto{margin:0 auto; max-width:1040px}
 #folheto .pagina{background:var(--clareza)}
-#folheto .pagina img{width:100%; height:100%; object-fit:cover}
+/* `display:block`: imagem em linha deixa o vão da linha de base embaixo, e
+   esse vão aparecia como um filete claro sob cada página. */
+#folheto .pagina img{width:100%; height:100%; object-fit:cover; display:block}
 /* O convite na última página. Fica sobre o rodapé da folha, com um véu por
    baixo para não brigar com o texto do miolo. */
 #folheto .pagina{position:relative}
@@ -1041,7 +1043,7 @@ details p{margin-top:11px; font-size:15.5px}
     var f = new window.St.PageFlip(el, {
       width: larg, height: alt, size: 'stretch',
       minWidth: 200, maxWidth: 520, minHeight: 290, maxHeight: Math.round(520 * alt / larg),
-      usePortrait: !largo, showCover: true, maxShadowOpacity: .5,
+      usePortrait: !largo, showCover: true, maxShadowOpacity: .18,
       mobileScrollSupport: true, drawShadow: true
     });
     f.loadFromHTML(paginas);
