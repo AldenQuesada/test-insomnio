@@ -128,7 +128,10 @@ a.cta:focus-visible{outline:3px solid var(--calma); outline-offset:3px}
 
 /* ── prévia folheável ── */
 .previa{margin-top:26px}
-#folheto{margin:0 auto; max-width:1040px}
+/* A folha dobra dentro dos limites do livro. A biblioteca desenha a curva
+   como papel de verdade, e no meio da virada a ponta passava da borda e
+   invadia a área dos botões. O efeito é só folhear: nada sai do livro. */
+#folheto{margin:0 auto; max-width:1040px; overflow:hidden}
 #folheto .pagina{background:var(--clareza)}
 /* `display:block`: imagem em linha deixa o vão da linha de base embaixo, e
    esse vão aparecia como um filete claro sob cada página. */
