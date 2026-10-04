@@ -76,9 +76,14 @@
   // Conta só o tempo com a aba à vista: aba esquecida aberta atrás de outra
   // não é leitura. Manda a cada vez que a página some, com o total acumulado;
   // na análise vale o maior valor por sessão.
+  var tempoEnviado = -1;
   function enviarTempo(){
     if (visivelDesde) { visivelTotal += agora() - visivelDesde; visivelDesde = 0; }
-    gravar('tempo', { segundos: Math.round(visivelTotal / 1000), rolou: rolouMax }, true);
+    // `visibilitychange` e `pagehide` disparam juntos ao fechar: um envio só.
+    var seg = Math.round(visivelTotal / 1000);
+    if (seg === tempoEnviado) return;
+    tempoEnviado = seg;
+    gravar('tempo', { segundos: seg, rolou: rolouMax }, true);
   }
 
   R.iniciar = function(o){
@@ -125,7 +130,10 @@
           });
           io.unobserve(e.target);
         });
-      }, { threshold: 0.5 });
+      // Conta quando o bloco cruza a linha do MEIO da tela. «Metade do bloco
+      // visível» nunca acontece com bloco mais alto que a tela do celular, e
+      // assim herói, autor e bônus ficavam de fora.
+      }, { rootMargin: '-50% 0px -50% 0px', threshold: 0 });
       document.querySelectorAll('[data-bloco]').forEach(function(n){ io.observe(n); });
     }
 
