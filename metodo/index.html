@@ -230,7 +230,7 @@ ul.itens li .marca svg{width:12px; height:12px; color:var(--noite)}
 /* ── letreiro do topo ──
    Faixa fixa, o texto correndo como em telejornal. Fica por cima de tudo e o
    corpo ganha a altura dela de recuo, senão o herói nasce escondido. */
-.letreiro{position:fixed; top:0; left:0; right:0; z-index:60; height:38px;
+.letreiro{cursor:pointer; position:fixed; top:0; left:0; right:0; z-index:60; height:38px;
   display:flex; align-items:center; overflow:hidden;
   background:var(--noite-3); border-bottom:1px solid rgba(216,184,121,.35)}
 body.com-letreiro{padding-top:38px}
@@ -582,12 +582,18 @@ details p{margin-top:11px; font-size:15.5px}
     var vel   = parseInt(c.velocidade, 10) || 70;   // pixels por segundo
     var reduz = false;
     try { reduz = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
-    if (reduz) { el.classList.add('parado'); diag(el, reduz, false); return; }
+    // Decisão dela: o letreiro anda mesmo com «Reduzir movimento» ligado no
+    // aparelho (o iPhone dela está assim, e com ele parado o letreiro não
+    // cumpre a função). Nesse caso anda mais devagar, e em qualquer caso um
+    // toque pausa e outro retoma: é a saída para quem passa mal com movimento.
+    if (reduz) vel = parseInt(c.velocidade_reduzida, 10) || Math.round(vel / 2);
+    var pausado = false;
+    el.addEventListener('click', function(){ pausado = !pausado; });
 
     var x = 0, antes = 0, largura = 0;
     function passo(t){
       if (!largura) largura = fita.getBoundingClientRect().width;
-      if (antes && largura) {
+      if (antes && largura && !pausado) {
         x -= vel * Math.min(0.1, (t - antes) / 1000);
         if (x <= -largura) x += largura;   // a 2ª cópia ocupou o lugar da 1ª
         pista.style.transform = 'translate3d(' + x.toFixed(2) + 'px,0,0)';
