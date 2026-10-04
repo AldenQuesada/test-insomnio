@@ -128,10 +128,16 @@ a.cta:focus-visible{outline:3px solid var(--calma); outline-offset:3px}
 
 /* ── prévia folheável ── */
 .previa{margin-top:26px}
-/* A folha dobra dentro dos limites do livro. A biblioteca desenha a curva
-   como papel de verdade, e no meio da virada a ponta passava da borda e
-   invadia a área dos botões. O efeito é só folhear: nada sai do livro. */
-#folheto{margin:0 auto; max-width:1040px; overflow:hidden}
+/* Corte só em CIMA e EMBAIXO. No meio da virada a ponta da folha descia
+   além do livro e invadia os botões, por isso o corte vertical. Os lados
+   ficam livres: no celular a folha que vira gira para a esquerda, para fora
+   da página única, e com o corte nos lados ela sumia inteira e a página da
+   esquerda nunca aparecia. `clip-path` com margem lateral negativa faz isso
+   e funciona também em iPhone antigo, onde `overflow: clip` não existe. */
+#folheto{margin:0 auto; max-width:1040px;
+  -webkit-clip-path:inset(0 -100vw); clip-path:inset(0 -100vw)}
+/* A folha girando para fora não pode criar rolagem lateral na página. */
+[data-bloco="previa"]{overflow-x:hidden; overflow-x:clip}
 #folheto .pagina{background:var(--clareza)}
 /* `display:block`: imagem em linha deixa o vão da linha de base embaixo, e
    esse vão aparecia como um filete claro sob cada página. */
