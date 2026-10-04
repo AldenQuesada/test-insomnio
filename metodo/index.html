@@ -530,6 +530,23 @@ details p{margin-top:11px; font-size:15.5px}
     return d;
   }
 
+  // `?diag=1`: mostra na tela o que o aparelho informa à página. Serve para
+  // ver o que o telefone dela vê, sem adivinhar.
+  function diag(el, reduz, anda){
+    if (new URLSearchParams(location.search).get('diag') === null) return;
+    var d = document.createElement('div');
+    d.style.cssText = 'position:fixed;left:8px;right:8px;top:46px;z-index:99;' +
+      'background:#fff;color:#111;font:13px/1.45 monospace;padding:10px;border-radius:6px';
+    var x0 = 0;
+    function pinta(){
+      var tr = getComputedStyle(el.querySelector('.le-pista')).transform;
+      d.textContent = 'Reducir movimiento: ' + (reduz ? 'SÍ (activado)' : 'no') +
+        ' | anima: ' + (anda ? 'sí' : 'no') + ' | posición: ' + tr.slice(0, 40) +
+        ' | ' + navigator.userAgent.slice(0, 90);
+    }
+    document.body.appendChild(d); pinta(); setInterval(pinta, 500);
+  }
+
   function montarLetreiro(c){
     if (!c) return;
     var r = lerResultado();
@@ -556,21 +573,30 @@ details p{margin-top:11px; font-size:15.5px}
     el.hidden = false;
     document.body.classList.add('com-letreiro');
 
-    // Velocidade constante: a duração sai da largura. Sem isso, mensagem
-    // curta voa e mensagem longa se arrasta.
+    // O texto anda pelo próprio código, quadro a quadro, e não por animação
+    // de CSS. A animação de CSS se comporta diferente no motor do iPhone (que
+    // é o mesmo em qualquer navegador de lá), e foi ali que o letreiro ficou
+    // parado. Movendo na mão, todo motor faz igual.
     var pista = el.querySelector('.le-pista');
-    var px = el.querySelector('.le-fita').getBoundingClientRect().width;
-    var vel = parseInt(c.velocidade, 10) || 70;   // pixels por segundo
-    // A animação nasce inteira aqui, com a duração já calculada. Deixar no
-    // CSS com 0s e trocar só a duração depois funciona no Chrome, mas o Safari
-    // do iPhone não reinicia a animação, e o texto fica parado.
-    pista.style.animation = 'correr ' + Math.max(8, px / vel) + 's linear infinite';
-    try {
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        pista.style.animation = 'none';
-        el.classList.add('parado');
+    var fita  = el.querySelector('.le-fita');
+    var vel   = parseInt(c.velocidade, 10) || 70;   // pixels por segundo
+    var reduz = false;
+    try { reduz = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+    if (reduz) { el.classList.add('parado'); diag(el, reduz, false); return; }
+
+    var x = 0, antes = 0, largura = 0;
+    function passo(t){
+      if (!largura) largura = fita.getBoundingClientRect().width;
+      if (antes && largura) {
+        x -= vel * Math.min(0.1, (t - antes) / 1000);
+        if (x <= -largura) x += largura;   // a 2ª cópia ocupou o lugar da 1ª
+        pista.style.transform = 'translate3d(' + x.toFixed(2) + 'px,0,0)';
       }
-    } catch (e) {}
+      antes = t;
+      requestAnimationFrame(passo);
+    }
+    requestAnimationFrame(passo);
+    diag(el, reduz, true);
   }
 
   // Barra fixa no rodapé do celular: oferta e prazo à esquerda, botão à
