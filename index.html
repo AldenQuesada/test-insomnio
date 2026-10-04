@@ -686,7 +686,10 @@ a.cta-res{
         dur:    respostas.dur || '',
         nome:   pessoa.nome || '',
         sexo:   pessoa.sexo || '',
-        quando: Date.now()
+        quando: Date.now(),
+        // A página do método reusa esta sessão nos eventos dela: assim o
+        // funil de uma mesma pessoa se lê de ponta a ponta.
+        sessao: sessao
       }));
     } catch (e) {}   // janela anônima, armazenamento bloqueado, cota cheia
   }
@@ -726,6 +729,9 @@ a.cta-res{
     tela.querySelector('.apoio').textContent = faixaCorpo[res.faixa] || '';
     tela.querySelector('.aviso').textContent = res.aviso;
     if (cta.url) {
+      tela.querySelector('.cta-res').addEventListener('click', function(){
+        evento('cta_resultado', { destino: cta.url });
+      });
       tela.querySelector('.chamada').textContent =
         preencherNome(faixaChamada[res.faixa] || '');
     }

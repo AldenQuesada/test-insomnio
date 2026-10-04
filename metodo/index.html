@@ -470,6 +470,7 @@ details p{margin-top:11px; font-size:15.5px}
 
 <script src="vendor/page-flip.browser.js"></script>
 <script src="../config.js"></script>
+<script src="rastreio.js"></script>
 <script>
 (function(){
   var CFG = window.QUIZ_CONFIG || {};
@@ -641,6 +642,7 @@ details p{margin-top:11px; font-size:15.5px}
         n.querySelector('[data-u="m"]').textContent = mm;
         n.querySelector('[data-u="s"]').textContent = ss;
         n.classList.toggle('zerado', s === 0);
+        if (s === 0 && window.RastreioTSL) window.RastreioTSL.evento('contador_cero');
         if (s === 0 && c.expirado) {
           var t = n.querySelector('.conta-tit');
           if (t) t.textContent = c.expirado;
@@ -1054,7 +1056,11 @@ details p{margin-top:11px; font-size:15.5px}
     function pintar(){
       if (conta) conta.textContent = (f.getCurrentPageIndex() + 1) + ' / ' + f.getPageCount();
     }
-    f.on('flip', pintar); pintar();
+    f.on('flip', function(){
+      pintar();
+      if (window.RastreioTSL) window.RastreioTSL.pagina(f.getCurrentPageIndex() + 1);
+    });
+    pintar();
     document.querySelectorAll('.pv').forEach(function(b){
       b.onclick = function(){
         parar();
@@ -1086,11 +1092,12 @@ details p{margin-top:11px; font-size:15.5px}
     } else { andar(); }
   }
 
-  fetch(CFG.url + '/rest/v1/quiz_templates?select=schema&slug=eq.' + CFG.slug + '&active=eq.true', {
+  fetch(CFG.url + '/rest/v1/quiz_templates?select=id,schema&slug=eq.' + CFG.slug + '&active=eq.true', {
     headers: { apikey: CFG.anon, Authorization: 'Bearer ' + CFG.anon }
   }).then(function(r){ return r.json(); }).then(function(linhas){
     if (!linhas || !linhas.length) throw new Error('página no encontrada');
     ESQ = linhas[0].schema || {};
+    var QUIZ_ID = linhas[0].id;
     T = ESQ.tsl_es || {};
     CHECKOUT = T.checkout || '';
     // Na conferência os botões aparecem mesmo sem checkout: é essa copy que
@@ -1109,7 +1116,10 @@ details p{margin-top:11px; font-size:15.5px}
       if (i === 1) html += saudacao();
       // O segundo argumento existe para os blocos que precisam olhar fora da
       // própria chave: a prova repetida do fim e o atalho, que mostra o preço.
-      if (BLOCOS[nome]) html += BLOCOS[nome](T[nome] || {}, T);
+      // Cada seção leva o nome do bloco: é o que o rastreio usa para dizer
+      // em que ponto da página a pessoa parou.
+      if (BLOCOS[nome]) html += String(BLOCOS[nome](T[nome] || {}, T))
+        .replace('<section ', '<section data-bloco="' + nome + '" ');
     });
     document.getElementById('pagina').innerHTML = html;
     montarFolheto(T.previa || {});
@@ -1117,6 +1127,9 @@ details p{margin-top:11px; font-size:15.5px}
     ligarContagem(T.contador || {});
     montarLetreiro(T.cabecalho);
     montarBarra(T.barra);
+    if (window.RastreioTSL && !PREVIA) window.RastreioTSL.iniciar({
+      url: CFG.url, anon: CFG.anon, quizId: QUIZ_ID,
+      rastreio: ESQ.rastreio || {}, resultado: lerResultado() });
   }).catch(function(e){
     document.getElementById('pagina').innerHTML =
       '<section class="faixa"><div class="dentro"><h2>No pude cargar la página</h2>' +
