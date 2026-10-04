@@ -38,7 +38,8 @@ body{
 #pagina > section.faixa + section.faixa{border-top:1px solid rgba(244,240,232,.07)}
 /* `.faixa` junto para empatar com a regra da alternância acima: sem ele a
    pseudo-classe ganhava e o herói perdia a própria cor. */
-#pagina > section.faixa.heroi{background:var(--noite); border-top:0}
+#pagina > section.faixa.heroi{background:var(--noite); border-top:0; padding-top:30px}
+@media (min-width:900px){ #pagina > section.faixa.heroi{padding-top:44px} }
 .escura{background:var(--noite-3)}
 .ameixa{background:var(--noite)}
 .o2-img{width:100%; max-width:330px; margin:26px auto 4px}
@@ -187,7 +188,7 @@ ul.itens li .marca svg{width:12px; height:12px; color:var(--noite)}
   font-size:15.5px; line-height:1.45}
 .pilha .marca{flex:none}
 .pilha li.com-capa{align-items:center; padding:16px 0}
-.p-capa{width:46px; height:auto; flex:none; border-radius:3px;
+.p-capa{width:74px; height:auto; flex:none; border-radius:3px;
   box-shadow:0 4px 14px rgba(0,0,0,.45)}
 .p-nome{flex:1; border-bottom:1px dotted rgba(244,240,232,.25); padding-bottom:3px}
 .p-val{flex:none; font-weight:700; color:var(--saude); white-space:nowrap}
@@ -232,7 +233,7 @@ ul.itens li .marca svg{width:12px; height:12px; color:var(--noite)}
   background:var(--noite-3); border-bottom:1px solid rgba(216,184,121,.35)}
 body.com-letreiro{padding-top:38px}
 .le-pista{display:flex; white-space:nowrap; will-change:transform;
-  animation:correr linear infinite}
+}
 .le-fita{font-family:Montserrat,sans-serif; font-size:13px; font-weight:600;
   letter-spacing:.03em; color:var(--clareza); padding-right:0}
 .le-fita i{font-style:normal; color:var(--saude); margin:0 6px}
@@ -557,7 +558,10 @@ details p{margin-top:11px; font-size:15.5px}
     var pista = el.querySelector('.le-pista');
     var px = el.querySelector('.le-fita').getBoundingClientRect().width;
     var vel = parseInt(c.velocidade, 10) || 70;   // pixels por segundo
-    pista.style.animationDuration = Math.max(8, px / vel) + 's';
+    // A animação nasce inteira aqui, com a duração já calculada. Deixar no
+    // CSS com 0s e trocar só a duração depois funciona no Chrome, mas o Safari
+    // do iPhone não reinicia a animação, e o texto fica parado.
+    pista.style.animation = 'correr ' + Math.max(8, px / vel) + 's linear infinite';
     try {
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         pista.style.animation = 'none';
@@ -573,7 +577,11 @@ details p{margin-top:11px; font-size:15.5px}
     var p = T.preco || {};
     var preco = (p.moeda ? p.moeda + ' ' : '') + (p.por || '');
     var de = (p.moeda ? p.moeda + ' ' : '') + (c.de || '');
-    var txt = esc(c.texto || '').replace('%preco%', '<b>' + esc(preco) + '</b>')
+    // Desconto calculado, nunca escrito: se o preço mudar, o % acompanha.
+    function num(v){ return parseFloat(String(v || '').replace(',', '.')) || 0; }
+    var off = num(c.de) ? Math.round((1 - num(p.por) / num(c.de)) * 100) : 0;
+    var txt = esc(c.texto || '').replace('%off%', '<b>' + off + '% OFF</b>')
+                                 .replace('%preco%', '<b>' + esc(preco) + '</b>')
                                  .replace('%de%', '<s>' + esc(de) + '</s>');
     var el = document.createElement('div');
     el.className = 'barra';
