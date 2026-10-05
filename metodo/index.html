@@ -439,9 +439,11 @@ details p{margin-top:11px; font-size:15.5px}
 .r-pagos{display:flex; flex-wrap:wrap; gap:9px; justify-content:center}
 .r-links{display:flex; flex-direction:column; gap:9px; align-items:center}
 /* Selos de pagamento: cartão branco com a marca, como em checkout. */
-.r-logo{background:#fff; border:0; padding:0; width:58px; height:38px; border-radius:6px;
-  display:inline-flex; align-items:center; justify-content:center}
-.r-logo img{width:30px; height:30px; display:block}
+.r-logo{background:#fff; border:0; padding:0; width:52px; height:36px; border-radius:6px;
+  display:inline-flex; align-items:center; justify-content:center; flex:none}
+.r-logo img{width:28px; height:28px; display:block}
+/* Os cinco selos numa linha só: 5 × 52 + 4 × 7 = 288px, cabe na coluna. */
+.r-pagos:has(.r-logo){flex-wrap:nowrap; gap:7px}
 .r-pago{font-family:Montserrat,sans-serif; font-size:12.5px; color:#9aa2b6;
   border:1px solid #39415a; border-radius:5px; padding:5px 13px}
 .r-link{font-family:Montserrat,sans-serif; font-size:14px; font-weight:300;
