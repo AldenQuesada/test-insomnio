@@ -5,7 +5,7 @@
 <title>Venciendo el Insomnio en 7 días · Dr. Alden J. Quesada</title>
 <meta name="description" content="El método completo del Dr. Alden J. Quesada para volver a dormir la noche entera, sin depender de medicamentos controlados.">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Lora:ital,wght@0,400;0,600;1,400;1,600&family=Montserrat:wght@300;400;500;600;700&family=Patrick+Hand&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Lora:ital,wght@0,400;0,600;1,400;1,600&family=Montserrat:wght@300;400;500;600;700&display=swap">
 <style>
 /* Identidade da marca, da folha dela. A paleta anterior era a da página que
    serviu de modelo de ESTRUTURA, não de marca, e isso eu tinha misturado. */
@@ -142,13 +142,14 @@ a.cta:focus-visible{outline:3px solid var(--calma); outline-offset:3px}
 /* `display:block`: imagem em linha deixa o vão da linha de base embaixo, e
    esse vão aparecia como um filete claro sob cada página. */
 #folheto .pagina img{width:100%; height:100%; object-fit:cover; display:block}
-/* O mapa ocupa a folha inteira, e o botão fica em cima do passo 3. */
-#folheto .mapa{background:#f7f2e7}
-#folheto .mapa-svg{width:100%; height:100%; display:block}
+/* A última página é a imagem do caminho, e o botão fica em cima do último
+   passo: a curiosidade é ver como a noite termina. */
+#folheto .mapa{background:#111b32}
+#folheto .mapa img{object-position:center top}
 /* Altura em % da folha: com altura fixa, no computador a folha é mais alta e
    o passo 3 aparecia inteiro embaixo do botão. Só a bandeirinha e a pontinha
    do cartão ficam de fora, de propósito. */
-#folheto .mapa .pv-cta{top:83%; bottom:auto; height:12.5%; padding:0;
+#folheto .mapa .pv-cta{top:83.5%; bottom:auto; height:11%; padding:0;
   display:flex; align-items:center; justify-content:center;
   font-size:clamp(14px, 2.2vw, 20px)}
 /* O convite na última página. Fica sobre o rodapé da folha, com um véu por
@@ -674,98 +675,6 @@ details p{margin-top:11px; font-size:15.5px}
     }).observe(alvo);
   }
 
-  // ── O mapa da última página da revista ─────────────────────────────
-  // Desenho de criança em folha de caderno: o caminho de quem está acordado
-  // às 3 da manhã até a noite inteira, com os passos como casas de um jogo de
-  // tabuleiro. O passo 3 fica embaixo do botão «Leer más»: a curiosidade é o
-  // gancho. Só o traço mora aqui; todo texto vem do banco (`previa.final`).
-  function mapaSvg(m){
-    function linhas(t, x, y, tam, cor, anc){
-      return String(t || '').split('\n').map(function(l, i){
-        return '<text x="' + x + '" y="' + (y + i * tam * 1.05) + '" font-size="' + tam +
-               '" fill="' + cor + '" text-anchor="' + (anc || 'start') + '">' + esc(l) + '</text>';
-      }).join('');
-    }
-    var P = m.passos || [], ps = m.pensamentos || [];
-    var tinta = '#1b2440', areia = '#ead8ac', lila = '#b7aacd', ouro = '#d8b879', coral = '#e07a5f';
-    var pauta = '';
-    for (var y = 66; y < 526; y += 22) pauta += '<line x1="0" y1="' + y + '" x2="350" y2="' + y + '" />';
-    var estrelas = [[22,22],[328,30],[312,150],[30,190],[330,420]].map(function(e){
-      return '<path d="M' + e[0] + ' ' + (e[1]-6) + ' l1.8 4.2 4.4.4-3.3 2.9 1 4.3-3.9-2.3-3.9 2.3 1-4.3-3.3-2.9 4.4-.4z" fill="' + ouro + '"/>';
-    }).join('');
-    function casa(x, y, n, cor){
-      return '<line x1="' + x + '" y1="' + (y-16) + '" x2="' + x + '" y2="' + (y-40) + '" stroke="' + tinta + '" stroke-width="2"/>' +
-             '<path d="M' + x + ' ' + (y-40) + ' l16 5 -16 6z" fill="' + coral + '" stroke="' + tinta + '" stroke-width="1.5"/>' +
-             '<circle cx="' + x + '" cy="' + y + '" r="16" fill="' + cor + '" stroke="' + tinta + '" stroke-width="2.6"/>' +
-             '<text x="' + x + '" y="' + (y+6) + '" font-size="19" fill="' + tinta + '" text-anchor="middle">' + n + '</text>';
-    }
-    function cartao(x, y, w, giro, p){
-      return '<g transform="rotate(' + giro + ' ' + (x + w/2) + ' ' + (y + 26) + ')">' +
-        '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="54" rx="9" fill="#fff" stroke="' + tinta + '" stroke-width="2"/>' +
-        linhas(p.rotulo, x + 10, y + 16, 12, '#a07d36') +
-        linhas(p.titulo, x + 10, y + 33, 16, tinta) + '</g>';
-    }
-    var caminho = 'M110 252 C110 296 255 278 250 332 S95 372 105 426 S240 472 286 548';
-    return '<svg class="mapa-svg" viewBox="0 0 350 526" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" font-family="\'Patrick Hand\', \'Comic Sans MS\', cursive" role="img" aria-label="' + esc(m.titulo || '') + '">' +
-      '<defs><filter id="lapis" x="-5%" y="-5%" width="110%" height="110%">' +
-        '<feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="7"/>' +
-        '<feDisplacementMap in="SourceGraphic" scale="2.6"/></filter></defs>' +
-      '<rect width="350" height="526" fill="#f7f2e7"/>' +
-      '<g stroke="#d9d1e6" stroke-width=".7">' + pauta + '</g>' +
-      '<line x1="30" y1="0" x2="30" y2="526" stroke="#ecb4a6" stroke-width="1.2"/>' +
-      estrelas +
-      linhas(m.titulo, 175, 38, 25, tinta, 'middle') +
-      '<path d="M78 48 q15 -6 30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0" fill="none" stroke="' + ouro + '" stroke-width="2.6" stroke-linecap="round"/>' +
-      '<g filter="url(#lapis)" stroke-linejoin="round" stroke-linecap="round">' +
-        // nuvem de pensamentos
-        '<g stroke="' + tinta + '" stroke-width="2.4" fill="#fff">' +
-          [[150,96,22],[178,76,26],[218,68,28],[258,76,25],[290,94,20],[262,112,22],[214,114,25],[176,113,21]].map(function(c){
-            return '<circle cx="' + c[0] + '" cy="' + c[1] + '" r="' + c[2] + '"/>'; }).join('') + '</g>' +
-        '<g fill="#fff">' +
-          [[150,96,20],[178,76,24],[218,68,26],[258,76,23],[290,94,18],[262,112,20],[214,114,23],[176,113,19],[218,94,30]].map(function(c){
-            return '<circle cx="' + c[0] + '" cy="' + c[1] + '" r="' + c[2] + '"/>'; }).join('') + '</g>' +
-        '<circle cx="96" cy="126" r="4.5" fill="#fff" stroke="' + tinta + '" stroke-width="2"/>' +
-        '<circle cx="112" cy="112" r="6.5" fill="#fff" stroke="' + tinta + '" stroke-width="2"/>' +
-        // relógio e rabiscos dentro da nuvem
-        '<circle cx="164" cy="92" r="12" fill="#fff" stroke="' + coral + '" stroke-width="2.4"/>' +
-        '<path d="M164 84 v8 l6 4" fill="none" stroke="' + coral + '" stroke-width="2.4"/>' +
-        '<path d="M284 64 c-7 0 -9 9 -2 10 c8 1 8 -12 -3 -12 c-11 0 -12 18 1 18" fill="none" stroke="' + lila + '" stroke-width="2.2"/>' +
-        '<path d="M190 112 l7 -7 l6 7 l7 -7 l6 7" fill="none" stroke="' + coral + '" stroke-width="2.2"/>' +
-        // cama
-        '<rect x="22" y="132" width="13" height="70" rx="4" fill="#c49a62" stroke="' + tinta + '" stroke-width="2.2"/>' +
-        '<rect x="30" y="172" width="168" height="26" rx="8" fill="#fff" stroke="' + tinta + '" stroke-width="2.2"/>' +
-        '<rect x="36" y="196" width="7" height="12" fill="#c49a62" stroke="' + tinta + '" stroke-width="1.8"/>' +
-        '<rect x="186" y="196" width="7" height="12" fill="#c49a62" stroke="' + tinta + '" stroke-width="1.8"/>' +
-        '<ellipse cx="62" cy="170" rx="24" ry="11" fill="#fff" stroke="' + tinta + '" stroke-width="2.2"/>' +
-        '<rect x="80" y="160" width="120" height="30" rx="14" fill="' + lila + '" stroke="' + tinta + '" stroke-width="2.2"/>' +
-        '<path d="M110 162 v26 M140 161 v28 M170 162 v26" stroke="#fff" stroke-width="2.4"/>' +
-        // cabeça acordada
-        '<circle cx="64" cy="152" r="17" fill="#f2c79f" stroke="' + tinta + '" stroke-width="2.4"/>' +
-        '<path d="M48 146 l5 -9 l4 6 l4 -9 l4 7 l5 -9 l3 8 l6 -6" fill="none" stroke="' + tinta + '" stroke-width="2.4"/>' +
-        '<circle cx="58" cy="152" r="5" fill="#fff" stroke="' + tinta + '" stroke-width="1.8"/>' +
-        '<circle cx="71" cy="152" r="5" fill="#fff" stroke="' + tinta + '" stroke-width="1.8"/>' +
-        '<circle cx="58" cy="152" r="2" fill="' + tinta + '"/><circle cx="71" cy="152" r="2" fill="' + tinta + '"/>' +
-        '<path d="M53 159 q5 3 10 0 M66 159 q5 3 10 0" fill="none" stroke="' + lila + '" stroke-width="1.8"/>' +
-        '<path d="M58 164 q3 -2 6 0 t6 0" fill="none" stroke="' + tinta + '" stroke-width="1.8"/>' +
-        // o caminho, como estrada de jogo de tabuleiro
-        '<path d="' + caminho + '" fill="none" stroke="' + tinta + '" stroke-width="35"/>' +
-        '<path d="' + caminho + '" fill="none" stroke="' + areia + '" stroke-width="30"/>' +
-        '<path d="' + caminho + '" fill="none" stroke="#fff" stroke-width="2.4" stroke-dasharray="7 9"/>' +
-      '</g>' +
-      // Zzz riscado
-      '<text x="126" y="148" font-size="20" fill="' + tinta + '">Zzz</text>' +
-      '<path d="M122 133 l38 19 M160 133 l-38 19" stroke="' + coral + '" stroke-width="2" stroke-linecap="round" opacity=".9"/>' +
-      linhas(ps[0], 196, 82, 14, coral) + linhas(ps[1], 222, 104, 13, tinta) +
-      linhas(m.legenda, 112, 226, 15, tinta, 'middle') +
-      casa(192, 282, 1, ouro) + casa(172, 379, 2, lila) + casa(172, 470, 3, coral) +
-      (P[0] ? cartao(212, 250, 128, 3, P[0]) : '') +
-      (P[1] ? cartao(12, 350, 140, -3, P[1]) : '') +
-      (P[2] ? cartao(200, 446, 138, 2, P[2]) : '') +
-      '<text x="300" y="440" font-size="22" fill="' + coral + '">?</text>' +
-      '<text x="40" y="468" font-size="18" fill="' + coral + '">?</text>' +
-      '</svg>';
-  }
-
   // Marcação do contador. Só o desenho: a conta roda em `ligarContagem`.
   function contagem(c){
     if (!c || !c.minutos) return '';
@@ -973,7 +882,8 @@ details p{margin-top:11px; font-size:15.5px}
           return '<div class="pagina"><img src="' + esc(u) + '" alt="" loading="lazy">' +
                  fim + '</div>';
         }).join('') +
-        (c.final ? '<div class="pagina mapa">' + mapaSvg(c.final) +
+        (c.final && c.final.imagem ? '<div class="pagina mapa"><img src="' +
+          esc(c.final.imagem) + '" alt="" loading="lazy">' +
           (c.cta && CHECKOUT ? '<a class="pv-cta" href="' + esc(CHECKOUT) +
             '" rel="noopener">' + esc(c.cta) + '</a>' : '') + '</div>' : '') +
         '</div>' +
