@@ -20,23 +20,25 @@ body{
   margin:0; background:var(--noite); color:var(--luz);
   font-family:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,sans-serif;
   font-size:15px; line-height:1.5;
-  padding:16px; padding-bottom:48px;
+  padding:16px; padding-bottom:56px;
 }
-.folha{max-width:980px; margin:0 auto}
+.folha{max-width:820px; margin:0 auto}
 h1{font-size:19px; margin:0 0 2px; font-weight:600}
-h2{font-size:15px; margin:28px 0 10px; font-weight:600; color:var(--luz)}
+h2{font-size:15.5px; margin:0 0 3px; font-weight:600}
 .sub{color:var(--luz-3); font-size:13px; margin:0 0 18px}
+.secao{margin:34px 0 0}
+.secao .porque{color:var(--luz-3); font-size:12.5px; margin:0 0 12px}
 
 /* ── login ───────────────────────────────────────────────────────── */
 .entrar{max-width:320px; margin:12vh auto 0}
 label{display:block; margin:0 0 12px}
 label span{display:block; font-size:13px; color:var(--luz-2); margin-bottom:5px}
-input, select{
+input{
   width:100%; padding:11px 12px; font-size:16px; font-family:inherit;
   background:var(--noite-2); color:var(--luz);
   border:1px solid var(--linha); border-radius:9px;
 }
-input:focus, select:focus{outline:2px solid var(--lua); outline-offset:1px}
+input:focus{outline:2px solid var(--lua); outline-offset:1px}
 /* Campo de senha com o olho dentro. Digitar senha às cegas no celular, com
    teclado que troca letra, é o motivo nº 1 de "não consigo entrar". */
 .campo-senha{position:relative; display:block}
@@ -57,43 +59,137 @@ button.principal{
 button.principal:disabled{opacity:.5; cursor:default}
 .erro{color:var(--perda); font-size:13px; margin-top:10px; min-height:18px}
 
-/* ── barra de período ────────────────────────────────────────────── */
-.topo{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:4px}
+/* ── topo ────────────────────────────────────────────────────────── */
+.topo{display:flex; align-items:flex-start; gap:10px; margin-bottom:12px}
 .topo .cresce{flex:1}
-.periodos{display:flex; gap:6px; flex-wrap:wrap}
+.sair{background:none; border:0; color:var(--luz-3); font-size:13px; cursor:pointer; font-family:inherit; padding:4px 0}
+.periodos{display:flex; gap:6px; flex-wrap:wrap; margin-bottom:20px}
 .periodos button{
-  padding:7px 12px; font-size:13px; font-family:inherit; cursor:pointer;
+  padding:7px 13px; font-size:13px; font-family:inherit; cursor:pointer;
   background:var(--noite-2); color:var(--luz-2);
-  border:1px solid var(--linha); border-radius:8px;
+  border:1px solid var(--linha); border-radius:20px;
 }
-.periodos button[aria-pressed="true"]{background:var(--noite-3); color:var(--luz); border-color:var(--lua)}
-.sair{background:none; border:0; color:var(--luz-3); font-size:13px; cursor:pointer; font-family:inherit; padding:7px 0}
+.periodos button[aria-pressed="true"]{background:var(--lua); color:#11151d; border-color:var(--lua); font-weight:600}
 
-/* ── funil ───────────────────────────────────────────────────────── */
-.passo{margin:0 0 9px}
-.passo .rot{display:flex; justify-content:space-between; align-items:baseline; gap:10px; font-size:13px; margin-bottom:4px}
-.passo .rot b{font-weight:600; font-size:14px}
-.passo .rot .pct{color:var(--luz-3); font-variant-numeric:tabular-nums}
-.trilho{height:22px; background:var(--noite-2); border-radius:6px; overflow:hidden; position:relative}
-.cheio{height:100%; background:var(--noite-3); border-right:2px solid var(--lua); transition:width .4s ease}
-.queda{font-size:12px; color:var(--luz-3); margin:2px 0 0; padding-left:1px}
-.queda.forte{color:var(--perda); font-weight:600}
+/* ── números grandes ─────────────────────────────────────────────── */
+.resumo{display:grid; grid-template-columns:repeat(3,1fr); gap:9px; margin-bottom:18px}
+.bloco{background:var(--noite-2); border:1px solid var(--linha); border-radius:12px; padding:13px 12px}
+.bloco .v{font-size:25px; font-weight:600; font-variant-numeric:tabular-nums; line-height:1.15}
+.bloco .k{font-size:12px; color:var(--luz-3); margin-top:3px}
+.bloco.bom .v{color:var(--calmo)}
 
-/* ── tabelas ─────────────────────────────────────────────────────── */
-table{width:100%; border-collapse:collapse; font-size:13.5px}
-th,td{text-align:left; padding:8px 10px; border-bottom:1px solid var(--linha)}
-th{color:var(--luz-3); font-weight:500; font-size:12.5px}
-td.n, th.n{text-align:right; font-variant-numeric:tabular-nums}
-.vazio{color:var(--luz-3); font-size:13.5px; padding:10px 0}
+/* O diagnóstico em uma frase. É o que ela lê primeiro e, muitas vezes, a
+   única coisa que precisa ler. */
+.veredito{
+  display:flex; gap:11px; align-items:flex-start;
+  background:rgba(226,104,90,.10); border:1px solid rgba(226,104,90,.38);
+  border-radius:12px; padding:13px 14px; margin-bottom:6px;
+}
+.veredito.ok{background:rgba(87,193,147,.10); border-color:rgba(87,193,147,.38)}
+.veredito .ic{flex:none; color:var(--perda); margin-top:1px}
+.veredito.ok .ic{color:var(--calmo)}
+.veredito .ic svg{width:19px; height:19px; display:block}
+.veredito b{display:block; font-size:14.5px; font-weight:600; margin-bottom:1px}
+.veredito p{margin:0; font-size:13px; color:var(--luz-2)}
 
-/* ── cartões ─────────────────────────────────────────────────────── */
-.cartoes{display:grid; grid-template-columns:repeat(auto-fit,minmax(145px,1fr)); gap:10px}
-.cartao{background:var(--noite-2); border:1px solid var(--linha); border-radius:10px; padding:12px}
-.cartao .v{font-size:21px; font-weight:600; font-variant-numeric:tabular-nums}
-.cartao .k{font-size:12.5px; color:var(--luz-3); margin-top:2px}
+/* ── o caminho ───────────────────────────────────────────────────── */
+.fluxo{margin-top:4px}
+.no{
+  display:flex; align-items:center; gap:12px; position:relative;
+  background:var(--noite-2); border:1px solid var(--linha);
+  border-radius:12px; padding:10px 13px;
+}
+.no-ic{
+  flex:none; width:34px; height:34px; border-radius:9px;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--noite-3); color:var(--luz-3);
+}
+.no-ic svg{width:17px; height:17px; display:block}
+.no-txt{min-width:0}
+.no-n{font-size:21px; font-weight:600; font-variant-numeric:tabular-nums; line-height:1.15}
+.no-rot{font-size:13px; color:var(--luz-2); display:block}
+.no-aviso{display:block; font-size:11.5px; color:var(--luz-3); font-style:italic; margin-top:2px}
+.no-pct{
+  margin-left:auto; flex:none; font-size:12px; color:var(--luz-3);
+  font-variant-numeric:tabular-nums; text-align:right;
+}
+.no.inicio{border-color:var(--lua)}
+.no.inicio .no-ic{background:rgba(226,160,74,.16); color:var(--lua)}
+.no.fim{border-color:var(--calmo)}
+.no.fim .no-ic{background:rgba(87,193,147,.16); color:var(--calmo)}
+.no.fim .no-n{color:var(--calmo)}
+
+/* A ligação entre dois passos. A linha vertical é o caminho; o cotovelo
+   vermelho é quem saiu, desenhado SAINDO do caminho, como no mapa de funil:
+   perda que não é desenhada vira perda que ninguém olha. */
+.elo{position:relative; margin-left:30px; padding:9px 0 9px 24px; min-height:46px}
+.elo::before{content:""; position:absolute; left:0; top:-1px; bottom:-1px; width:2px; background:var(--linha)}
+.elo .cotovelo{
+  position:absolute; left:0; top:10px; width:17px; height:13px;
+  border-left:2px solid var(--perda); border-bottom:2px solid var(--perda);
+  border-bottom-left-radius:9px;
+}
+.elo .saiu{font-size:12.5px; color:var(--perda); font-weight:600; line-height:1.3}
+.elo .segue{font-size:12px; color:var(--luz-3); margin-top:1px}
+.elo.grave .cotovelo{border-color:var(--perda); border-left-width:3px; border-bottom-width:3px}
+.elo.grave .saiu{font-size:13.5px}
+.elo.limpo .segue{color:var(--luz-3)}
+.elo .aviso{font-size:12px; color:var(--luz-3); font-style:italic}
+
+/* bloco das perguntas, que abre */
+.grupo{border:1px dashed var(--linha); border-radius:12px; padding:9px; background:rgba(26,33,48,.5)}
+.grupo .no{background:var(--noite-2)}
+.abrir{
+  display:block; width:100%; margin-top:8px; padding:7px;
+  background:none; border:0; color:var(--luz-3);
+  font-size:12.5px; font-family:inherit; cursor:pointer; border-radius:8px;
+}
+.abrir:hover{color:var(--luz-2); background:var(--noite-2)}
+.dentro{margin-top:9px}
+.dentro .elo{min-height:40px}
+
+/* ── listas ──────────────────────────────────────────────────────── */
+.lista{display:flex; flex-direction:column; gap:7px}
+.item{
+  background:var(--noite-2); border:1px solid var(--linha);
+  border-radius:11px; padding:11px 13px; position:relative; overflow:hidden;
+}
+/* Barra de fundo proporcional ao volume: dá para ler a tabela de relance,
+   sem comparar número com número. */
+.item .fundo{position:absolute; inset:0 auto 0 0; background:var(--noite-3); z-index:0}
+.item .frente{position:relative; z-index:1; display:flex; align-items:center; gap:10px}
+/* Sem cortar com reticências: nome de anúncio e de navegador é o que ela
+   precisa ler inteiro para saber do que se trata. */
+.item .nome{font-size:13.5px; font-weight:600; min-width:0; overflow-wrap:anywhere}
+.item .nums{margin-left:auto; flex:none; display:flex; gap:14px; align-items:baseline}
+.item .nums span{font-size:12px; color:var(--luz-3); font-variant-numeric:tabular-nums}
+.item .nums b{font-size:14px; font-variant-numeric:tabular-nums}
+.item .nums b.conv{color:var(--calmo)}
+.item .nums b.conv.zero{color:var(--luz-3)}
+
+.cartoes{display:grid; grid-template-columns:repeat(auto-fit,minmax(138px,1fr)); gap:9px}
+.cartao{background:var(--noite-2); border:1px solid var(--linha); border-radius:11px; padding:12px}
+.cartao .v{font-size:20px; font-weight:600; font-variant-numeric:tabular-nums}
+.cartao .k{font-size:12px; color:var(--luz-3); margin-top:2px}
+.cartao.alerta{border-color:rgba(226,104,90,.5)}
 .cartao.alerta .v{color:var(--perda)}
-.nota{font-size:12.5px; color:var(--luz-3); margin:10px 0 0}
+
+.vazio{
+  color:var(--luz-3); font-size:13.5px; padding:16px; text-align:center;
+  border:1px dashed var(--linha); border-radius:11px;
+}
+.nota{font-size:12px; color:var(--luz-3); margin:10px 0 0}
 .oculto{display:none}
+
+/* Três números continuam em três colunas no celular: quebrar em duas deixa
+   o terceiro sozinho e desequilibrado. Encolhe a fonte, não a grade. */
+@media (max-width:430px){
+  .bloco{padding:11px 9px}
+  .bloco .v{font-size:19px}
+  .bloco .k{font-size:11px}
+  .item .nums{gap:9px}
+  .item .nums span{font-size:11px}
+}
 </style>
 </head>
 <body>
@@ -124,34 +220,48 @@ td.n, th.n{text-align:right; font-variant-numeric:tabular-nums}
   <div class="topo">
     <div class="cresce">
       <h1>Funil do teste</h1>
-      <p class="sub" id="resumo">a carregar…</p>
+      <p class="sub" id="resumo" style="margin-bottom:0">a carregar…</p>
     </div>
     <button class="sair" id="btsair">sair</button>
   </div>
+
   <div class="periodos" id="periodos">
     <button data-dias="7">7 dias</button>
     <button data-dias="30" aria-pressed="true">30 dias</button>
     <button data-dias="0">tudo</button>
   </div>
 
-  <h2>Onde cada visita para</h2>
-  <div id="funil"></div>
-  <p class="nota" id="nota-funil"></p>
+  <div class="resumo" id="numeros"></div>
+  <div id="veredito"></div>
 
-  <h2>Tela em que fechou a página</h2>
-  <div id="saidas"></div>
+  <div class="secao">
+    <h2>O caminho</h2>
+    <p class="porque">Cada caixa é uma tela. O traço vermelho é quem foi embora ali.</p>
+    <div id="fluxo"></div>
+  </div>
 
-  <h2>Por anúncio</h2>
-  <div id="criativos"></div>
+  <div class="secao">
+    <h2>Por anúncio</h2>
+    <p class="porque">Qual peça traz gente que termina o teste, e qual só traz clique.</p>
+    <div id="criativos"></div>
+  </div>
 
-  <h2>Por aparelho e navegador</h2>
-  <div id="aparelhos"></div>
+  <div class="secao">
+    <h2>Por aparelho</h2>
+    <p class="porque">Quem abre dentro do Instagram costuma converter menos que quem abre no navegador normal.</p>
+    <div id="aparelhos"></div>
+  </div>
 
-  <h2>Saúde técnica</h2>
-  <div class="cartoes" id="tecnico"></div>
+  <div class="secao">
+    <h2>Problemas técnicos</h2>
+    <p class="porque">Lead perdido sem ser por causa do texto.</p>
+    <div class="cartoes" id="tecnico"></div>
+  </div>
 
-  <h2>Por dia</h2>
-  <div id="dias"></div>
+  <div class="secao">
+    <h2>Dia a dia</h2>
+    <div id="dias"></div>
+  </div>
 </div>
 
 <script src="../config.js"></script>
@@ -170,16 +280,27 @@ td.n, th.n{text-align:right; font-variant-numeric:tabular-nums}
   }
   function num(n){ return (n == null ? '—' : Number(n).toLocaleString('pt-BR')); }
 
+  // ── ícones ────────────────────────────────────────────────────────
+  // Inline, pelo mesmo motivo do quiz: dois desenhos não justificam baixar
+  // uma fonte de ícones que pode nem carregar.
+  var T = 'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"';
+  var IC = {
+    olho:   '<svg viewBox="0 0 24 24" ' + T + '><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>',
+    toque:  '<svg viewBox="0 0 24 24" ' + T + '><path d="M9 11V6a2 2 0 1 1 4 0v5"/><path d="M13 11V9a2 2 0 1 1 4 0v2"/><path d="M17 11v-1a2 2 0 1 1 4 0v6a5 5 0 0 1-5 5h-3a6 6 0 0 1-5-2.7L5 15a2 2 0 0 1 3-2.6l1 1"/></svg>',
+    gente:  '<svg viewBox="0 0 24 24" ' + T + '><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>',
+    etiq:   '<svg viewBox="0 0 24 24" ' + T + '><path d="M20.59 13.41 13.42 20.6a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><circle cx="7" cy="7" r="1.2"/></svg>',
+    lista:  '<svg viewBox="0 0 24 24" ' + T + '><line x1="9" y1="6" x2="20" y2="6"/><line x1="9" y1="12" x2="20" y2="12"/><line x1="9" y1="18" x2="20" y2="18"/><circle cx="4.5" cy="6" r="1.3"/><circle cx="4.5" cy="12" r="1.3"/><circle cx="4.5" cy="18" r="1.3"/></svg>',
+    zap:    '<svg viewBox="0 0 24 24" ' + T + '><path d="M21 15.46v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 1.12 2.75 2 2 0 0 1 3.11.55h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L7.09 8.46a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.33 1.85.57 2.81.7a2 2 0 0 1 1.72 2.02z"/></svg>',
+    certo:  '<svg viewBox="0 0 24 24" ' + T + '><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+    alerta: '<svg viewBox="0 0 24 24" ' + T + '><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'
+  };
+
   // ── sessão ────────────────────────────────────────────────────────
   function guardada(){
     try { return JSON.parse(localStorage.getItem(SESSAO) || 'null'); } catch (e) { return null; }
   }
-  function guardar(s){
-    try { localStorage.setItem(SESSAO, JSON.stringify(s)); } catch (e) {}
-  }
-  function esquecer(){
-    try { localStorage.removeItem(SESSAO); } catch (e) {}
-  }
+  function guardar(s){ try { localStorage.setItem(SESSAO, JSON.stringify(s)); } catch (e) {} }
+  function esquecer(){ try { localStorage.removeItem(SESSAO); } catch (e) {} }
 
   function entrar(email, senha){
     return fetch(CFG.url + '/auth/v1/token?grant_type=password', {
@@ -199,13 +320,10 @@ td.n, th.n{text-align:right; font-variant-numeric:tabular-nums}
       headers: { 'apikey': CFG.anon, 'Content-Type': 'application/json' },
       body: JSON.stringify({ refresh_token: s.refresh_token })
     }).then(function(r){ return r.json(); })
-      .then(function(d){
-        if (d && d.access_token) { guardar(d); return d; }
-        return null;
-      }).catch(function(){ return null; });
+      .then(function(d){ if (d && d.access_token) { guardar(d); return d; } return null; })
+      .catch(function(){ return null; });
   }
 
-  // ── dados ─────────────────────────────────────────────────────────
   function chamar(desde, segunda){
     var s = guardada();
     if (!s || !s.access_token) return Promise.reject('sem_sessao');
@@ -229,106 +347,214 @@ td.n, th.n{text-align:right; font-variant-numeric:tabular-nums}
     });
   }
 
-  // ── desenho ───────────────────────────────────────────────────────
-  var ROTULOS = {
-    abriu:    'Abriu a página',
-    comecou:  'Tocou em começar',
-    sexo:     'Respondeu se é homem ou mulher',
-    nome:     'Disse o nome',
-    contato:  'Chegou na tela do WhatsApp',
-    lead:     'Mandou o número (lead)'
+  // ── nomes e ícones de cada passo ──────────────────────────────────
+  var PASSOS = {
+    abriu:   { rot:'Abriu a página',       ic:'olho'  },
+    comecou: { rot:'Tocou em começar',     ic:'toque' },
+    sexo:    { rot:'Disse se é homem ou mulher', ic:'gente' },
+    nome:    { rot:'Escreveu o nome',      ic:'etiq'  },
+    contato: { rot:'Chegou na tela do WhatsApp', ic:'zap' },
+    lead:    { rot:'Mandou o número',      ic:'certo' }
   };
-  function rotulo(chave){
-    if (ROTULOS[chave]) return ROTULOS[chave];
+  function infoPasso(chave){
+    if (PASSOS[chave]) return PASSOS[chave];
     var m = /^pergunta_(\d+)$/.exec(chave);
-    return m ? 'Pergunta ' + m[1] : chave;
+    return { rot: m ? 'Pergunta ' + m[1] : chave, ic:'lista' };
   }
 
-  function desenharFunil(funil){
-    var alvo = $('funil');
+  // "7 de cada 10" diz mais que "71%" para quem lê de relance.
+  function emCada10(parte, total){
+    if (!total) return '';
+    var x = Math.round(parte / total * 10);
+    if (x <= 0) return 'quase ninguém';
+    if (x >= 10) return 'praticamente todo mundo';
+    return x + ' de cada 10';
+  }
+
+  // ── desenho do caminho ────────────────────────────────────────────
+  function no(passo, topo, classe, aviso){
+    var i = infoPasso(passo.chave);
+    var n = passo.n || 0;
+    var pct = topo ? Math.round(n / topo * 100) : 0;
+    return '<div class="no ' + (classe || '') + '">' +
+      '<div class="no-ic">' + IC[i.ic] + '</div>' +
+      '<div class="no-txt"><div class="no-n">' + num(n) + '</div>' +
+      '<span class="no-rot">' + esc(i.rot) + '</span>' +
+      // O aviso mora NA caixa, não uma linha abaixo: número estranho sem
+      // explicação ao lado parece defeito do painel.
+      (aviso ? '<span class="no-aviso">' + esc(aviso) + '</span>' : '') +
+      '</div>' +
+      '<div class="no-pct">' + pct + '%<br>de quem abriu</div>' +
+    '</div>';
+  }
+
+  function elo(antes, depois, pior){
+    var a = antes.n || 0, d = depois.n || 0;
+    // Passo que CRESCE não é queda: é sinal de que o teste mudou de tamanho e
+    // as visitas antigas não tinham essa pergunta.
+    if (d > a) {
+      return '<div class="elo limpo"><p class="aviso">esta pergunta foi criada depois, ' +
+             'por isso as visitas antigas não passaram por ela</p></div>';
+    }
+    var perdeu = a - d;
+    if (perdeu <= 0) {
+      return '<div class="elo limpo"><div class="segue">seguiram todos</div></div>';
+    }
+    var pctQ = a ? Math.round(perdeu / a * 100) : 0;
+    var grave = (perdeu === pior && perdeu > 0);
+    return '<div class="elo' + (grave ? ' grave' : '') + '">' +
+      '<span class="cotovelo"></span>' +
+      '<div class="saiu">' + num(perdeu) + ' saíram aqui · ' + pctQ + '%</div>' +
+      '<div class="segue">' + emCada10(d, a) + ' seguiu em frente</div>' +
+    '</div>';
+  }
+
+  var grupoAberto = false;
+
+  function desenharFluxo(funil){
+    var alvo = $('fluxo');
     if (!funil.length) { alvo.innerHTML = '<p class="vazio">Nenhuma visita neste período.</p>'; return; }
     var topo = funil[0].n || 0;
 
-    // A maior queda é o que interessa olhar primeiro, então ela fica marcada.
-    var maior = 0;
+    // A maior perda do caminho inteiro, para marcar o buraco principal.
+    var pior = 0;
     funil.forEach(function(p, i){
-      if (i === 0) return;
+      if (!i) return;
       var perdeu = (funil[i-1].n || 0) - (p.n || 0);
-      if (perdeu > maior) maior = perdeu;
+      if (perdeu > pior) pior = perdeu;
     });
 
-    alvo.innerHTML = funil.map(function(p, i){
-      var n = p.n || 0;
-      var pct = topo ? Math.round(n / topo * 100) : 0;
-      var antes = i ? (funil[i-1].n || 0) : null;
-      var perdeu = antes === null ? null : antes - n;
-      var pctQueda = (antes ? Math.round(perdeu / antes * 100) : 0);
-      // Passo que CRESCE em relação ao anterior não é queda: é sinal de que o
-      // teste mudou de tamanho e as visitas antigas não tinham essa pergunta.
-      var linha = '';
-      if (perdeu !== null && perdeu > 0) {
-        linha = '<p class="queda' + (perdeu === maior && perdeu > 0 ? ' forte' : '') + '">↳ saíram ' +
-                num(perdeu) + ' aqui (' + pctQueda + '% de quem tinha chegado)</p>';
-      } else if (perdeu !== null && perdeu < 0) {
-        linha = '<p class="queda">↳ passo criado depois: visitas antigas não tinham esta pergunta</p>';
-      }
-      return '<div class="passo">' +
-        '<div class="rot"><b>' + esc(rotulo(p.chave)) + '</b>' +
-        '<span class="pct">' + num(n) + ' · ' + pct + '%</span></div>' +
-        '<div class="trilho"><div class="cheio" style="width:' + Math.max(pct, 1) + '%"></div></div>' +
-        linha + '</div>';
-    }).join('');
+    // As perguntas viram um bloco só. Oito caixas quase iguais empurravam o
+    // resto da página para fora da tela e não diziam nada a mais.
+    var antes = [], perg = [], depois = [];
+    funil.forEach(function(p){
+      if (/^pergunta_/.test(p.chave)) perg.push(p);
+      else if (perg.length) depois.push(p);
+      else antes.push(p);
+    });
+
+    var html = '';
+    antes.forEach(function(p, i){
+      if (i) html += elo(antes[i-1], p, pior);
+      html += no(p, topo, i === 0 ? 'inicio' : '');
+    });
+
+    if (perg.length) {
+      if (antes.length) html += elo(antes[antes.length-1], perg[0], pior);
+      var ultima = perg[perg.length-1];
+      // O nome do bloco tem que existir ANTES de desenhar a caixa, senão sai
+      // a chave crua na tela.
+      PASSOS.grupo_perg = { rot: 'Respondeu as ' + perg.length + ' perguntas', ic:'lista' };
+      // Pergunta criada depois deixa as visitas antigas de fora, e aí o passo
+      // seguinte fica MAIOR que este. Avisar na caixa evita a leitura errada.
+      var avisoGrupo = (depois.length && (ultima.n || 0) < (depois[0].n || 0))
+        ? 'a última pergunta é nova, as visitas antigas não passaram por ela'
+        : '';
+      html += '<div class="grupo">' +
+        no({ chave:'grupo_perg', n: ultima.n }, topo, '', avisoGrupo) +
+        '<button class="abrir" id="abre-perg">' +
+          (grupoAberto ? 'esconder as perguntas' : 'ver as ' + perg.length + ' perguntas uma a uma') +
+        '</button>' +
+        (grupoAberto ? '<div class="dentro">' + perg.map(function(p, i){
+          return (i ? elo(perg[i-1], p, pior) : '') + no(p, topo);
+        }).join('') + '</div>' : '') +
+      '</div>';
+    }
+
+    var cadeiaFim = (perg.length ? [perg[perg.length-1]] : [antes[antes.length-1]]).concat(depois);
+    depois.forEach(function(p, i){
+      html += elo(cadeiaFim[i], p, pior);
+      html += no(p, topo, p.chave === 'lead' ? 'fim' : '');
+    });
+
+    alvo.innerHTML = html;
+    var bt = $('abre-perg');
+    if (bt) bt.onclick = function(){ grupoAberto = !grupoAberto; desenharFluxo(funil); };
   }
 
-  function tabela(alvo, linhas, colunas, vazio){
+  // ── veredito ──────────────────────────────────────────────────────
+  function desenharVeredito(funil, visitas){
+    var alvo = $('veredito');
+    if (!visitas) {
+      alvo.innerHTML = '<div class="veredito ok"><span class="ic">' + IC.certo + '</span>' +
+        '<div><b>Ainda não há visitas neste período.</b>' +
+        '<p>Quando o anúncio subir, o caminho aparece aqui.</p></div></div>';
+      return;
+    }
+    var pior = null;
+    funil.forEach(function(p, i){
+      if (!i) return;
+      var a = funil[i-1].n || 0, perdeu = a - (p.n || 0);
+      if (perdeu > 0 && (!pior || perdeu > pior.perdeu)) {
+        pior = { perdeu: perdeu, de: funil[i-1], para: p, antes: a };
+      }
+    });
+    if (!pior) {
+      alvo.innerHTML = '<div class="veredito ok"><span class="ic">' + IC.certo + '</span>' +
+        '<div><b>Ninguém largou o teste pelo meio.</b>' +
+        '<p>Com tão poucas visitas, isso ainda não diz muito.</p></div></div>';
+      return;
+    }
+    var onde = infoPasso(pior.para.chave).rot.toLowerCase();
+    alvo.innerHTML = '<div class="veredito"><span class="ic">' + IC.alerta + '</span>' +
+      '<div><b>O maior buraco está antes de "' + esc(onde) + '".</b>' +
+      '<p>' + esc(emCada10(pior.perdeu, pior.antes)) + ' que chegaram até ali foram embora, ' +
+      'o que dá ' + num(pior.perdeu) + ' ' + (pior.perdeu === 1 ? 'pessoa' : 'pessoas') + '.</p></div></div>';
+  }
+
+  // ── listas ────────────────────────────────────────────────────────
+  function lista(alvo, linhas, nome, vazio){
     var el = $(alvo);
-    if (!linhas || !linhas.length) { el.innerHTML = '<p class="vazio">' + vazio + '</p>'; return; }
-    el.innerHTML = '<table><thead><tr>' +
-      colunas.map(function(c){ return '<th class="' + (c.n ? 'n' : '') + '">' + esc(c.titulo) + '</th>'; }).join('') +
-      '</tr></thead><tbody>' +
-      linhas.map(function(l){
-        return '<tr>' + colunas.map(function(c){
-          return '<td class="' + (c.n ? 'n' : '') + '">' + esc(c.ler(l)) + '</td>';
-        }).join('') + '</tr>';
-      }).join('') + '</tbody></table>';
+    if (!linhas || !linhas.length) { el.innerHTML = '<p class="vazio">' + esc(vazio) + '</p>'; return; }
+    var maior = Math.max.apply(null, linhas.map(function(l){ return l.abriu || 0; })) || 1;
+    el.innerHTML = '<div class="lista">' + linhas.map(function(l){
+      var larg = Math.round((l.abriu || 0) / maior * 100);
+      var conv = (l.pct == null ? 0 : l.pct);
+      return '<div class="item">' +
+        '<div class="fundo" style="width:' + larg + '%"></div>' +
+        '<div class="frente">' +
+          '<span class="nome">' + esc(nome(l)) + '</span>' +
+          '<span class="nums">' +
+            '<span>' + num(l.abriu) + ' abriu</span>' +
+            '<span>' + num(l.lead) + ' lead</span>' +
+            '<b class="conv' + (conv ? '' : ' zero') + '">' + conv + '%</b>' +
+          '</span>' +
+        '</div>' +
+      '</div>';
+    }).join('') + '</div>';
   }
 
   function desenhar(d){
     var p = d.periodo || {};
-    $('resumo').textContent = num(p.visitas) + ' visitas' +
-      (p.desde ? ' desde ' + p.desde.split('-').reverse().join('/') : ' (todo o histórico)') +
+    var funil = d.funil || [];
+    var visitas = p.visitas || 0;
+    var leads = (funil.filter(function(x){ return x.chave === 'lead'; })[0] || {}).n || 0;
+    var conv = visitas ? (leads / visitas * 100) : 0;
+
+    $('resumo').textContent =
+      (p.desde ? 'desde ' + p.desde.split('-').reverse().join('/') : 'todo o histórico') +
       ' · sem contar as visitas internas';
 
-    desenharFunil(d.funil || []);
-    $('nota-funil').textContent =
-      'A porcentagem é sobre quem abriu a página. O teste tem ' + (p.perguntas || '?') + ' perguntas.';
+    $('numeros').innerHTML =
+      '<div class="bloco"><div class="v">' + num(visitas) + '</div><div class="k">visitas</div></div>' +
+      '<div class="bloco bom"><div class="v">' + num(leads) + '</div><div class="k">leads</div></div>' +
+      '<div class="bloco"><div class="v">' + conv.toFixed(1).replace('.', ',') + '%</div><div class="k">viram lead</div></div>';
 
-    tabela('saidas', d.saidas, [
-      { titulo:'Tela onde fechou', ler:function(l){ return rotulo(l.tela) === l.tela ? l.tela : rotulo(l.tela); } },
-      { titulo:'Visitas', n:true, ler:function(l){ return num(l.n); } }
-    ], 'Ninguém fechou a página sem terminar neste período.');
+    desenharVeredito(funil, visitas);
+    desenharFluxo(funil);
 
-    tabela('criativos', d.criativos, [
-      { titulo:'Anúncio', ler:function(l){ return l.criativo; } },
-      { titulo:'Abriu', n:true, ler:function(l){ return num(l.abriu); } },
-      { titulo:'Leads', n:true, ler:function(l){ return num(l.lead); } },
-      { titulo:'Conversão', n:true, ler:function(l){ return (l.pct == null ? '—' : l.pct + '%'); } }
-    ], 'Nenhuma visita neste período.');
-
-    tabela('aparelhos', d.aparelhos, [
-      { titulo:'Navegador', ler:function(l){ return l.app; } },
-      { titulo:'Aparelho', ler:function(l){ return l.aparelho === 'movel' ? 'celular' : l.aparelho; } },
-      { titulo:'Abriu', n:true, ler:function(l){ return num(l.abriu); } },
-      { titulo:'Leads', n:true, ler:function(l){ return num(l.lead); } },
-      { titulo:'Conversão', n:true, ler:function(l){ return (l.pct == null ? '—' : l.pct + '%'); } }
-    ], 'Nenhuma visita neste período.');
+    lista('criativos', d.criativos, function(l){ return l.criativo; },
+      'Nenhuma visita neste período.');
+    lista('aparelhos', d.aparelhos, function(l){
+      return l.app + ' · ' + (l.aparelho === 'movel' ? 'celular' : l.aparelho);
+    }, 'Nenhuma visita neste período.');
 
     var t = d.tecnico || {};
     var cartoes = [
       { k:'carregamento típico', v:(t.ms_carga_mediano == null ? '—' : (t.ms_carga_mediano/1000).toFixed(1).replace('.', ',') + ' s') },
-      { k:'carregou acima de 3 s', v:num(t.carga_lenta), alerta:t.carga_lenta > 0 },
+      { k:'demorou mais de 3 s', v:num(t.carga_lenta), alerta:t.carga_lenta > 0 },
       { k:'falhou ao enviar', v:num(t.erros_envio), alerta:t.erros_envio > 0 },
-      { k:'saiu com número inválido', v:num(t.fone_invalido), alerta:t.fone_invalido > 0 },
+      { k:'saiu com número errado', v:num(t.fone_invalido), alerta:t.fone_invalido > 0 },
       { k:'saiu sem digitar nada', v:num(t.fone_vazio) },
       { k:'abriu a página de venda', v:num(t.abriu_tsl) }
     ];
@@ -337,11 +563,11 @@ td.n, th.n{text-align:right; font-variant-numeric:tabular-nums}
              '<div class="v">' + esc(c.v) + '</div><div class="k">' + esc(c.k) + '</div></div>';
     }).join('');
 
-    tabela('dias', (d.dias || []).slice().reverse(), [
-      { titulo:'Dia', ler:function(l){ return l.dia.split('-').reverse().join('/'); } },
-      { titulo:'Abriu', n:true, ler:function(l){ return num(l.abriu); } },
-      { titulo:'Leads', n:true, ler:function(l){ return num(l.lead); } }
-    ], 'Nenhuma visita neste período.');
+    lista('dias', (d.dias || []).slice().reverse().map(function(l){
+      return { criativo:l.dia, abriu:l.abriu, lead:l.lead,
+               pct: l.abriu ? Math.round(l.lead / l.abriu * 1000) / 10 : 0 };
+    }), function(l){ return l.criativo.split('-').reverse().join('/'); },
+      'Nenhuma visita neste período.');
   }
 
   // ── período ───────────────────────────────────────────────────────
@@ -429,11 +655,10 @@ td.n, th.n{text-align:right; font-variant-numeric:tabular-nums}
       $('erro-login').textContent = 'Não consegui falar com o servidor.';
     });
   };
-  // Olho da senha. Desenhado aqui, inline, pelo mesmo motivo dos ícones do
-  // quiz: nada de pedir fonte de ícone só para dois desenhos.
-  var OLHO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>';
-  var OLHO_CORTADO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
 
+  // Olho da senha.
+  var OLHO = IC.olho;
+  var OLHO_CORTADO = '<svg viewBox="0 0 24 24" ' + T + '><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
   var btOlho = $('ver-senha');
   btOlho.innerHTML = OLHO;
   btOlho.onclick = function(){
