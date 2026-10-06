@@ -95,6 +95,16 @@ button.principal:disabled{opacity:.5; cursor:default}
   border:1px solid var(--linha); border-radius:20px;
 }
 .periodos button[aria-pressed="true"]{background:var(--lua); color:#11151d; border-color:var(--lua); font-weight:600}
+.alterna{
+  padding:6px 12px; font-size:12.5px; font-family:inherit; cursor:pointer;
+  background:none; color:var(--luz-3);
+  border:1px dashed var(--linha); border-radius:20px;
+}
+.alterna:hover{color:var(--luz-2); border-color:var(--luz-3)}
+.alterna[aria-pressed="true"]{
+  background:rgba(226,160,74,.14); color:var(--lua);
+  border-style:solid; border-color:var(--lua);
+}
 
 /* ── números grandes ─────────────────────────────────────────────── */
 .resumo{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:0}
@@ -271,6 +281,9 @@ button.principal:disabled{opacity:.5; cursor:default}
       <button data-dias="30" aria-pressed="true">30 dias</button>
       <button data-dias="0">tudo</button>
     </div>
+    <!-- Por padrão o painel mostra só tráfego real. O teste da casa fica a um
+         toque de distância, em vez de sumir para sempre. -->
+    <button class="alterna" id="bt-internos" aria-pressed="false">incluir meus testes</button>
     <button class="sair" id="btsair">sair</button>
   </header>
 
@@ -389,7 +402,7 @@ button.principal:disabled{opacity:.5; cursor:default}
         'Authorization': 'Bearer ' + s.access_token,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ p_desde: desde, p_ate: null })
+      body: JSON.stringify({ p_desde: desde, p_ate: null, p_internos: verInternos })
     }).then(function(r){
       if (r.status === 401 && !segunda) {
         return renovar().then(function(novo){
@@ -535,8 +548,9 @@ button.principal:disabled{opacity:.5; cursor:default}
     var alvo = $('veredito');
     if (!visitas) {
       alvo.innerHTML = '<div class="veredito ok"><span class="ic">' + IC.certo + '</span>' +
-        '<div><b>Ainda não há visitas neste período.</b>' +
-        '<p>Quando o anúncio subir, o caminho aparece aqui.</p></div></div>';
+        '<div><b>Nenhuma visita de verdade ainda.</b>' +
+        '<p>O teste nunca recebeu anúncio. Para ver as visitas de teste, ' +
+        'toque em "incluir meus testes" lá em cima.</p></div></div>';
       return;
     }
     var pior = null;
@@ -612,15 +626,28 @@ button.principal:disabled{opacity:.5; cursor:default}
 
     $('resumo').textContent =
       (p.desde ? 'desde ' + p.desde.split('-').reverse().join('/') : 'todo o histórico') +
-      ' · sem contar as visitas internas';
+      (p.internos ? ' · com as minhas visitas de teste juntas'
+                  : ' · só tráfego real, sem as visitas de teste');
+
+    // Leads é quantas VISITAS terminaram o teste. Se a mesma pessoa terminar
+    // oito vezes, são oito. Por isso o número de pessoas aparece ao lado: foi
+    // justamente essa confusão que fez "20 leads" parecerem 20 pessoas.
+    var pessoas = p.pessoas;
+    var rotuloLead = (pessoas != null && pessoas !== leads)
+      ? 'leads, de ' + num(pessoas) + (pessoas === 1 ? ' pessoa' : ' pessoas')
+      : 'leads';
 
     $('numeros').innerHTML =
       '<div class="bloco"><div class="v">' + num(visitas) + '</div><div class="k">visitas</div></div>' +
-      '<div class="bloco bom"><div class="v">' + num(leads) + '</div><div class="k">leads</div></div>' +
+      '<div class="bloco bom"><div class="v">' + num(leads) + '</div><div class="k">' + esc(rotuloLead) + '</div></div>' +
       '<div class="bloco"><div class="v">' + conv.toFixed(1).replace('.', ',') + '%</div><div class="k">viram lead</div></div>';
 
     desenharVeredito(funil, visitas);
-    desenharFluxo(funil);
+    if (!visitas) {
+      $('fluxo').innerHTML = '<p class="vazio">Sem visitas para desenhar o caminho.</p>';
+    } else {
+      desenharFluxo(funil);
+    }
 
     lista('criativos', d.criativos, function(l){ return l.criativo; },
       'Nenhuma visita neste período.');
@@ -656,6 +683,7 @@ button.principal:disabled{opacity:.5; cursor:default}
   }
 
   var diasAtuais = 30;
+  var verInternos = false;
   function carregar(){
     $('resumo').textContent = 'a carregar…';
     chamar(desdeDe(diasAtuais))
@@ -665,6 +693,13 @@ button.principal:disabled{opacity:.5; cursor:default}
         $('resumo').textContent = 'Não consegui carregar agora. Recarregue a página.';
       });
   }
+
+  $('bt-internos').onclick = function(){
+    verInternos = !verInternos;
+    this.setAttribute('aria-pressed', verInternos ? 'true' : 'false');
+    this.textContent = verInternos ? 'a mostrar meus testes' : 'incluir meus testes';
+    carregar();
+  };
 
   $('periodos').addEventListener('click', function(ev){
     var b = ev.target.closest('button');
