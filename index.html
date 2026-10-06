@@ -344,13 +344,58 @@ a.cta-res{
   var sessao = 's-' + Date.now() + '-' + Math.random().toString(36).slice(2,9);
 
   // A UTM vem do anúncio e precisa sobreviver até o lead: é ela que diz qual
-  // criativo trouxe cada pessoa.
+  // criativo trouxe cada pessoa. `content` é o anúncio e `term` é o conjunto:
+  // sem os dois, sabe-se que a campanha trouxe lead, mas não QUAL peça.
   var url = new URLSearchParams(location.search);
   var utm = {
     source:   url.get('utm_source'),
     medium:   url.get('utm_medium'),
-    campaign: url.get('utm_campaign')
+    campaign: url.get('utm_campaign'),
+    content:  url.get('utm_content'),
+    term:     url.get('utm_term')
   };
+
+  // Visita nossa, de teste. `?interno=1` marca o navegador e toda visita dali
+  // em diante sai da conta sem apagar nada; `?interno=0` desmarca. Antes a
+  // única saída era zerar a tabela antes de subir anúncio, e aí o histórico
+  // dos testes ia junto.
+  var INTERNO = false;
+  try {
+    if (url.get('interno') !== null) {
+      if (url.get('interno') === '0') localStorage.removeItem('insonia_interno');
+      else localStorage.setItem('insonia_interno', '1');
+    }
+    INTERNO = localStorage.getItem('insonia_interno') === '1';
+  } catch (e) {}
+
+  // Em que tela a pessoa está agora. É o que o evento de saída precisa saber:
+  // o último evento gravado diz o que ela FEZ, não onde ela parou.
+  var telaAtual = 'carregando';
+  function emTela(nome){ telaAtual = nome; }
+
+  // Estado do campo de telefone, lido pelo evento de saída. Sair com nove
+  // dígitos digitados e número ainda inválido é um problema de máscara ou de
+  // país; sair com o campo vazio é outro problema.
+  var contato = { digitos: 0, valido: false };
+
+  // O aparelho e o navegador. Quem abre dentro do Instagram está num navegador
+  // que não guarda cookie como os outros e costuma converter menos: sem esta
+  // marca, a queda aparece como culpa do criativo.
+  function contexto(){
+    var ua = navigator.userAgent || '';
+    return {
+      utm: utm,
+      fbclid: !!fbclid,
+      ref: (document.referrer || '').slice(0, 120),
+      movel: /Mobi|Android|iPhone|iPod/i.test(ua),
+      app: /Instagram/i.test(ua) ? 'instagram'
+         : /FBAN|FBAV/i.test(ua) ? 'facebook'
+         : /TikTok/i.test(ua) ? 'tiktok' : '',
+      largura: window.innerWidth,
+      idioma_nav: (navigator.language || '').slice(0, 5),
+      ms_carga: Math.round(performance.now())
+    };
+  }
   // `?ver=<nota>` abre a tela de resultado direto, para conferir a copy de cada
   // faixa sem responder o teste sete vezes. NÃO grava lead, NÃO grava evento e
   // NÃO dispara pixel: é conferência, não tráfego.
@@ -371,14 +416,52 @@ a.cta-res{
     }).then(function(r){ return r.json(); });
   }
 
-  function evento(tipo, extra){
+  // `manter` usa keepalive: o envio sobrevive à página fechando, que é
+  // justamente quando o evento de saída é mandado.
+  function evento(tipo, extra, manter){
     if (PREVIA) return;
+    var meta = extra || {};
+    if (INTERNO) meta.interno = true;
     // Best-effort: se o registro de evento falhar, o quiz não pode parar.
-    api('quiz_events', {
-      quiz_id: quiz.id, session_id: sessao, tipo: tipo,
-      passo: passo, metadata: extra || {}
-    }).catch(function(){});
+    try {
+      fetch(CFG.url + '/rest/v1/quiz_events', {
+        method: 'POST', keepalive: !!manter,
+        headers: {
+          'apikey': CFG.anon,
+          'Authorization': 'Bearer ' + CFG.anon,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({
+          quiz_id: quiz.id, session_id: sessao, tipo: tipo,
+          passo: passo, metadata: meta
+        })
+      }).catch(function(){});
+    } catch (e) {}
   }
+
+  // Saída: um evento por sessão, no momento em que a página some. É ele que
+  // responde "em que tela a pessoa desistiu", sem precisar deduzir do último
+  // evento gravado. `pagehide` e `visibilitychange` disparam juntos ao fechar,
+  // daí a trava de uma vez só.
+  var saiuEnviado = false;
+  var abriuEm = Date.now();
+  function registrarSaida(){
+    if (saiuEnviado || PREVIA || !quiz) return;
+    // Quem terminou não abandonou nada: não é saída, é fim de caminho.
+    if (telaAtual === 'resultado') return;
+    saiuEnviado = true;
+    var meta = { tela: telaAtual, segundos: Math.round((Date.now() - abriuEm) / 1000) };
+    if (telaAtual === 'contato') {
+      meta.digitos = contato.digitos;
+      meta.fone_valido = contato.valido;
+    }
+    evento('abandon', meta, true);
+  }
+  document.addEventListener('visibilitychange', function(){
+    if (document.visibilityState === 'hidden') registrarSaida();
+  });
+  window.addEventListener('pagehide', registrarSaida);
 
   function pintarProgresso(){
     var bar = document.getElementById('barra');
@@ -393,6 +476,7 @@ a.cta-res{
     passo = n;
     pintarProgresso();
     if (n >= perguntas.length) { pedirContato(); return; }
+    emTela('pergunta_' + (n + 1));
     desenharPergunta(perguntas[n]);
   }
 
@@ -421,6 +505,11 @@ a.cta-res{
     tela.querySelector('h2').textContent = chamado;
 
     var caixa = tela.querySelector('.opcoes');
+    // A tela só troca 300ms depois do toque, e nesse intervalo ela continuava
+    // aceitando toque. Dois toques seguidos avançavam DUAS perguntas: a pessoa
+    // pulava uma sem ver e, na última, a tela do telefone era desenhada duas
+    // vezes e contada duas vezes no funil.
+    var avancou = false;
     opcoes.forEach(function(rotulo, i){
       var b = document.createElement('button');
       b.type = 'button';
@@ -429,6 +518,8 @@ a.cta-res{
       b.innerHTML = '<span class="marca"></span><span></span>';
       b.lastChild.textContent = rotulo;
       b.onclick = function(){
+        if (avancou) return;
+        avancou = true;
         caixa.querySelectorAll('.opcao').forEach(function(o){
           o.classList.remove('escolhida');
         });
@@ -461,6 +552,7 @@ a.cta-res{
   }
 
   function montarContato(){
+    emTela('contato');
     progresso.style.width = '100%';
     var nome = primeiroNome();
     tela.innerHTML =
@@ -504,6 +596,10 @@ a.cta-res{
       // O texto de ajuda só aparece quando o número já foi começado: mostrar
       // "faltam dígitos" num campo vazio é ruído, não ajuda.
       var ok = n >= pa.min_digitos && n <= pa.max_digitos;
+      // Guardado para o evento de saída: diz se quem desistiu aqui chegou a
+      // digitar e se o número ainda estava inválido quando ela foi embora.
+      contato.digitos = n;
+      contato.valido = ok;
       // Só avisa quantos dígitos onde a contagem foi verificada. Dica errada
       // atrapalha mais que dica nenhuma.
       dica.textContent = (n > 0 && !ok && pa.digitos_exatos)
@@ -549,12 +645,18 @@ a.cta-res{
         if (!res || !res.ok) throw new Error((res && res.erro) || 'falhou');
         // A conversão que importa: só dispara quando o banco confirmou que
         // gravou. Disparar no clique contaria lead que nunca existiu.
-        rastrear('final', { content_name: 'quiz-' + CFG.slug,
-                            value: res.score, currency: 'USD' });
+        // Sem a nota: ela é dado de saúde e não vai para o Pixel nem para o
+        // GA4, a mesma regra que o rastreio da página de venda já segue. Como
+        // `value`, ainda por cima, a Meta leria a nota como dinheiro.
+        rastrear('final', { content_name: 'quiz-' + CFG.slug });
         guardarResultado(res);
         mostrarResultado(res);
       })
       .catch(function(){
+        // Lead que chegou até aqui e não gravou é o pior tipo de perda: a
+        // pessoa quis e o sistema falhou. Sem este evento, ela some do funil
+        // como se tivesse desistido.
+        evento('erro', { motivo: 'submit', pais: pessoa.pais && pessoa.pais.codigo });
         botao.disabled = false;
         botao.textContent = t('contato_botao','Ver o meu resultado');
         var e = document.getElementById('erro');
@@ -695,6 +797,7 @@ a.cta-res{
   }
 
   function mostrarResultado(res){
+    emTela('resultado');
     var cta  = quiz.schema.resultado_cta || {};
     var pior = piorItem();
     var n = 0;
@@ -845,6 +948,7 @@ a.cta-res{
   };
 
   function telaAbertura(){
+    emTela('abertura');
     progresso.style.width = '0%';
     var c = quiz.schema['intro_' + IDIOMA] || quiz.schema.intro || {};
     var ordem = c.ordem || ['headline','subheadline','badges','imagem','checklist'];
@@ -880,6 +984,7 @@ a.cta-res{
   }
 
   function telaSexo(){
+    emTela('sexo');
     progresso.style.width = '8%';
     tela.innerHTML =
       '<p class="passo-n">' + t('rotulo_inicio','Para começar') + '</p>' +
@@ -895,6 +1000,9 @@ a.cta-res{
       : [{ valor:'f', rotulo:t('sexo_f','Mulher') },
          { valor:'m', rotulo:t('sexo_m','Homem') }];
     if (opcoes.some(function(o){ return o.imagem; })) caixa.className = 'opcoes retratos';
+    // Mesma trava das perguntas: sem ela, dois toques gravavam a resposta duas
+    // vezes.
+    var avancou = false;
     opcoes.forEach(function(o){
       var b = document.createElement('button');
       b.type = 'button'; b.className = 'opcao';
@@ -904,6 +1012,8 @@ a.cta-res{
         '<span></span>';
       b.lastChild.textContent = o.rotulo;
       b.onclick = function(){
+        if (avancou) return;
+        avancou = true;
         caixa.querySelectorAll('.opcao').forEach(function(x){ x.classList.remove('escolhida'); });
         b.classList.add('escolhida');
         pessoa.sexo = o.valor;
@@ -916,6 +1026,7 @@ a.cta-res{
   }
 
   function telaNome(){
+    emTela('nome');
     progresso.style.width = '16%';
     tela.innerHTML =
       '<p class="passo-n">' + t('rotulo_inicio','Para começar') + '</p>' +
@@ -1002,7 +1113,9 @@ a.cta-res{
       });
       if (PREVIA) { conferir(); return; }
       telaAbertura();
-      evento('page_view');
+      // A origem é gravada na CHEGADA, não no envio. Quem sai na pergunta 3
+      // também veio de um anúncio, e antes essa visita ficava sem dono.
+      evento('page_view', contexto());
       rastrear('abertura', { content_name: quiz.slug || CFG.slug });
     })
     .catch(function(){
