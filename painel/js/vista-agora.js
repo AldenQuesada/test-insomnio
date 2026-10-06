@@ -3,7 +3,7 @@
 // Desenha e nada mais. Quem busca é o painel; de quanto em quanto tempo
 // buscar é o banco que diz, em `mapa.agora.atualiza_seg`.
 
-import { esc, num, t, segundos } from './formato.js';
+import { esc, num, t, segundos, rotuloApp } from './formato.js';
 import { icone } from './icones.js';
 
 export function desenhar(alvo, cfg, agora){
@@ -28,7 +28,7 @@ export function desenhar(alvo, cfg, agora){
         <span class="agora-ic">${icone(no.icone)}</span>
         <span class="agora-onde">${esc(no.rotulo || p.no)}</span>
         <span class="agora-quando">${esc(t(T, 'agora_ha', segundos(T, p.segundos)))}</span>
-        <span class="agora-apar">${esc(p.app || (p.movel ? 'celular' : 'navegador'))}</span>
+        <span class="agora-apar">${esc(rotuloApp(T, p.app))}</span>
       </div>`;
     }).join('')}</div>` : `<p class="vazio">${esc(t(T, 'vazio_agora'))}</p>`}
     <div class="agora-resumo">${esc(t(T, 'agora_ultimos', u.minutos))}

@@ -5,7 +5,7 @@
 
 import * as sessao from './sessao.js';
 import { chamar, chamarPublica, SEM_SESSAO } from './api.js';
-import { esc, t, dataBR } from './formato.js';
+import { esc, t, dataBR, rotuloAparelho, rotuloApp, rotuloCriativo } from './formato.js';
 import { icone } from './icones.js';
 import * as caminho from './vista-caminho.js';
 import * as mapa from './vista-mapa.js';
@@ -161,9 +161,10 @@ async function carregar(){
       caminho.desenharVeredito($('veredito'), CFG, funil, p.visitas || 0);
       if (!(p.visitas || 0)) $('fluxo').innerHTML = `<p class="vazio">${esc(t(T, 'vazio_caminho'))}</p>`;
       else caminho.desenharFluxo($('fluxo'), CFG, funil);
-      caminho.desenharLista($('criativos'), CFG, d.criativos, l => l.criativo);
+      caminho.desenharLista($('criativos'), CFG, d.criativos,
+        l => rotuloCriativo(T, l.criativo));
       caminho.desenharLista($('aparelhos'), CFG, d.aparelhos,
-        l => `${l.app} · ${l.aparelho === 'movel' ? 'celular' : l.aparelho}`);
+        l => `${rotuloApp(T, l.app)} · ${rotuloAparelho(T, l.aparelho)}`);
       caminho.desenharGrafico($('dias'), CFG, d.dias || []);
       caminho.desenharTecnico($('tecnico'), CFG, d.tecnico || {});
     }

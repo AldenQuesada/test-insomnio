@@ -51,3 +51,20 @@ export function segundos(textos, s){
 export function pct(parte, total){
   return total ? Math.round(parte / total * 100) : 0;
 }
+
+// Aparelho e navegador chegam crus do banco ('movel', vazio) e viram palavra
+// aqui, com o que estiver na definição. O nome do app (Instagram, Facebook)
+// passa direto: é nome próprio, não rótulo a traduzir.
+export function rotuloAparelho(textos, aparelho){
+  if (aparelho === 'movel')      return t(textos, 'aparelho_celular');
+  if (aparelho === 'escritorio') return t(textos, 'aparelho_escritorio');
+  return t(textos, 'aparelho_outro');
+}
+
+export function rotuloApp(textos, app){
+  return app || t(textos, 'app_navegador');
+}
+
+export function rotuloCriativo(textos, criativo){
+  return criativo || t(textos, 'sem_origem');
+}
