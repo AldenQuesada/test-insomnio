@@ -820,8 +820,10 @@ a.cta-res{
       }).join('<span class="selo-div"></span>');
       return '<div class="selos">' + itens + '</div>';
     },
-    imagem: function(c){
-      var im = c.imagem || {};
+    // Serve a `imagem` e a qualquer `imagem_<nome>` da ordem: cada uma lê a
+    // chave de mesmo nome, então uma foto a mais é só uma entrada no banco.
+    imagem: function(c, nome){
+      var im = c[nome || 'imagem'] || {};
       if (!im.url) return '';
       // A proporção vem escrita como "largura:altura" e vira altura em % da
       // largura. Antes era uma tabela de proporções conhecidas aqui no código,
@@ -848,8 +850,8 @@ a.cta-res{
     var ordem = c.ordem || ['headline','subheadline','badges','imagem','checklist'];
 
     var corpo = ordem.map(function(nome){
-      var montar = BLOCOS[nome];
-      return montar ? montar(c) : '';
+      var montar = BLOCOS[nome] || (/^imagem_/.test(nome) && BLOCOS.imagem);
+      return montar ? montar(c, nome) : '';
     }).join('');
 
     var bt = c.botao || {};
