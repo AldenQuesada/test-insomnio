@@ -228,6 +228,7 @@ ul.itens li .marca svg{width:12px; height:12px; color:var(--noite)}
    Uma foto por tela no celular, três no computador. A altura nunca passa de
    70% da tela, para a foto inteira caber sem rolar. */
 .gal{max-width:1100px; margin:0 auto}
+.transicao + .gal{margin-top:34px}
 .gal-pista{display:flex; gap:14px; overflow-x:auto; scroll-snap-type:x mandatory;
   scroll-behavior:smooth; scrollbar-width:none}
 .gal-pista::-webkit-scrollbar{display:none}
@@ -847,28 +848,16 @@ details p{margin-top:11px; font-size:15.5px}
 
     // Galeria de fotos logo abaixo da frase de passagem. Só fotos REAIS de
     // quem leu, com autorização: sem fotos no banco, o bloco não existe.
-    galeria: function(c){
-      var fs = c.fotos || [];
-      // No modo conferência a galeria aparece mesmo vazia, com os lugares
-      // marcados, para ela ver onde fica e como anda. O lead nunca vê isso.
-      var vazio = !fs.length && PREVIA;
-      if (vazio) fs = Array.apply(null, Array(parseInt(c.max, 10) || 6)).map(function(){ return ''; });
-      if (!fs.length) return '';
-      return secao('<div class="gal"><div class="gal-pista" id="gal-pista">' +
-        fs.map(function(f){
-          var u = typeof f === 'string' ? f : f.url;
-          if (!u) return '<figure class="gal-item gal-vazio"><span>espacio para foto real</span></figure>';
-          return '<figure class="gal-item"><img src="' + esc(u) + '" alt="" loading="lazy"></figure>';
-        }).join('') + '</div><div class="gal-pontos" id="gal-pontos">' +
-        fs.map(function(_, i){ return '<i data-i="' + i + '"></i>'; }).join('') +
-        '</div></div>');
-    },
+    galeria: function(c){ var g = galeriaHtml(c); return g ? secao(g) : ''; },
 
     // Frase curta de passagem entre a prova e a história. Na modelo é uma
     // linha só, sem título e sem botão: serve de respiro e de promessa.
-    transicao: function(c){
+    // A galeria mora DENTRO deste bloco, com o mesmo fundo: a frase apresenta
+    // as pessoas, e as fotos vêm logo embaixo, sem trocar de faixa.
+    transicao: function(c, T){
       if (!c.texto) return '';
-      return secao('<p class="transicao">' + esc(c.texto) + '</p>');
+      return secao('<p class="transicao">' + esc(c.texto) + '</p>' +
+        galeriaHtml((T && T.galeria) || {}));
     },
 
     // Repetição da oferta no meio da página, como na modelo: ela não espera o
@@ -1107,6 +1096,23 @@ details p{margin-top:11px; font-size:15.5px}
     if (pessoa.pior) t += 'lo que más te pesa es ' + pessoa.pior + '. ';
     t += 'Esto fue escrito exactamente para eso.';
     return secao('<p style="font-size:18px;color:var(--luz)">' + esc(t) + '</p>');
+  }
+
+  function galeriaHtml(c){
+      var fs = c.fotos || [];
+      // No modo conferência a galeria aparece mesmo vazia, com os lugares
+      // marcados, para ela ver onde fica e como anda. O lead nunca vê isso.
+      var vazio = !fs.length && PREVIA;
+      if (vazio) fs = Array.apply(null, Array(parseInt(c.max, 10) || 6)).map(function(){ return ''; });
+      if (!fs.length) return '';
+      return ('<div class="gal"><div class="gal-pista" id="gal-pista">' +
+        fs.map(function(f){
+          var u = typeof f === 'string' ? f : f.url;
+          if (!u) return '<figure class="gal-item gal-vazio"><span>espacio para foto real</span></figure>';
+          return '<figure class="gal-item"><img src="' + esc(u) + '" alt="" loading="lazy"></figure>';
+        }).join('') + '</div><div class="gal-pontos" id="gal-pontos">' +
+        fs.map(function(_, i){ return '<i data-i="' + i + '"></i>'; }).join('') +
+        '</div></div>');
   }
 
   // Galeria: avança sozinha, para no primeiro toque, e só anda na tela.
