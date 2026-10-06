@@ -37,6 +37,19 @@ input, select{
   border:1px solid var(--linha); border-radius:9px;
 }
 input:focus, select:focus{outline:2px solid var(--lua); outline-offset:1px}
+/* Campo de senha com o olho dentro. Digitar senha às cegas no celular, com
+   teclado que troca letra, é o motivo nº 1 de "não consigo entrar". */
+.campo-senha{position:relative; display:block}
+.campo-senha input{padding-right:46px}
+.olho{
+  position:absolute; right:5px; top:50%; transform:translateY(-50%);
+  display:flex; align-items:center; padding:8px; cursor:pointer;
+  background:none; border:0; border-radius:7px; color:var(--luz-3);
+}
+.olho:hover{color:var(--luz-2)}
+.olho[aria-pressed="true"]{color:var(--lua)}
+.olho:focus-visible{outline:2px solid var(--lua); outline-offset:0}
+.olho svg{width:19px; height:19px; display:block}
 button.principal{
   width:100%; padding:12px; font-size:15px; font-weight:600; font-family:inherit;
   background:var(--lua); color:#11151d; border:0; border-radius:9px; cursor:pointer;
@@ -90,7 +103,12 @@ td.n, th.n{text-align:right; font-variant-numeric:tabular-nums}
   <h1>Painel do teste de insônia</h1>
   <p class="sub">Entre para ver o funil.</p>
   <label><span>E-mail</span><input id="email" type="email" autocomplete="username"></label>
-  <label><span>Senha</span><input id="senha" type="password" autocomplete="current-password"></label>
+  <label><span>Senha</span>
+    <span class="campo-senha">
+      <input id="senha" type="password" autocomplete="current-password">
+      <button type="button" class="olho" id="ver-senha" aria-pressed="false" aria-label="Mostrar a senha"></button>
+    </span>
+  </label>
   <button class="principal" id="btentrar">Entrar</button>
   <div class="erro" id="erro-login"></div>
 </div>
@@ -373,13 +391,35 @@ td.n, th.n{text-align:right; font-variant-numeric:tabular-nums}
         return;
       }
       guardar(d);
+      // Campo limpo e escondido de novo: quem sai e volta não encontra a
+      // senha anterior à mostra.
       $('senha').value = '';
+      if ($('senha').type === 'text') btOlho.click();
       mostrarPainel();
     }).catch(function(){
       b.disabled = false; b.textContent = 'Entrar';
       $('erro-login').textContent = 'Não consegui falar com o servidor.';
     });
   };
+  // Olho da senha. Desenhado aqui, inline, pelo mesmo motivo dos ícones do
+  // quiz: nada de pedir fonte de ícone só para dois desenhos.
+  var OLHO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+  var OLHO_CORTADO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+
+  var btOlho = $('ver-senha');
+  btOlho.innerHTML = OLHO;
+  btOlho.onclick = function(){
+    var campo = $('senha');
+    var escondida = campo.type === 'password';
+    campo.type = escondida ? 'text' : 'password';
+    this.innerHTML = escondida ? OLHO_CORTADO : OLHO;
+    this.setAttribute('aria-pressed', escondida ? 'true' : 'false');
+    this.setAttribute('aria-label', escondida ? 'Esconder a senha' : 'Mostrar a senha');
+    // Volta o cursor para o fim, senão o toque no olho tira o foco do campo.
+    campo.focus();
+    try { campo.setSelectionRange(campo.value.length, campo.value.length); } catch (e) {}
+  };
+
   $('senha').onkeydown = function(e){ if (e.key === 'Enter') $('btentrar').click(); };
   $('btsair').onclick = function(){ esquecer(); mostrarLogin(); };
 
