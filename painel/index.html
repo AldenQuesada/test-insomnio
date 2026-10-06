@@ -102,14 +102,20 @@ td.n, th.n{text-align:right; font-variant-numeric:tabular-nums}
 <div class="folha entrar" id="tela-login">
   <h1>Painel do teste de insônia</h1>
   <p class="sub">Entre para ver o funil.</p>
-  <label><span>E-mail</span><input id="email" type="email" autocomplete="username"></label>
-  <label><span>Senha</span>
-    <span class="campo-senha">
-      <input id="senha" type="password" autocomplete="current-password">
-      <button type="button" class="olho" id="ver-senha" aria-pressed="false" aria-label="Mostrar a senha"></button>
-    </span>
-  </label>
-  <button class="principal" id="btentrar">Entrar</button>
+  <!-- Formulário de verdade, com `name` e submit: é isso que faz o navegador
+       oferecer guardar a senha e preencher sozinho da próxima vez. Com um
+       botão solto e um onclick, ele nunca oferece. -->
+  <form id="form-login" autocomplete="on">
+    <label><span>E-mail</span>
+      <input id="email" name="username" type="email" autocomplete="username"></label>
+    <label><span>Senha</span>
+      <span class="campo-senha">
+        <input id="senha" name="password" type="password" autocomplete="current-password">
+        <button type="button" class="olho" id="ver-senha" aria-pressed="false" aria-label="Mostrar a senha"></button>
+      </span>
+    </label>
+    <button class="principal" id="btentrar" type="submit">Entrar</button>
+  </form>
   <div class="erro" id="erro-login"></div>
 </div>
 
@@ -154,6 +160,7 @@ td.n, th.n{text-align:right; font-variant-numeric:tabular-nums}
   'use strict';
   var CFG = window.QUIZ_CONFIG;
   var SESSAO = 'painel_sessao';
+  var EMAIL_LEMBRADO = 'painel_email';
 
   function $(id){ return document.getElementById(id); }
   function esc(x){
@@ -371,7 +378,11 @@ td.n, th.n{text-align:right; font-variant-numeric:tabular-nums}
   function mostrarLogin(){
     $('tela-login').classList.remove('oculto');
     $('tela-painel').classList.add('oculto');
-    $('email').focus();
+    var lembrado = '';
+    try { lembrado = localStorage.getItem(EMAIL_LEMBRADO) || ''; } catch (e) {}
+    if (lembrado && !$('email').value) $('email').value = lembrado;
+    // Com o e-mail já no lugar, o cursor vai direto para o que falta.
+    ($('email').value ? $('senha') : $('email')).focus();
   }
   function mostrarPainel(){
     $('tela-login').classList.add('oculto');
@@ -379,8 +390,21 @@ td.n, th.n{text-align:right; font-variant-numeric:tabular-nums}
     carregar();
   }
 
-  $('btentrar').onclick = function(){
-    var b = this, email = $('email').value.trim(), senha = $('senha').value;
+  // Pede ao gerenciador de senhas do navegador para guardar. Só o Chrome
+  // atende esta chamada; nos outros quem resolve é o formulário.
+  function lembrarNoNavegador(email, senha){
+    try {
+      if (window.PasswordCredential && navigator.credentials && navigator.credentials.store) {
+        navigator.credentials.store(
+          new window.PasswordCredential({ id: email, password: senha, name: email })
+        ).catch(function(){});
+      }
+    } catch (e) {}
+  }
+
+  $('form-login').onsubmit = function(ev){
+    ev.preventDefault();
+    var b = $('btentrar'), email = $('email').value.trim(), senha = $('senha').value;
     if (!email || !senha) return;
     b.disabled = true; b.textContent = 'a entrar…';
     $('erro-login').textContent = '';
@@ -391,6 +415,10 @@ td.n, th.n{text-align:right; font-variant-numeric:tabular-nums}
         return;
       }
       guardar(d);
+      lembrarNoNavegador(email, senha);
+      // O e-mail fica guardado mesmo depois de sair: não é segredo, e poupa
+      // digitar a parte chata no celular.
+      try { localStorage.setItem(EMAIL_LEMBRADO, email); } catch (e) {}
       // Campo limpo e escondido de novo: quem sai e volta não encontra a
       // senha anterior à mostra.
       $('senha').value = '';
@@ -420,11 +448,23 @@ td.n, th.n{text-align:right; font-variant-numeric:tabular-nums}
     try { campo.setSelectionRange(campo.value.length, campo.value.length); } catch (e) {}
   };
 
-  $('senha').onkeydown = function(e){ if (e.key === 'Enter') $('btentrar').click(); };
   $('btsair').onclick = function(){ esquecer(); mostrarLogin(); };
 
-  // Já entrou antes? Tenta seguir sem pedir senha de novo.
-  if (guardada()) { mostrarPainel(); } else { mostrarLogin(); }
+  // ── abertura ──────────────────────────────────────────────────────
+  // A sessão fica guardada e o token de uma hora se renova sozinho, então
+  // entrar é uma vez só por aparelho. A renovação acontece ANTES do primeiro
+  // pedido: sem isso, reabrir depois de uma hora gastava uma requisição
+  // recusada antes de funcionar.
+  (function abrir(){
+    var s = guardada();
+    if (!s || !s.access_token) { mostrarLogin(); return; }
+    var vencido = s.expires_at && (s.expires_at * 1000 - Date.now() < 60000);
+    if (!vencido) { mostrarPainel(); return; }
+    renovar().then(function(novo){
+      if (novo) { mostrarPainel(); }
+      else { esquecer(); mostrarLogin(); }
+    });
+  })();
 })();
 </script>
 </body>
