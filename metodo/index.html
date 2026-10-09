@@ -24,6 +24,7 @@ html{scroll-behavior:smooth}
 body{
   font-family:Montserrat,-apple-system,BlinkMacSystemFont,sans-serif;
   background:var(--noite); color:var(--clareza); line-height:1.55;
+  overflow-x:hidden; overflow-x:clip;
   -webkit-font-smoothing:antialiased;
 }
 .faixa{padding:86px 40px; text-align:center}
@@ -89,6 +90,12 @@ p:last-child{margin-bottom:0}
   font-family:Montserrat,sans-serif; font-size:13px; font-weight:500;
   letter-spacing:.06em; text-transform:uppercase; color:var(--saude);
 }
+.heroi-leitura h1{font-size:clamp(30px,3.15vw,44px); font-weight:600;
+  line-height:1.16; letter-spacing:-.02em}
+.heroi-leitura .sobretitulo{font-size:clamp(15px,1.35vw,18px); font-weight:500;
+  line-height:1.5; letter-spacing:.01em; text-transform:none}
+.heroi-leitura .h-b h2{font-size:clamp(20px,1.8vw,25px); line-height:1.35;
+  color:var(--saude); text-transform:none}
 .h-img-desk{display:none}
 .citacao{display:flex; gap:16px; align-items:center; margin-top:24px; text-align:left}
 .citacao img{width:74px; height:74px; border-radius:50%; object-fit:cover; flex:none;
@@ -210,7 +217,8 @@ ul.itens li .marca svg{width:12px; height:12px; color:var(--noite)}
 .pilha li.com-capa{align-items:center; padding:16px 0}
 .p-capa{width:96px; height:auto; flex:none; border-radius:3px;
   box-shadow:0 4px 14px rgba(0,0,0,.45)}
-.p-nome{flex:1; border-bottom:1px dotted rgba(244,240,232,.25); padding-bottom:3px}
+.p-nome{flex:1; min-width:0; overflow-wrap:anywhere;
+  border-bottom:1px dotted rgba(244,240,232,.25); padding-bottom:3px}
 .p-val{flex:none; font-weight:700; color:var(--saude); white-space:nowrap;
   display:flex; flex-direction:column; align-items:flex-end; gap:5px}
 .p-val s{opacity:.6; font-weight:600; text-decoration-thickness:2px}
@@ -307,19 +315,22 @@ ul.itens li .marca svg{width:12px; height:12px; color:var(--noite)}
     transform:translateY(110%); transition:transform .35s ease;
     border-top:1px solid rgba(216,184,121,.35);
     padding:11px 14px calc(11px + env(safe-area-inset-bottom, 0px))}
-  body.com-barra{padding-bottom:78px}
+  body.com-barra{padding-bottom:calc(100px + env(safe-area-inset-bottom, 0px))}
   /* Mesmo corte da barra: quando ela existe, o relógio dela basta. Os dois
      contadores grandes só repetiriam a mesma hora na mesma tela. */
   .barra.visivel{transform:none}
-  body.com-barra .faixa:not(.heroi) .conta{display:none}
+  body.com-barra-contador .faixa:not(.heroi) .conta{display:none}
   .barra-esq{flex:1; min-width:0}
   .barra-txt{font-family:Montserrat,sans-serif; font-size:12.5px; line-height:1.3;
     color:var(--clareza); margin:0}
   .barra-txt b{color:var(--saude); font-weight:800}
+  .barra-apoio{font-family:Montserrat,sans-serif; font-size:11.5px;
+    line-height:1.35; color:var(--apoio); margin:4px 0 0; overflow-wrap:anywhere}
   .barra-rel{font-family:Montserrat,sans-serif; font-weight:800; font-size:17px;
     letter-spacing:.04em; color:var(--saude); margin:3px 0 0;
     font-variant-numeric:tabular-nums}
-  .barra-btn{flex:none; background:var(--saude); color:var(--noite);
+  .barra-btn{flex:0 1 auto; max-width:62%; min-width:0; text-align:center;
+    overflow-wrap:anywhere; background:var(--saude); color:var(--noite);
     font-family:Montserrat,sans-serif; font-weight:800; font-size:13.5px;
     letter-spacing:.03em; text-decoration:none; padding:14px 18px;
     border-radius:999px; box-shadow:0 0 22px rgba(216,184,121,.35)}
@@ -400,6 +411,12 @@ ul.itens li .marca svg{width:12px; height:12px; color:var(--noite)}
 .garantia .g-tit{font-size:34px; line-height:1.2; text-transform:uppercase;
   max-width:740px; margin:0 auto 24px}
 .garantia .g-txt{font-size:17px; line-height:1.6; max-width:640px; margin:0 auto}
+.garantia .g-txt + .g-txt{margin-top:18px}
+.garantia .g-contato{margin:22px auto 0; font-size:15px; max-width:640px;
+  overflow-wrap:anywhere}
+.g-contato a{color:var(--saude); text-underline-offset:3px}
+.g-contato a:focus-visible,.barra-btn:focus-visible{outline:3px solid var(--calma);
+  outline-offset:4px}
 @media (min-width:900px){
   .g-selo{width:190px; height:190px; margin-bottom:34px}
   .garantia .g-tit{font-size:52px}
@@ -487,7 +504,7 @@ details p{margin-top:11px; font-size:15.5px}
   .duas .dentro{display:grid; grid-template-columns:1fr 1fr; gap:56px;
     align-items:center; text-align:left}
   .duas img{width:100%; margin:0}
-  .texto-longo .dentro{max-width:780px}
+  .texto-longo .dentro{max-width:900px}
   ul.itens{display:grid; grid-template-columns:1fr 1fr; gap:0 44px}
   ul.itens li{border-bottom:0; padding-bottom:0; margin-bottom:26px}
   .faq-grid{display:grid; grid-template-columns:1fr 1fr; gap:0 44px}
@@ -504,6 +521,8 @@ details p{margin-top:11px; font-size:15.5px}
 /* Quatro parágrafos centralizados não se leem no celular: cada linha começa
    num lugar diferente e o olho perde o começo da seguinte. */
 .autor-texto{text-align:left}
+.autor-subtitulo{font-family:Montserrat,sans-serif; font-size:16px;
+  font-weight:600; line-height:1.5; color:var(--calma); margin-bottom:22px}
 .autor .rotulo{font-family:Montserrat,sans-serif; font-weight:700; font-size:12px;
   letter-spacing:.16em; text-transform:uppercase; color:var(--saude);
   margin-bottom:10px}
@@ -511,6 +530,75 @@ details p{margin-top:11px; font-size:15.5px}
   .autor .dentro{grid-template-columns:minmax(0,420px) minmax(0,1fr); align-items:start}
   .autor-foto{max-width:none; margin:0}
   .autor-texto h2{margin-top:0}
+}
+
+/* Blocos de leitura: a mesma paleta, com medidas para textos e cartões. */
+.leitura .dentro{max-width:960px; min-width:0}
+.leitura h2{font-size:clamp(23px,2.2vw,32px); line-height:1.3; margin-bottom:24px}
+.leitura p{line-height:1.7}
+.texto-corrido{max-width:850px; margin:0 auto; text-align:left; min-width:0}
+.leitura strong,.autor-texto strong{font-weight:600; color:var(--clareza)}
+.leitura .fecho{max-width:850px; margin:28px auto 0; color:var(--clareza)}
+.narrativa-grade{display:grid; gap:28px; align-items:center}
+.narrativa-grade > *{min-width:0}
+.narrativa-imagem{width:100%; max-width:420px; margin:0 auto; border-radius:12px;
+  border:1px solid rgba(216,184,121,.3)}
+.conteudo-grade{display:grid; gap:24px; margin-top:30px; text-align:left}
+.conteudo-card{min-width:0; background:var(--clareza); border-radius:12px;
+  overflow:hidden; border:1px solid rgba(216,184,121,.3)}
+.conteudo-imagem{width:100%; height:360px; object-fit:contain; padding:22px 22px 0}
+.conteudo-corpo{padding:26px}
+.conteudo-card h3{font-size:21px; line-height:1.4; color:var(--noite)}
+.conteudo-card p{font-size:16px; color:var(--noite-2)}
+.conteudo-card strong{color:inherit}
+.publico-lista{margin-top:26px}
+.acesso-passos{list-style:none; display:grid; gap:24px; margin:30px 0 0;
+  text-align:left}
+.acesso-passos li{min-width:0; padding:24px; border-radius:10px;
+  border:1px solid rgba(183,170,205,.35); background:var(--noite)}
+.passo-numero{display:grid; place-items:center; width:42px; height:42px;
+  border-radius:50%; margin-bottom:18px; background:var(--saude); color:var(--noite);
+  font-family:"Bebas Neue",Impact,sans-serif; font-size:26px; line-height:1}
+.acesso-passos h3{font-size:20px; line-height:1.4}
+.acesso-passos p{font-size:16px}
+.acesso-midia{max-width:850px; margin:34px auto 0}
+.acesso-midia img,.acesso-midia video{display:block; width:100%; max-width:100%;
+  height:auto; border-radius:10px; background:var(--noite)}
+.acesso-midia figcaption{font-family:Montserrat,sans-serif; font-size:13px;
+  line-height:1.5; color:var(--apoio); margin-top:12px}
+.caminhos{display:grid; gap:24px; margin-top:30px; text-align:left}
+.caminhos + .texto-corrido{margin-top:28px}
+.caminho-card{min-width:0; padding:28px; border-radius:10px;
+  border:1px solid var(--calma); background:var(--noite)}
+.caminho-card:nth-child(2){border-color:var(--saude); background:var(--noite-2)}
+.caminho-rotulo{font-family:Montserrat,sans-serif; font-size:12px; font-weight:600;
+  letter-spacing:.09em; text-transform:uppercase; color:var(--calma);
+  margin-bottom:14px}
+.caminho-card:nth-child(2) .caminho-rotulo{color:var(--saude)}
+.caminho-card h3{font-size:23px; line-height:1.35; margin-bottom:18px}
+.caminho-card p:not(.caminho-rotulo){font-size:16px}
+[data-bloco="faq"] .dentro,[data-bloco="resumo"] .dentro,
+[data-bloco="resumo_fim"] .dentro,.autor .dentro{max-width:1000px}
+@media (min-width:700px){
+  .conteudo-grade,.caminhos{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .acesso-passos{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media (min-width:900px){
+  .narrativa-grade.com-imagem{grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);
+    gap:40px}
+  .leitura .itens{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:600px){
+  .faixa{padding:58px 22px}
+  .m-img{width:calc(100% + 28px); margin-left:-14px}
+  .conteudo-corpo,.caminho-card{padding:24px}
+  .conteudo-imagem{height:340px; padding:18px 18px 0}
+  .conta-cx{min-width:0; flex:1}
+  .r-pagos .r-logo{flex-shrink:1; min-width:36px}
+}
+@media (max-width:360px){
+  .p-capa{width:74px}
+  .pilha li{gap:8px; font-size:14px}
 }
 
 .aviso-previa{background:var(--saude); color:var(--noite); text-align:center;
@@ -541,7 +629,32 @@ details p{margin-top:11px; font-size:15.5px}
       .replace(/&/g,'&amp;').replace(/</g,'&lt;')
       .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
-  var TIQUE = '<span class="marca"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2"><polyline points="20 6 9 17 4 12"/></svg></span>';
+  // A ênfase é aplicada depois do escape; o conteúdo nunca vira HTML livre.
+  function formato(x){
+    return esc(x).replace(/\*\*([^*]+)\*\*|\*([^*]+)\*/g, function(_, dupla, simples){
+      return '<strong>' + (dupla || simples) + '</strong>';
+    });
+  }
+
+  function paragrafos(texto, classe){
+    return (Array.isArray(texto) ? texto : [texto]).map(function(t){
+      return String(t == null ? '' : t).split(/\r?\n/).map(function(p){
+        return p.trim()
+          ? '<p' + (classe ? ' class="' + esc(classe) + '"' : '') + '>' + formato(p) + '</p>'
+          : '';
+      }).join('');
+    }).join('');
+  }
+
+  function videoDireto(valor){
+    if (!valor) return '';
+    try {
+      var u = new URL(String(valor), location.href);
+      return /^https?:$/.test(u.protocol) && /\.(mp4|webm)$/i.test(u.pathname) ? u.href : '';
+    } catch (e) { return ''; }
+  }
+
+  var TIQUE = '<span class="marca" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2"><polyline points="20 6 9 17 4 12"/></svg></span>';
 
   var CADEADO = '<svg class="r-cad" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
 
@@ -664,6 +777,7 @@ details p{margin-top:11px; font-size:15.5px}
   // direita, sempre onde o polegar está. Lê o MESMO prazo dos contadores.
   function montarBarra(c){
     if (!c || !c.botao || !CHECKOUT) return;
+    var contar = c.contador !== false;
     var p = T.preco || {};
     var preco = (p.moeda ? p.moeda + ' ' : '') + (p.por || '');
     var de = (p.moeda ? p.moeda + ' ' : '') + (c.de || '');
@@ -676,19 +790,23 @@ details p{margin-top:11px; font-size:15.5px}
     var el = document.createElement('div');
     el.className = 'barra';
     el.innerHTML = '<div class="barra-esq"><p class="barra-txt">' + txt + '</p>' +
-      '<p class="barra-rel" id="barra-rel">00:15:00</p></div>' +
+      (c.apoio ? '<p class="barra-apoio">' + formato(c.apoio) + '</p>' : '') +
+      (contar ? '<p class="barra-rel" id="barra-rel">00:15:00</p>' : '') + '</div>' +
       '<a class="barra-btn" href="' + esc(CHECKOUT) + '" rel="noopener">' + esc(c.botao) + '</a>';
     document.body.appendChild(el);
     document.body.classList.add('com-barra');
-    var rel = document.getElementById('barra-rel');
-    function pintar(){
-      var ate = 0; try { ate = parseInt(localStorage.getItem('oferta_ate'), 10) || 0; } catch (e) {}
-      if (!ate) return;
-      var s = Math.max(0, Math.floor((ate - Date.now()) / 1000));
-      rel.textContent = [Math.floor(s/3600), Math.floor((s%3600)/60), s%60]
-        .map(function(n){ return String(n).padStart(2,'0'); }).join(':');
+    if (contar) {
+      document.body.classList.add('com-barra-contador');
+      var rel = document.getElementById('barra-rel');
+      var pintar = function(){
+        var ate = 0; try { ate = parseInt(localStorage.getItem('oferta_ate'), 10) || 0; } catch (e) {}
+        if (!ate) return;
+        var s = Math.max(0, Math.floor((ate - Date.now()) / 1000));
+        rel.textContent = [Math.floor(s/3600), Math.floor((s%3600)/60), s%60]
+          .map(function(n){ return String(n).padStart(2,'0'); }).join(':');
+      };
+      pintar(); setInterval(pintar, 1000);
     }
-    pintar(); setInterval(pintar, 1000);
 
     // Aparece quando o botão do herói SAI da tela por cima (a pessoa rolou
     // para baixo); some de novo se ela voltar até ele.
@@ -801,7 +919,7 @@ details p{margin-top:11px; font-size:15.5px}
         '</div>' +
         (c.imagem ? '<div class="h-img h-img-desk"><img src="' + esc(c.imagem) +
                     '" alt="" width="573" height="860" loading="lazy"></div>' : ''),
-        'heroi ameixa');
+        'heroi ameixa' + (String(c.titulo).length > 90 && !/\*/.test(c.titulo) ? ' heroi-leitura' : ''));
     },
     cta1: function(){ return ''; },
     cta2: function(c){ return secao(botao(c)); },
@@ -860,6 +978,24 @@ details p{margin-top:11px; font-size:15.5px}
         galeriaHtml((T && T.galeria) || {}));
     },
 
+    dores: function(c){
+      if (!c.titulo && !c.texto && !c.imagem) return '';
+      return secao(
+        (c.titulo ? '<h2>' + formato(c.titulo) + '</h2>' : '') +
+        '<div class="narrativa-grade' + (c.imagem ? ' com-imagem' : '') + '">' +
+          (c.imagem ? '<img class="narrativa-imagem" src="' + esc(c.imagem) +
+            '" alt="' + esc(c.imagem_alt || '') + '" loading="lazy">' : '') +
+          '<div class="texto-corrido">' + paragrafos(c.texto) + '</div>' +
+        '</div>' + paragrafos(c.fecho, 'fecho'), 'leitura');
+    },
+
+    ponte: function(c){
+      if (!c.titulo && !c.texto) return '';
+      return secao(
+        (c.titulo ? '<h2>' + formato(c.titulo) + '</h2>' : '') +
+        '<div class="texto-corrido">' + paragrafos(c.texto) + '</div>', 'leitura');
+    },
+
     // Repetição da oferta no meio da página, como na modelo: ela não espera o
     // fim para pedir a venda de novo.
     oferta2: function(c){
@@ -877,10 +1013,17 @@ details p{margin-top:11px; font-size:15.5px}
     // outros a partir do segundo.
     atalho: function(c){
       if (!c.titulo) return '';
+      var caminhos = Array.isArray(c.caminhos) ? c.caminhos : [];
       return secao(
-        '<h2>' + esc(c.titulo) + '</h2>' +
-        (c.texto || []).map(function(t){ return '<p>' + esc(t) + '</p>'; }).join('') +
-        botao(c.botao));
+        '<h2>' + formato(c.titulo) + '</h2>' +
+        (caminhos.length ? '<div class="caminhos">' + caminhos.map(function(caminho){
+          return '<article class="caminho-card">' +
+            (caminho.rotulo ? '<p class="caminho-rotulo">' + formato(caminho.rotulo) + '</p>' : '') +
+            (caminho.titulo ? '<h3>' + formato(caminho.titulo) + '</h3>' : '') +
+            paragrafos(caminho.texto) + '</article>';
+        }).join('') + '</div>' : '') +
+        '<div class="texto-corrido">' + paragrafos(c.texto) + '</div>' +
+        paragrafos(c.fecho, 'fecho') + botao(c.botao), 'leitura');
     },
 
     mockups: function(c){
@@ -934,8 +1077,9 @@ details p{margin-top:11px; font-size:15.5px}
         (c.foto ? '<div class="autor-foto"><img src="' + esc(c.foto) + '" alt="' + esc(c.nome || '') + '" loading="lazy"></div>' : '') +
         '<div class="autor-texto">' +
         (c.rotulo ? '<p class="rotulo">' + esc(c.rotulo) + '</p>' : '') +
-        '<h2>' + esc(c.nome || '') + '</h2>' +
-        c.bio.split('\n').map(function(p){ return '<p>' + esc(p) + '</p>'; }).join('') +
+        '<h2>' + formato(c.nome || '') + '</h2>' +
+        (c.subtitulo ? '<p class="autor-subtitulo">' + formato(c.subtitulo) + '</p>' : '') +
+        paragrafos(c.bio) +
         '</div>', 'escura duas autor');
     },
 
@@ -949,9 +1093,61 @@ details p{margin-top:11px; font-size:15.5px}
     beneficios: function(c){
       var it = c.itens || [];
       if (!it.length) return '';
-      return secao('<h2>' + esc(c.titulo || '') + '</h2><ul class="itens">' +
-        it.map(function(t){ return '<li>' + TIQUE + esc(t) + '</li>'; }).join('') +
-        '</ul>', 'escura');
+      return secao('<h2>' + formato(c.titulo || '') + '</h2><ul class="itens" role="list">' +
+        it.map(function(t){ return '<li>' + TIQUE + formato(t) + '</li>'; }).join('') +
+        '</ul>', 'escura leitura');
+    },
+
+    conteudo: function(c){
+      var it = c.itens || [];
+      if (!it.length) return '';
+      return secao(
+        (c.titulo ? '<h2>' + formato(c.titulo) + '</h2>' : '') +
+        '<div class="texto-corrido">' + paragrafos(c.texto) + '</div>' +
+        '<div class="conteudo-grade">' + it.map(function(item){
+          return '<article class="conteudo-card">' +
+            (item.imagem ? '<img class="conteudo-imagem" src="' + esc(item.imagem) +
+              '" alt="' + esc(item.imagem_alt || item.titulo || '') + '" loading="lazy">' : '') +
+            '<div class="conteudo-corpo">' +
+              (item.titulo ? '<h3>' + formato(item.titulo) + '</h3>' : '') +
+              paragrafos(item.texto) +
+            '</div></article>';
+        }).join('') + '</div>', 'leitura');
+    },
+
+    publico: function(c){
+      var it = c.itens || [];
+      if (!it.length) return '';
+      return secao(
+        (c.titulo ? '<h2>' + formato(c.titulo) + '</h2>' : '') +
+        '<ul class="itens publico-lista" role="list">' +
+          it.map(function(t){ return '<li>' + TIQUE + formato(t) + '</li>'; }).join('') +
+        '</ul>' + paragrafos(c.fecho, 'fecho'), 'leitura');
+    },
+
+    acesso: function(c){
+      var it = c.itens || [];
+      if (!c.titulo && !c.texto && !it.length && !c.imagem && !c.video) return '';
+      var video = videoDireto(c.video);
+      var midia = video
+        ? '<video controls playsinline preload="metadata" src="' + esc(video) + '"' +
+          (c.imagem ? ' poster="' + esc(c.imagem) + '"' : '') +
+          (c.video_titulo || c.titulo ? ' aria-label="' + esc(c.video_titulo || c.titulo) + '"' : '') +
+          '>' + (c.imagem ? '<img src="' + esc(c.imagem) + '" alt="' +
+            esc(c.imagem_alt || '') + '">' : '') + '</video>'
+        : (c.imagem ? '<img src="' + esc(c.imagem) + '" alt="' +
+            esc(c.imagem_alt || '') + '" loading="lazy">' : '');
+      return secao(
+        (c.titulo ? '<h2>' + formato(c.titulo) + '</h2>' : '') +
+        '<div class="texto-corrido">' + paragrafos(c.texto) + '</div>' +
+        (it.length ? '<ol class="acesso-passos" role="list">' + it.map(function(item, i){
+          return '<li><span class="passo-numero" aria-hidden="true">' + (i + 1) + '</span>' +
+            (item.titulo ? '<h3>' + formato(item.titulo) + '</h3>' : '') +
+            paragrafos(item.texto) + '</li>';
+        }).join('') + '</ol>' : '') +
+        (midia ? '<figure class="acesso-midia">' + midia +
+          (video && c.video_titulo ? '<figcaption>' + formato(c.video_titulo) + '</figcaption>' : '') +
+          '</figure>' : '') + botao(c.botao), 'leitura');
     },
 
     // Card medido na página modelo, na ordem dela: faixa com número e título,
@@ -1003,12 +1199,17 @@ details p{margin-top:11px; font-size:15.5px}
     // de 740, texto 20px em caixa de 640. Tudo centralizado, sem moldura.
     garantia: function(c){
       if (!c.texto) return '';
+      var email = String(c.email || '').trim();
+      var contato = (c.contato_texto ? formato(c.contato_texto) : '') +
+        (email ? (c.contato_texto ? ' ' : '') + '<a href="mailto:' +
+          esc(email) + '">' + esc(email) + '</a>' : '');
       return secao('<div class="garantia">' +
         (c.selo_img
           ? '<img class="g-selo" src="' + esc(c.selo_img) + '" alt="" width="190" height="190" loading="lazy">'
           : (c.selo ? '<div class="carimbo">' + esc(c.selo).replace(' ', '<br>') + '</div>' : '')) +
-        '<h2 class="g-tit">' + esc(c.titulo || '') + '</h2>' +
-        '<p class="g-txt">' + esc(c.texto) + '</p></div>', 'escura');
+        '<h2 class="g-tit">' + formato(c.titulo || '') + '</h2>' +
+        paragrafos(c.texto, 'g-txt') +
+        (contato ? '<p class="g-contato">' + contato + '</p>' : '') + '</div>', 'escura');
     },
 
     // O empilhamento de oferta. Cada peça com o seu valor, o total somado, a
@@ -1043,6 +1244,8 @@ details p{margin-top:11px; font-size:15.5px}
           (p.apoio ? '<p class="apoio">' + esc(p.apoio) + '</p>' : '') +
         '</div>' + botao(c.botao), 'escura');
     },
+
+    resumo_fim: function(c, T){ return BLOCOS.resumo((T && T.resumo) || {}, T); },
 
     faq: function(c){
       var it = c.itens || [];
@@ -1307,3 +1510,4 @@ details p{margin-top:11px; font-size:15.5px}
   });
 })();
 </script>
+
