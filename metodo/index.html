@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="es">
 <meta charset="utf-8">
-<meta name="tsl-renderer-version" content="approval-20261009-v2">
+<meta name="tsl-renderer-version" content="corrections-20261010-v1">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Venciendo el Insomnio en 7 días · Dr. Alden J. Quesada</title>
 <meta name="description" content="El método completo del Dr. Alden J. Quesada para volver a dormir la noche entera, sin depender de medicamentos controlados.">
@@ -316,7 +316,7 @@ ul.itens li .marca svg{width:12px; height:12px; color:var(--noite)}
     transform:translateY(110%); transition:transform .35s ease;
     border-top:1px solid rgba(216,184,121,.35);
     padding:11px 14px calc(11px + env(safe-area-inset-bottom, 0px))}
-  body.com-barra{padding-bottom:calc(100px + env(safe-area-inset-bottom, 0px))}
+  body.com-barra{padding-bottom:var(--barra-altura,calc(160px + env(safe-area-inset-bottom, 0px)))}
   /* Mesmo corte da barra: quando ela existe, o relógio dela basta. Os dois
      contadores grandes só repetiriam a mesma hora na mesma tela. */
   .barra.visivel{transform:none}
@@ -620,10 +620,10 @@ details p{margin-top:11px; font-size:15.5px}
 .ap-benefit h3{font:600 20px/1.35 Montserrat,sans-serif;color:var(--noite);margin:0 0 12px}.ap-benefit p,.ap-benefit strong{color:var(--noite-2);font-size:16.5px}.ap-benefit .ap-icon{width:28px;height:28px;color:#90743f}
 .ap-content-rows{display:grid;gap:55px;margin-top:44px}.ap-content-row{display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:56px;text-align:left}.ap-content-row:nth-child(even) figure{order:2}.ap-content-row figure{margin:0;display:flex;justify-content:center}.ap-content-row img{display:block;width:100%;max-width:400px;height:auto;max-height:580px;object-fit:contain;filter:drop-shadow(0 20px 24px #0004);border-radius:3px}.ap-content-row h3{font:600 26px/1.35 Montserrat,sans-serif;margin-bottom:22px}.ap-content-row p{font-size:18px}
 .ap-bonus-list{display:flex;flex-direction:column;gap:30px;margin:36px auto 0;max-width:1000px}.ap-bonus-card{background:var(--clareza);border-radius:14px;overflow:hidden}.ap-bonus-card header{background:var(--noite);border:1px solid #d8b87966;padding:24px}.ap-bonus-card header p{font:600 13px/1.3 Montserrat,sans-serif;letter-spacing:.13em;color:var(--saude);margin-bottom:10px}.ap-bonus-card header h3{font:600 24px/1.35 Montserrat,sans-serif;margin:0;color:var(--clareza)}
-.ap-bonus-inner{padding:34px;display:grid;grid-template-columns:45% 1fr;gap:30px;align-items:center;text-align:left}.ap-bonus-inner img{width:100%;max-width:430px;margin:auto}.ap-bonus-inner p,.ap-bonus-inner strong{color:var(--noite-2);font-size:17px}.ap-bonus-inner .ap-bonus-benefit{font:600 20px/1.45 Montserrat,sans-serif;color:var(--noite);margin-bottom:24px}.ap-bonus-inner .ap-gift{display:inline-block;background:var(--saude);color:var(--noite);padding:10px 15px;border-radius:6px;font:600 14px/1.4 Montserrat,sans-serif}.ap-formats{max-width:900px;margin:30px auto 0!important}
+.ap-bonus-inner{padding:34px;display:grid;grid-template-columns:45% 1fr;gap:30px;align-items:center;text-align:left}.ap-bonus-inner img{width:100%;max-width:430px;margin:auto}.ap-bonus-inner p,.ap-bonus-inner strong{color:var(--noite-2);font-size:17px}.ap-bonus-inner .ap-bonus-benefit{font:600 20px/1.45 Montserrat,sans-serif;color:var(--noite);margin-bottom:24px}.ap-bonus-inner .ap-gift{display:inline-block;background:var(--saude);color:var(--noite);padding:10px 15px;border-radius:6px;font:600 14px/1.4 Montserrat,sans-serif}.ap-bonus-pricing{margin:24px 0}.ap-bonus-inner .ap-bonus-price{font:500 18px/1.6 Montserrat,sans-serif;margin-bottom:12px;color:var(--noite)}.ap-bonus-price b{font-size:24px;font-weight:800}.ap-bonus-pricing .p-gratis{display:inline-block;max-width:100%;font:800 14px/1.5 Montserrat,sans-serif;letter-spacing:.04em;padding:7px 13px}.ap-formats{max-width:900px;margin:30px auto 0!important}
 #pagina>section.faixa.ap-public,#pagina>section.faixa.ap-faq-section{background:var(--clareza);color:var(--noite)}.ap-public h2,.ap-public p,.ap-public strong,.ap-public li,.ap-faq-section h2,.ap-faq-section p,.ap-faq-section strong,.ap-faq-section summary{color:var(--noite)}
 .ap-public-list{list-style:none;max-width:840px;margin:32px auto;text-align:left;display:grid;gap:24px}.ap-public-list li{display:flex;align-items:flex-start;gap:14px;font:18px/1.65 Lora,Georgia,serif}.ap-public-list .ap-icon{color:#927844;width:26px;height:26px;margin-top:3px}.ap-public .ap-public-close{max-width:870px;margin:18px auto}.ap-public-close:first-of-type{font-size:23px}
-.ap-eyebrow{font:600 13px/1.4 Montserrat,sans-serif;letter-spacing:.16em;color:var(--saude);margin-bottom:16px}.ap-recap{max-width:860px;margin:32px auto 0;background:var(--clareza);color:var(--noite);padding:30px 36px;border-radius:12px;text-align:left}.ap-recap ul{list-style:none}.ap-recap li{display:flex;align-items:flex-start;gap:16px;padding:20px 0;border-bottom:1px solid #111b3225;font:17px/1.5 Montserrat,sans-serif}.ap-recap li:last-child{border:0}.ap-recap .ap-icon{width:25px;height:25px;color:#90743f}.ap-recap-name{flex:1;min-width:0}.ap-recap li b{white-space:nowrap}.ap-recap .ap-total{padding:20px 0 0;margin:15px 0 0;border-top:1px solid #111b3244;color:var(--noite);text-align:right;font:600 20px/1.6 Montserrat,sans-serif}
+.ap-eyebrow{font:600 13px/1.4 Montserrat,sans-serif;letter-spacing:.16em;color:var(--saude);margin-bottom:16px}.ap-recap{max-width:860px;margin:32px auto 0;background:var(--clareza);color:var(--noite);padding:30px 36px;border-radius:12px;text-align:left}.ap-recap ul{list-style:none}.ap-recap li{display:flex;align-items:flex-start;gap:16px;padding:20px 0;border-bottom:1px solid #111b3225;font:17px/1.5 Montserrat,sans-serif}.ap-recap li:last-child{border:0}.ap-recap .ap-icon{width:25px;height:25px;color:#90743f}.ap-recap-name{flex:1;min-width:0}.ap-recap-value{flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:7px;white-space:nowrap}.ap-recap-value b{font-weight:700}.ap-recap-value s,.ap-total s,.ap-bonus-price s{text-decoration-thickness:2px}.ap-recap-value s{opacity:.7}.ap-recap .ap-total{padding:20px 0 0;margin:15px 0 0;border-top:1px solid #111b3244;color:var(--noite);text-align:right;font:600 20px/1.6 Montserrat,sans-serif}
 .ap-ribbon{background:var(--saude);color:var(--noite);font:600 22px/1.4 Montserrat,sans-serif;margin:46px 0 40px;padding:26px 40px;position:relative;border-radius:5px}.ap-ribbon:after{content:'';position:absolute;left:calc(50% - 18px);bottom:-16px;border-left:18px solid transparent;border-right:18px solid transparent;border-top:18px solid var(--saude)}
 .ap-offer{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:center;padding-top:15px}.ap-books{display:grid;grid-template-columns:1fr 1fr;position:relative;align-items:end;justify-items:center;padding-top:0;gap:5px}.ap-books .ap-book-0{grid-column:1 / 3;width:65%;max-height:510px;object-fit:contain;margin:0 auto}.ap-books .ap-book-1,.ap-books .ap-book-2{width:100%;max-height:280px;object-fit:contain;margin-top:-145px;z-index:1;filter:drop-shadow(0 12px 16px #0006)}
 .ap-price{border:1px solid #d8b87988;background:var(--noite);border-radius:14px;padding:36px 26px}.ap-label{font:500 19px/1.4 Montserrat,sans-serif;color:var(--clareza)}.ap-amount{font:400 clamp(72px,8vw,105px)/1.05 'Bebas Neue',sans-serif;color:var(--saude)}.ap-amount small{font-size:.38em}.ap-payment{font:15px/1.6 Montserrat,sans-serif;color:var(--clareza);margin-top:14px}.ap-price a.cta{font-size:18px;padding:22px 16px}.ap-trust{list-style:none;margin:26px 0 0;display:grid;gap:12px;text-align:left}.ap-trust li{display:flex;gap:10px;font:13px/1.5 Montserrat,sans-serif;color:var(--apoio)}.ap-trust .ap-icon{width:18px;height:18px}
@@ -632,9 +632,19 @@ details p{margin-top:11px; font-size:15.5px}
 .ap-faq{max-width:880px;margin:30px auto 0}.ap-faq details{border-bottom:1px solid #111b3233;padding:22px 0}.ap-faq summary{font-size:17px;line-height:1.5}.ap-faq summary:after{color:#927844}.ap-faq p{font-size:17px;line-height:1.7}
 .ap-paths{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin:38px auto;align-items:start}.ap-path{background:var(--noite);border:1px solid #b7aacd66;border-radius:14px;padding:32px;text-align:left}.ap-path:nth-child(2){border-color:var(--saude);background:var(--noite-2)}.ap-path h3{font:600 26px/1.35 Montserrat,sans-serif;margin:16px 0 22px}.ap-path p{font-size:17px;line-height:1.75}.ap-path .ap-icon{width:38px;height:38px}.ap-close{max-width:850px;margin:0 auto}.ap-close p{font-size:20px}.ap-close h3{font:600 30px/1.4 Montserrat,sans-serif;margin:28px auto;color:var(--saude)}
 @media(max-width:899px){.ap-author .dentro{grid-template-columns:1fr}.ap-author .autor-foto{max-width:390px;margin:auto}.ap-offer{gap:26px}.ap-price{padding:28px 20px}}
-@media(max-width:700px){.ap-benefits,.ap-content-row,.ap-offer,.ap-access-steps,.ap-paths,.ap-bonus-inner{grid-template-columns:1fr}.ap-bonus-inner{padding:25px;gap:25px}.ap-benefit{padding:25px}.ap-content-row{gap:24px;text-align:left}.ap-content-row:nth-child(even) figure{order:0}.ap-content-row img{max-height:510px}.ap-content-row h3{font-size:23px}.ap-content-row p{font-size:17px}.ap-content-rows{gap:44px}.ap-thoughts{margin:18px 0 0;gap:12px}.ap-thought{padding:18px;font-size:15px}.ap-pain-img{border-radius:10px}.ap-pain-copy p{font-size:18px}.ap-recap{padding:20px}.ap-recap li{gap:10px;font-size:15px;flex-wrap:wrap}.ap-recap-name{flex-basis:calc(100% - 40px)}.ap-recap li b{margin-left:auto;padding-left:35px}.ap-recap .ap-total{text-align:left;font-size:18px}.ap-ribbon{padding:22px;font-size:19px}.ap-books{max-width:480px;width:100%;margin:auto}.ap-books .ap-book-0{max-height:460px}.ap-books .ap-book-1,.ap-books .ap-book-2{max-height:220px;margin-top:-110px}.ap-price a.cta{font-size:17px}.ap-path{padding:26px}.ap-close p{font-size:18px}.ap-close h3{font-size:25px}}
+@media(max-width:700px){.ap-benefits,.ap-content-row,.ap-offer,.ap-access-steps,.ap-paths,.ap-bonus-inner{grid-template-columns:1fr}.ap-bonus-inner{padding:25px;gap:25px}.ap-benefit{padding:25px}.ap-content-row{gap:24px;text-align:left}.ap-content-row:nth-child(even) figure{order:0}.ap-content-row img{max-height:510px}.ap-content-row h3{font-size:23px}.ap-content-row p{font-size:17px}.ap-content-rows{gap:44px}.ap-thoughts{margin:18px 0 0;gap:12px}.ap-thought{padding:18px;font-size:15px}.ap-pain-img{border-radius:10px}.ap-pain-copy p{font-size:18px}.ap-recap{padding:20px}.ap-recap li{gap:10px;font-size:15px;flex-wrap:wrap}.ap-recap-name{flex-basis:calc(100% - 40px)}.ap-recap-value{margin-left:auto;padding-left:35px}.ap-recap .ap-total{text-align:left;font-size:18px}.ap-ribbon{padding:22px;font-size:19px}.ap-books{max-width:480px;width:100%;margin:auto}.ap-books .ap-book-0{max-height:460px}.ap-books .ap-book-1,.ap-books .ap-book-2{max-height:220px;margin-top:-110px}.ap-price a.cta{font-size:17px}.ap-path{padding:26px}.ap-close p{font-size:18px}.ap-close h3{font-size:25px}}
 @media(max-width:430px){.ap-thoughts{grid-template-columns:1fr}.ap-benefit h3{font-size:18px}.ap-benefit .ap-icon{width:24px;height:24px}.ap-benefits{gap:18px}.ap-access-steps{gap:18px}.ap-bonus-card header h3{font-size:21px}.barra-btn{max-width:46%;padding:13px;font-size:12px}.barra-txt{font-size:12px}}
-@media(prefers-reduced-motion:reduce){.heroi img,.m-img img{animation:none!important}.letreiro .le-pista{transform:none!important}html{scroll-behavior:auto!important}}
+@media(prefers-reduced-motion:reduce){.heroi img,.m-img img{animation:none!important}html{scroll-behavior:auto!important}}
+
+.barra-tempo[hidden],.conta[hidden]{display:none!important}
+.barra-rel-label{font:500 10px/1.3 Montserrat,sans-serif;color:var(--apoio);margin:5px 0 0}
+.aviso-checkout{position:fixed;inset:0;margin:auto;width:calc(100% - 32px);max-width:540px;max-height:calc(100% - 32px);overflow:auto;padding:32px;border:1px solid var(--saude);border-radius:16px;background:var(--noite);color:var(--clareza);box-shadow:0 20px 80px #0008;text-align:center}
+.aviso-checkout::backdrop{background:#070b15c9}
+.aviso-checkout h2{font:700 25px/1.3 Montserrat,sans-serif;margin-bottom:20px;color:var(--saude)}
+.aviso-checkout p{font:16px/1.6 Montserrat,sans-serif;margin:16px 0}
+.aviso-checkout .cta{display:block;font-size:16px;margin:24px 0 18px;padding:18px}
+.aviso-checkout-continuar{border:1px solid var(--apoio);background:transparent;color:var(--clareza);border-radius:8px;padding:12px 16px;font:600 13px/1.4 Montserrat,sans-serif;cursor:pointer}
+.aviso-checkout :focus-visible{outline:3px solid var(--saude);outline-offset:4px}
 
 /* Reserve image geometry before lazy downloads complete. */
 .ap-pain-img{aspect-ratio:3/2;object-fit:cover}.ap-content-row img{aspect-ratio:2/3}.ap-bonus-inner img{aspect-ratio:4/5;object-fit:contain}.ap-books img{aspect-ratio:2/3}.ap-author .autor-foto img{aspect-ratio:2/3}
@@ -825,22 +835,15 @@ details p{margin-top:11px; font-size:15.5px}
     el.className = 'barra';
     el.innerHTML = '<div class="barra-esq"><p class="barra-txt">' + txt + '</p>' +
       (c.apoio ? '<p class="barra-apoio">' + formato(c.apoio) + '</p>' : '') +
-      (contar ? '<p class="barra-rel" id="barra-rel">00:15:00</p>' : '') + '</div>' +
+      (contar ? '<div class="barra-tempo"><p class="barra-rel-label">'+esc((T.contador||{}).titulo||'')+'</p><p class="barra-rel" id="barra-rel">--:--</p></div>' : '') + '</div>' +
       '<a class="barra-btn" href="' + esc(CHECKOUT) + '" rel="noopener">' + esc(c.botao) + '</a>';
     document.body.appendChild(el);
     document.body.classList.add('com-barra');
-    if (contar) {
-      document.body.classList.add('com-barra-contador');
-      var rel = document.getElementById('barra-rel');
-      var pintar = function(){
-        var ate = 0; try { ate = parseInt(localStorage.getItem('oferta_ate'), 10) || 0; } catch (e) {}
-        if (!ate) return;
-        var s = Math.max(0, Math.floor((ate - Date.now()) / 1000));
-        rel.textContent = [Math.floor(s/3600), Math.floor((s%3600)/60), s%60]
-          .map(function(n){ return String(n).padStart(2,'0'); }).join(':');
-      };
-      pintar(); setInterval(pintar, 1000);
-    }
+    function reservarAltura(){document.body.style.setProperty('--barra-altura',el.offsetHeight+'px');}
+    reservarAltura();
+    if('ResizeObserver' in window)new ResizeObserver(reservarAltura).observe(el);
+    else window.addEventListener('resize',reservarAltura);
+    if (contar) document.body.classList.add('com-barra-contador');
 
     // Aparece quando o botão do herói SAI da tela por cima (a pessoa rolou
     // para baixo); some de novo se ela voltar até ele.
@@ -866,42 +869,94 @@ details p{margin-top:11px; font-size:15.5px}
       '</div></div>';
   }
 
-  // O prazo nasce na primeira visita e fica guardado no navegador. Recarregar
-  // não devolve tempo: contador que se renova a cada F5 qualquer pessoa
-  // desmonta em dois segundos.
+  // Janela de leitura, não vencimento da oferta. Cada entrada começa de novo;
+  // a contagem de entradas serve apenas para decidir quando sugerir o checkout.
   function ligarContagem(c){
     var cxs = document.querySelectorAll('.conta');
-    if (!cxs.length || !c || !c.minutos) return;
-    var ate = 0;
-    try {
-      ate = parseInt(localStorage.getItem('oferta_ate'), 10) || 0;
-      if (!ate) {
-        ate = Date.now() + parseInt(c.minutos, 10) * 60000;
-        localStorage.setItem('oferta_ate', String(ate));
-      }
-    } catch (e) { ate = Date.now() + parseInt(c.minutos, 10) * 60000; }
-
+    var rel = document.getElementById('barra-rel');
+    var tempo = document.querySelector('.barra-tempo');
+    var minutos = Number(c && c.minutos);
+    if ((!cxs.length && !rel) || !Number.isFinite(minutos) || minutos <= 0) {
+      if (tempo) tempo.hidden = true;
+      return;
+    }
+    var visitas = 1;
+    // Conferências com ?ver=1 não contam como visitas de um comprador.
+    if (!PREVIA) {
+      try {
+        var anteriores = Number(localStorage.getItem('insomnio_visitas_v1'));
+        visitas = (Number.isSafeInteger(anteriores) && anteriores > 0 ? anteriores : 0) + 1;
+        localStorage.setItem('insomnio_visitas_v1', String(visitas));
+      } catch (e) { /* Sem armazenamento, a leitura continua sem redirecionamento. */ }
+    }
+    var ate = Date.now() + minutos * 60000;
+    var intervalo;
     function pintar(){
-      var s = Math.max(0, Math.floor((ate - Date.now()) / 1000));
-      var hh = String(Math.floor(s / 3600)).padStart(2, '0');
-      var mm = String(Math.floor((s % 3600) / 60)).padStart(2, '0');
-      var ss = String(s % 60).padStart(2, '0');
+      var segundos = Math.max(0, Math.ceil((ate - Date.now()) / 1000));
+      var partes = [Math.floor(segundos/3600), Math.floor((segundos%3600)/60), segundos%60]
+        .map(function(n){ return String(n).padStart(2,'0'); });
+      if (rel) rel.textContent = partes.join(':');
       cxs.forEach(function(n){
-        n.querySelector('[data-u="h"]').textContent = hh;
-        n.querySelector('[data-u="m"]').textContent = mm;
-        n.querySelector('[data-u="s"]').textContent = ss;
-        n.classList.toggle('zerado', s === 0);
-        if (s === 0 && window.RastreioTSL) window.RastreioTSL.evento('contador_cero');
-        if (s === 0 && c.expirado) {
-          var t = n.querySelector('.conta-tit');
-          if (t) t.textContent = c.expirado;
-        }
+        ['h','m','s'].forEach(function(unidade,i){
+          var valor=n.querySelector('[data-u="'+unidade+'"]');
+          if(valor)valor.textContent=partes[i];
+        });
       });
-      return s;
+      if (!segundos) {
+        clearInterval(intervalo);
+        if (tempo) tempo.hidden = true;
+        cxs.forEach(function(n){ n.hidden = true; });
+        document.body.classList.remove('com-barra-contador');
+        if (!PREVIA && visitas >= (Number(c.avisar_a_partir_da_visita) || 2)) {
+          avisarCheckout(c.aviso || {});
+        }
+      }
+      return segundos;
     }
-    if (pintar() > 0) {
-      var t = setInterval(function(){ if (pintar() === 0) clearInterval(t); }, 1000);
+    if (pintar() > 0) intervalo = setInterval(pintar,1000);
+  }
+
+  function avisarCheckout(c){
+    if (!CHECKOUT || document.getElementById('aviso-checkout')) return;
+    var destino;
+    try { destino = new URL(CHECKOUT); } catch(e) { return; }
+    if (destino.protocol !== 'https:' || destino.hostname !== 'pay.hotmart.com') return;
+    var modal=document.createElement('dialog');
+    modal.id='aviso-checkout';
+    modal.className='aviso-checkout';
+    modal.setAttribute('aria-labelledby','aviso-checkout-titulo');
+    modal.innerHTML='<h2 id="aviso-checkout-titulo">'+esc(c.titulo||'')+'</h2>'+
+      '<p>'+esc(c.texto||'')+'</p><p class="aviso-checkout-prazo" aria-live="off"></p>'+
+      '<a class="cta" href="'+esc(CHECKOUT)+'" rel="noopener">'+esc(c.botao||'')+'</a>'+
+      '<button type="button" class="aviso-checkout-continuar">'+esc(c.continuar||'')+'</button>';
+    if(typeof modal.showModal!=='function') return;
+    document.body.appendChild(modal);
+    var focoAnterior=document.activeElement;
+    var restante=Math.max(5,Number(c.segundos)||10), intervalo;
+    var linha=modal.querySelector('.aviso-checkout-prazo');
+    function fechar(){
+      clearInterval(intervalo);
+      if(modal.open)modal.close();
+      modal.remove();
+      if(focoAnterior && focoAnterior.focus)focoAnterior.focus();
     }
+    modal.querySelector('button').addEventListener('click',fechar);
+    modal.addEventListener('cancel',function(e){e.preventDefault();fechar();});
+    modal.addEventListener('close',function(){clearInterval(intervalo);});
+    modal.querySelector('a').addEventListener('click',function(){clearInterval(intervalo);});
+    function pintar(){
+      linha.textContent=String(c.redirecionando||'').replace('%segundos%',restante);
+    }
+    modal.showModal();
+    modal.querySelector('button').focus();
+    pintar();
+    intervalo=setInterval(function(){
+      // Só encaminha enquanto a pessoa pode ver o aviso; não salta de uma aba oculta.
+      if(document.hidden)return;
+      restante--;
+      pintar();
+      if(restante<=0){clearInterval(intervalo);window.location.assign(destino.href);}
+    },1000);
   }
 
   function botao(b){
@@ -1141,7 +1196,7 @@ details p{margin-top:11px; font-size:15.5px}
       var tit=String(c.titulo||'').replace('%d',it.length).replace(/\{s\}/g,it.length===1?'':'s');
       return secao('<h2>'+formato(tit)+'</h2><div class="ap-section-intro">'+paragrafos(c.texto)+'</div><div class="ap-bonus-list">'+it.map(function(x,i){
         var n=String(c.rotulo||'').replace('%02d',String(i+1).padStart(2,'0'));
-        return '<article class="ap-bonus-card"><header><p>'+esc(n)+'</p><h3>'+formato(x.titulo||'')+'</h3></header><div class="ap-bonus-inner"><img src="'+esc(x.imagem||'')+'" alt="'+esc(x.titulo||'')+'" loading="lazy"><div>'+paragrafos(x.aspas,'ap-bonus-benefit')+paragrafos(x.texto)+'<p class="ap-gift">'+formato(c.fecho||'')+'</p></div></div></article>';
+        return '<article class="ap-bonus-card"><header><p>'+esc(n)+'</p><h3>'+formato(x.titulo||'')+'</h3></header><div class="ap-bonus-inner"><img src="'+esc(x.imagem||'')+'" alt="'+esc(x.titulo||'')+'" loading="lazy"><div>'+paragrafos(x.aspas,'ap-bonus-benefit')+paragrafos(x.texto)+(x.preco_de?'<div class="ap-bonus-pricing"><p class="ap-bonus-price">'+esc(c.etiqueta_preco||'')+' <s>'+esc(x.preco_de)+'</s> '+esc(c.conector||'')+' <b>'+esc(c.preco_zero||'')+'</b></p><span class="p-gratis">'+esc(c.sufixo||'')+'</span></div>':'')+'<p class="ap-gift">'+formato(c.fecho||'')+'</p></div></div></article>';
       }).join('')+'</div>'+paragrafos(c.formatos,'ap-formats'),'leitura ap-bonuses');
     },
 
@@ -1180,8 +1235,14 @@ details p{margin-top:11px; font-size:15.5px}
       var it=c.itens||[];if(!it.length)return '';
       var p=T.preco||{},m=(p.moeda||'')+' ';
       return secao(paragrafos(c.rotulo,'ap-eyebrow')+'<h2>'+formato(c.titulo||'')+'</h2><div class="ap-section-intro">'+paragrafos(c.texto)+'</div>'+
-      '<div class="ap-recap"><ul>'+it.map(function(x){var n=typeof x==='string'?x:x.nome, v=typeof x==='string'?'':x.valor;return '<li>'+approvalIcon('check')+'<span class="ap-recap-name">'+formato(n||'')+'</span>'+(v?'<b>'+esc(m+v)+'</b>':'')+'</li>';}).join('')+'</ul>'+
-      '<p class="ap-total">'+esc(p.rotulo_de||'')+' <b>'+esc(m+(p.de||''))+'</b></p></div>'+
+      '<div class="ap-recap"><ul>'+it.map(function(x){
+        var n=typeof x==='string'?x:x.nome, v=typeof x==='string'?'':x.valor;
+        var gratis=typeof x==='object'&&x.gratis===true;
+        var valor=v?(gratis?'<s>'+esc(m+v)+'</s>':'<b>'+esc(m+v)+'</b>'):'';
+        if(gratis)valor+='<span class="p-gratis">'+esc(c.gratis||'')+'</span>';
+        return '<li>'+approvalIcon('check')+'<span class="ap-recap-name">'+formato(n||'')+'</span>'+(valor?'<span class="ap-recap-value">'+valor+'</span>':'')+'</li>';
+      }).join('')+'</ul>'+
+      '<p class="ap-total">'+esc(p.rotulo_de||'')+' <s>'+esc(m+(p.de||''))+'</s></p></div>'+
       '<div class="ap-ribbon">'+formato(c.faixa||'')+'</div>'+approvalOffer(c,T),'leitura ap-summary');
     },
 
@@ -1433,9 +1494,9 @@ details p{margin-top:11px; font-size:15.5px}
     montarFolheto(T.previa || {});
     montarCarrossel(T.depoimentos || {});
     montarGaleria(T.galeria || {});
-    ligarContagem(T.contador || {});
     montarLetreiro(T.cabecalho);
     montarBarra(T.barra);
+    ligarContagem(T.contador || {});
     if (window.RastreioTSL && !PREVIA) window.RastreioTSL.iniciar({
       url: CFG.url, anon: CFG.anon, quizId: QUIZ_ID,
       rastreio: ESQ.rastreio || {}, resultado: lerResultado() });
@@ -1446,4 +1507,3 @@ details p{margin-top:11px; font-size:15.5px}
   });
 })();
 </script>
-
