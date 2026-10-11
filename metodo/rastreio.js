@@ -18,6 +18,10 @@
 // `session_id` liga as duas tabelas.
 (function(){
   var R = {}, cfg = null, sessao = '', inicio = Date.now();
+  // Visita nossa, de teste. Mesma marca do quiz e mesma chave, então quem
+  // abriu o quiz uma vez com `?interno=1` já chega aqui marcado: as duas
+  // páginas vivem no mesmo endereço e dividem o mesmo navegador.
+  var INTERNO = false;
   var visivelDesde = Date.now(), visivelTotal = 0, rolouMax = 0;
   var feitos = {};          // eventos que só podem acontecer uma vez
 
@@ -27,13 +31,15 @@
   // fechando, que é justamente quando o tempo de permanência é mandado.
   function gravar(tipo, meta, manter){
     if (!cfg || !cfg.quizId) return;
+    var m = meta || {};
+    if (INTERNO) m.interno = true;
     try {
       fetch(cfg.url + '/rest/v1/quiz_events', {
         method: 'POST', keepalive: !!manter,
         headers: { apikey: cfg.anon, Authorization: 'Bearer ' + cfg.anon,
                    'Content-Type': 'application/json', Prefer: 'return=minimal' },
         body: JSON.stringify({ quiz_id: cfg.quizId, session_id: sessao,
-                               tipo: 'tsl_' + tipo, metadata: meta || {} })
+                               tipo: 'tsl_' + tipo, metadata: m })
       }).catch(function(){});
     } catch (e) {}
   }
@@ -93,6 +99,17 @@
              ('t-' + agora() + '-' + Math.random().toString(36).slice(2, 9));
 
     var url = new URLSearchParams(location.search);
+
+    // Lido ANTES do primeiro registro, senão a própria chegada entraria como
+    // tráfego real. `?interno=1` marca o navegador e `?interno=0` desmarca.
+    try {
+      if (url.get('interno') !== null) {
+        if (url.get('interno') === '0') localStorage.removeItem('insonia_interno');
+        else localStorage.setItem('insonia_interno', '1');
+      }
+      INTERNO = localStorage.getItem('insonia_interno') === '1';
+    } catch (e) {}
+
     var utm = {};
     ['utm_source','utm_medium','utm_campaign','utm_content','utm_term'].forEach(function(k){
       if (url.get(k)) utm[k] = url.get(k);
