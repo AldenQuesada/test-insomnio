@@ -824,10 +824,15 @@ details p{margin-top:11px; font-size:15.5px}
     var contar = c.contador !== false;
     var p = T.preco || {};
     var preco = (p.moeda ? p.moeda + ' ' : '') + (p.por || '');
-    var de = (p.moeda ? p.moeda + ' ' : '') + (c.de || '');
+    // O valor de origem é o MESMO do resto da página. Quando a barra tinha o
+    // seu próprio, os dois divergiram: o corpo riscava 39,79 e a barra 19,99,
+    // anunciando metade do desconto real. `barra.de` segue valendo para quem
+    // quiser outro valor de propósito, mas o padrão é não repetir o número.
+    var baseDe = c.de || p.de || '';
+    var de = (p.moeda ? p.moeda + ' ' : '') + baseDe;
     // Desconto calculado, nunca escrito: se o preço mudar, o % acompanha.
     function num(v){ return parseFloat(String(v || '').replace(',', '.')) || 0; }
-    var off = num(c.de) ? Math.round((1 - num(p.por) / num(c.de)) * 100) : 0;
+    var off = num(baseDe) ? Math.round((1 - num(p.por) / num(baseDe)) * 100) : 0;
     var txt = esc(c.texto || '').replace('%off%', '<b>' + off + '% OFF</b>')
                                  .replace('%preco%', '<b>' + esc(preco) + '</b>')
                                  .replace('%de%', '<s>' + esc(de) + '</s>');
