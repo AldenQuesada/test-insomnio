@@ -142,22 +142,35 @@ a.cta:focus-visible{outline:3px solid var(--calma); outline-offset:3px}
    da página única, e com o corte nos lados ela sumia inteira e a página da
    esquerda nunca aparecia. `clip-path` com margem lateral negativa faz isso
    e funciona também em iPhone antigo, onde `overflow: clip` não existe. */
-#folheto{margin:0 auto; max-width:1040px;
+.folheto{margin:0 auto; max-width:1040px;
   -webkit-clip-path:inset(0 -100vw); clip-path:inset(0 -100vw)}
-/* A folha girando para fora não pode criar rolagem lateral na página. */
-[data-bloco="previa"]{overflow-x:hidden; overflow-x:clip}
-#folheto .pagina{background:var(--clareza)}
+/* A folha girando para fora não pode criar rolagem lateral na página. Vale
+   para todo bloco que tenha folheável, não só o do livro. */
+[data-bloco="previa"],[data-bloco="bonus"]{overflow-x:hidden; overflow-x:clip}
+
+/* ── revista dentro do cartão do bônus ── */
+/* O cartão é claro e a prévia do livro é escura, então os controles precisam
+   de cor própria aqui: dourado sobre claro não se lê. */
+.ap-bonus-previa{background:var(--noite); padding:26px 20px 24px; text-align:center}
+.ap-bonus-previa h4{font:600 17px/1.35 Montserrat,sans-serif; color:var(--clareza); margin:0}
+.ap-bonus-previa p{font:400 14px/1.5 Lora,serif; color:var(--apoio); margin:7px auto 0; max-width:46ch}
+/* A caixa tem a largura da folha, 520px, que é o teto usado pelo script. A
+   altura reservada pelo folheável sai da largura da CAIXA, não da folha, e
+   com a caixa larga sobrava o dobro de altura vazia em volta da página. */
+.ap-bonus-previa .previa{margin:20px auto 0; max-width:520px}
+.ap-bonus-previa .previa-passos{margin-top:18px}
+.folheto .pagina{background:var(--clareza)}
 /* `display:block`: imagem em linha deixa o vão da linha de base embaixo, e
    esse vão aparecia como um filete claro sob cada página. */
-#folheto .pagina img{width:100%; height:100%; object-fit:cover; display:block}
+.folheto .pagina img{width:100%; height:100%; object-fit:cover; display:block}
 /* A última página é a imagem do caminho, e o botão fica em cima do último
    passo: a curiosidade é ver como a noite termina. */
-#folheto .mapa{background:#111b32}
-#folheto .mapa img{object-position:center top}
+.folheto .mapa{background:#111b32}
+.folheto .mapa img{object-position:center top}
 /* Altura em % da folha: com altura fixa, no computador a folha é mais alta e
    o passo 3 aparecia inteiro embaixo do botão. Só a bandeirinha e a pontinha
    do cartão ficam de fora, de propósito. */
-#folheto .mapa .pv-cta{top:83.5%; bottom:auto; height:11%; padding:0;
+.folheto .mapa .pv-cta{top:83.5%; bottom:auto; height:11%; padding:0;
   display:flex; align-items:center; justify-content:center;
   font-size:clamp(14px, 2.2vw, 20px)}
 /* O convite na última página. Fica sobre o rodapé da folha, com um véu por
@@ -997,6 +1010,37 @@ details p{margin-top:11px; font-size:15.5px}
       botao(c.botao||T.resumo.botao)+'<ul class="ap-trust">'+trust.map(function(x){return '<li>'+approvalIcon('check')+'<span>'+formato(x)+'</span></li>';}).join('')+'</ul></div></div>';
   }
 
+  // Folheável. Antes existia UM só, preso a um id, e por isso o livro podia
+  // ter prévia e os bônus não. Agora cada um que aparecer na página ganha o
+  // seu, e a configuração de cada um fica guardada aqui pelo índice: é o que
+  // permite que o bônus tenha a sua própria proporção de folha, que não é a
+  // do livro.
+  var FOLHETOS = [];
+
+  function folhetoHTML(c){
+    var pgs = (c && c.paginas) || [];
+    if (!pgs.length) return '';
+    var id = FOLHETOS.push(c) - 1;
+    return '<div class="previa"><div class="folheto" data-folheto="' + id + '">' +
+      pgs.map(function(u, i){
+        // O convite para seguir lendo fica na ÚLTIMA página. Se existe o
+        // mapa, a última é ele, e as páginas do livro ficam sem botão.
+        var fim = (!c.final && i === pgs.length - 1 && c.cta && CHECKOUT)
+          ? '<a class="pv-cta" href="' + esc(CHECKOUT) + '" rel="noopener">' +
+            esc(c.cta) + '</a>' : '';
+        return '<div class="pagina"><img src="' + esc(u) + '" alt="" loading="lazy">' +
+               fim + '</div>';
+      }).join('') +
+      (c.final && c.final.imagem ? '<div class="pagina mapa"><img src="' +
+        esc(c.final.imagem) + '" alt="" loading="lazy">' +
+        (c.cta && CHECKOUT ? '<a class="pv-cta" href="' + esc(CHECKOUT) +
+          '" rel="noopener">' + esc(c.cta) + '</a>' : '') + '</div>' : '') +
+      '</div>' +
+      '<div class="previa-passos"><button class="pv" data-v="-1" aria-label="Anterior">&#8249;</button>' +
+      '<span class="pv-conta"></span>' +
+      '<button class="pv" data-v="1" aria-label="Siguiente">&#8250;</button></div></div>';
+  }
+
   var BLOCOS = {
     heroi: function(c){
       if (!c.titulo) return '';
@@ -1127,31 +1171,12 @@ details p{margin-top:11px; font-size:15.5px}
     // clínica, 43KB, puro navegador: numa página estática não dá para depender
     // de servidor.
     previa: function(c){
-      var pgs = c.paginas || [];
-      if (!pgs.length) return '';
+      if (!(c.paginas || []).length) return '';
       // A quantidade é contada, não escrita: o texto dizia «seis páginas» com
       // dez na tela, porque eu troquei as imagens e esqueci a legenda.
-      var sub = String(c.texto || '').replace('%d', pgs.length);
+      var sub = String(c.texto || '').replace('%d', c.paginas.length);
       return secao('<h2>' + esc(c.titulo || '') + '</h2>' +
-        (sub ? '<p>' + esc(sub) + '</p>' : '') +
-        '<div class="previa"><div id="folheto">' +
-        pgs.map(function(u, i){
-          // O convite para seguir lendo fica na ÚLTIMA página. Se existe o
-          // mapa, a última é ele, e as páginas do livro ficam sem botão.
-          var fim = (!c.final && i === pgs.length - 1 && c.cta && CHECKOUT)
-            ? '<a class="pv-cta" href="' + esc(CHECKOUT) + '" rel="noopener">' +
-              esc(c.cta) + '</a>' : '';
-          return '<div class="pagina"><img src="' + esc(u) + '" alt="" loading="lazy">' +
-                 fim + '</div>';
-        }).join('') +
-        (c.final && c.final.imagem ? '<div class="pagina mapa"><img src="' +
-          esc(c.final.imagem) + '" alt="" loading="lazy">' +
-          (c.cta && CHECKOUT ? '<a class="pv-cta" href="' + esc(CHECKOUT) +
-            '" rel="noopener">' + esc(c.cta) + '</a>' : '') + '</div>' : '') +
-        '</div>' +
-        '<div class="previa-passos"><button class="pv" data-v="-1" aria-label="Anterior">&#8249;</button>' +
-        '<span id="pv-conta"></span>' +
-        '<button class="pv" data-v="1" aria-label="Siguiente">&#8250;</button></div></div>',
+        (sub ? '<p>' + esc(sub) + '</p>' : '') + folhetoHTML(c),
         'escura');
     },
 
@@ -1201,7 +1226,14 @@ details p{margin-top:11px; font-size:15.5px}
       var tit=String(c.titulo||'').replace('%d',it.length).replace(/\{s\}/g,it.length===1?'':'s');
       return secao('<h2>'+formato(tit)+'</h2><div class="ap-section-intro">'+paragrafos(c.texto)+'</div><div class="ap-bonus-list">'+it.map(function(x,i){
         var n=String(c.rotulo||'').replace('%02d',String(i+1).padStart(2,'0'));
-        return '<article class="ap-bonus-card"><header><p>'+esc(n)+'</p><h3>'+formato(x.titulo||'')+'</h3></header><div class="ap-bonus-inner"><img src="'+esc(x.imagem||'')+'" alt="'+esc(x.titulo||'')+'" loading="lazy"><div>'+paragrafos(x.aspas,'ap-bonus-benefit')+paragrafos(x.texto)+(x.preco_de?'<div class="ap-bonus-pricing"><p class="ap-bonus-price">'+esc(c.etiqueta_preco||'')+' <s>'+esc(x.preco_de)+'</s> '+esc(c.conector||'')+' <b>'+esc(c.preco_zero||'')+'</b></p><span class="p-gratis">'+esc(c.sufixo||'')+'</span></div>':'')+'<p class="ap-gift">'+formato(c.fecho||'')+'</p></div></div></article>';
+        // Quando o bônus traz páginas, elas viram revista folheável logo
+        // abaixo do cartão: ver por dentro desperta mais do que ler a
+        // descrição do que tem dentro.
+        var revista = x.previa ? '<div class="ap-bonus-previa">' +
+          (x.previa.titulo ? '<h4>' + esc(x.previa.titulo) + '</h4>' : '') +
+          (x.previa.texto ? '<p>' + esc(String(x.previa.texto).replace('%d', (x.previa.paginas||[]).length)) + '</p>' : '') +
+          folhetoHTML(x.previa) + '</div>' : '';
+        return '<article class="ap-bonus-card"><header><p>'+esc(n)+'</p><h3>'+formato(x.titulo||'')+'</h3></header><div class="ap-bonus-inner"><img src="'+esc(x.imagem||'')+'" alt="'+esc(x.titulo||'')+'" loading="lazy"><div>'+paragrafos(x.aspas,'ap-bonus-benefit')+paragrafos(x.texto)+(x.preco_de?'<div class="ap-bonus-pricing"><p class="ap-bonus-price">'+esc(c.etiqueta_preco||'')+' <s>'+esc(x.preco_de)+'</s> '+esc(c.conector||'')+' <b>'+esc(c.preco_zero||'')+'</b></p><span class="p-gratis">'+esc(c.sufixo||'')+'</span></div>':'')+'<p class="ap-gift">'+formato(c.fecho||'')+'</p></div></div>'+revista+'</article>';
       }).join('')+'</div>'+paragrafos(c.formatos,'ap-formats'),'leitura ap-bonuses');
     },
 
@@ -1397,28 +1429,50 @@ details p{margin-top:11px; font-size:15.5px}
     } else { andar(); }
   }
 
-  function montarFolheto(cfg){
-    var el = document.getElementById('folheto');
+  // Monta todos os folheáveis que a página desenhou, cada um com a sua
+  // configuração. Chamar uma vez por página.
+  function montarFolhetos(){
+    document.querySelectorAll('[data-folheto]').forEach(function(el){
+      montarFolheto(el, FOLHETOS[parseInt(el.dataset.folheto, 10)] || {});
+    });
+  }
+
+  function montarFolheto(el, cfg){
     if (!el || !window.St || !window.St.PageFlip) return;
     var paginas = el.querySelectorAll('.pagina');
     if (!paginas.length) return;
+    // Tudo o que este folheável controla fica dentro da caixa dele: com dois
+    // na mesma página, botão e contador procurados no documento inteiro
+    // acabariam mexendo sempre no primeiro.
+    var caixa = el.parentNode;
     // A proporção da folha é propriedade do livro, não do código: trocou o
     // miolo, trocou a medida, e isso vem do banco junto com as imagens.
     var larg = parseInt(cfg.largura, 10) || 350;
     var alt  = parseInt(cfg.altura, 10) || 509;
     var largo = window.innerWidth >= 900;
+    var umaPag = cfg.uma_pagina === true;
     var f = new window.St.PageFlip(el, {
       width: larg, height: alt, size: 'stretch',
-      minWidth: 200, maxWidth: 520, minHeight: 290, maxHeight: Math.round(520 * alt / larg),
+      // A biblioteca escolhe folha única quando a caixa não comporta duas
+      // folhas do tamanho mínimo. Pedir folha única é, portanto, subir esse
+      // mínimo: com ele em 520 a dupla nunca cabe, e a folha sai inteira e
+      // centrada em vez de encostada num canto.
+      minWidth: umaPag ? 520 : 200,
+      maxWidth: 520, minHeight: 290, maxHeight: Math.round(520 * alt / larg),
       // Capa dura em todos os tamanhos. O bloco escuro que aparecia na
       // virada da capa no celular não era ela: era a cópia temporária da folha
       // caindo fora da pilha, por uma regra minha de CSS já removida.
-      usePortrait: !largo, showCover: true, maxShadowOpacity: .18,
+      // `uma_pagina` força folha única também no computador. A prévia do livro
+      // ganha com a página dupla, que mostra o miolo aberto; dentro do cartão
+      // do bônus a dupla deixava a capa encostada à direita e metade do bloco
+      // vazia, o que parece defeito e não revista.
+      usePortrait: umaPag || !largo,
+      showCover: true, maxShadowOpacity: .18,
       mobileScrollSupport: true, drawShadow: true
     });
     f.loadFromHTML(paginas);
 
-    var conta = document.getElementById('pv-conta');
+    var conta = caixa.querySelector('.pv-conta');
     function pintar(){
       if (conta) conta.textContent = (f.getCurrentPageIndex() + 1) + ' / ' + f.getPageCount();
     }
@@ -1435,7 +1489,7 @@ details p{margin-top:11px; font-size:15.5px}
       if (window.RastreioTSL) window.RastreioTSL.pagina(f.getCurrentPageIndex() + 1);
     });
     pintar();
-    document.querySelectorAll('.previa-passos .pv').forEach(function(b){
+    caixa.querySelectorAll('.previa-passos .pv').forEach(function(b){
       b.onclick = function(){
         parar();
         virar(+b.dataset.v);
@@ -1486,6 +1540,7 @@ details p{margin-top:11px; font-size:15.5px}
       av.classList.remove('oculto');
     }
     var html = '';
+    FOLHETOS = [];   // a página é desenhada uma vez; a lista começa limpa
     (T.ordem || []).forEach(function(nome, i){
       if (i === 1) html += saudacao();
       // O segundo argumento existe para os blocos que precisam olhar fora da
@@ -1496,7 +1551,7 @@ details p{margin-top:11px; font-size:15.5px}
         .replace('<section ', '<section data-bloco="' + nome + '" ');
     });
     document.getElementById('pagina').innerHTML = html;
-    montarFolheto(T.previa || {});
+    montarFolhetos();
     montarCarrossel(T.depoimentos || {});
     montarGaleria(T.galeria || {});
     montarLetreiro(T.cabecalho);
