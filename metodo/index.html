@@ -1451,13 +1451,16 @@ details p{margin-top:11px; font-size:15.5px}
     var alt  = parseInt(cfg.altura, 10) || 509;
     var largo = window.innerWidth >= 900;
     var umaPag = cfg.uma_pagina === true;
+    // A biblioteca escolhe folha única quando a caixa não comporta duas
+    // folhas do tamanho mínimo, então pedir folha única é subir esse mínimo
+    // acima da METADE da caixa. Mas o mínimo é também o piso da folha, e por
+    // isso não pode passar da caixa: fixo em 520 ele estourava a tela de
+    // 390px e a página saía cortada nos lados.
+    var caber = Math.round((el.parentNode && el.parentNode.clientWidth) || larg);
+    var minimo = umaPag ? Math.max(200, Math.min(520, caber)) : 200;
     var f = new window.St.PageFlip(el, {
       width: larg, height: alt, size: 'stretch',
-      // A biblioteca escolhe folha única quando a caixa não comporta duas
-      // folhas do tamanho mínimo. Pedir folha única é, portanto, subir esse
-      // mínimo: com ele em 520 a dupla nunca cabe, e a folha sai inteira e
-      // centrada em vez de encostada num canto.
-      minWidth: umaPag ? 520 : 200,
+      minWidth: minimo,
       maxWidth: 520, minHeight: 290, maxHeight: Math.round(520 * alt / larg),
       // Capa dura em todos os tamanhos. O bloco escuro que aparecia na
       // virada da capa no celular não era ela: era a cópia temporária da folha
