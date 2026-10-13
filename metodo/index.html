@@ -645,7 +645,15 @@ details p{margin-top:11px; font-size:15.5px}
 .ap-access-steps{list-style:none;display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin:36px 0}.ap-access-steps li{background:var(--clareza);padding:30px 23px;border-radius:12px}.ap-access-steps h3{font:600 19px/1.4 Montserrat,sans-serif;color:var(--noite);margin:18px 0 14px}.ap-access-steps p{font-size:16px;color:var(--noite-2)}.ap-access-steps .ap-icon{width:50px;height:50px;color:#967e4c}.ap-video{max-width:900px;margin:40px auto 0}.ap-video video{display:block;width:100%;border-radius:12px;background:var(--noite);aspect-ratio:16/9}
 .ap-author .dentro{display:grid;grid-template-columns:1.2fr .8fr;align-items:center;gap:50px;max-width:1140px}.ap-author h2{text-align:left;margin:0 0 10px;color:var(--saude)}.ap-author .autor-foto{margin:0;max-width:100%;align-self:center}.ap-author .autor-foto img{border:0;border-radius:9px;max-height:700px;object-fit:cover;object-position:top}.ap-author .autor-texto p{font-size:17px;line-height:1.7}
 .ap-faq{max-width:880px;margin:30px auto 0}.ap-faq details{border-bottom:1px solid #111b3233;padding:22px 0}.ap-faq summary{font-size:17px;line-height:1.5}.ap-faq summary:after{color:#927844}.ap-faq p{font-size:17px;line-height:1.7}
-.ap-paths{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin:38px auto;align-items:start}.ap-path{background:var(--noite);border:1px solid #b7aacd66;border-radius:14px;padding:32px;text-align:left}.ap-path:nth-child(2){border-color:var(--saude);background:var(--noite-2)}.ap-path h3{font:600 26px/1.35 Montserrat,sans-serif;margin:16px 0 22px}.ap-path p{font-size:17px;line-height:1.75}.ap-path .ap-icon{width:38px;height:38px}.ap-close{max-width:850px;margin:0 auto}.ap-close p{font-size:20px}.ap-close h3{font:600 30px/1.4 Montserrat,sans-serif;margin:28px auto;color:var(--saude)}
+.ap-paths{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin:38px auto;align-items:start}.ap-path{background:var(--noite);border:1px solid #b7aacd66;border-radius:14px;padding:32px;text-align:left}
+/* Foto no alto de cada caminho. Dentro do recuo do cartão, de propósito:
+   sangrar até a borda exigiria saber o recuo, que muda no celular, e o valor
+   cravado deixava a imagem torta de um lado. */
+.ap-path-img{display:block;width:100%;margin:0 0 22px;aspect-ratio:4/3;
+  object-fit:cover;border-radius:10px}
+/* Miniatura do produto na lista do empilhamento, no lugar do tique. */
+.ap-recap-img{flex:none;width:38px;height:auto;border-radius:4px;align-self:center;
+  box-shadow:0 2px 8px rgba(17,27,50,.25)}.ap-path:nth-child(2){border-color:var(--saude);background:var(--noite-2)}.ap-path h3{font:600 26px/1.35 Montserrat,sans-serif;margin:16px 0 22px}.ap-path p{font-size:17px;line-height:1.75}.ap-path .ap-icon{width:38px;height:38px}.ap-close{max-width:850px;margin:0 auto}.ap-close p{font-size:20px}.ap-close h3{font:600 30px/1.4 Montserrat,sans-serif;margin:28px auto;color:var(--saude)}
 @media(max-width:899px){.ap-author .dentro{grid-template-columns:1fr}.ap-author .autor-foto{max-width:390px;margin:auto}.ap-offer{gap:26px}.ap-price{padding:28px 20px}}
 @media(max-width:700px){.ap-benefits,.ap-content-row,.ap-offer,.ap-access-steps,.ap-paths,.ap-bonus-inner{grid-template-columns:1fr}.ap-bonus-inner{padding:25px;gap:25px}.ap-benefit{padding:25px}.ap-content-row{gap:24px;text-align:left}.ap-content-row:nth-child(even) figure{order:0}.ap-content-row img{max-height:510px}.ap-content-row h3{font-size:23px}.ap-content-row p{font-size:17px}.ap-content-rows{gap:44px}.ap-thoughts{margin:18px 0 0;gap:12px}.ap-thought{padding:18px;font-size:15px}.ap-pain-img{border-radius:10px}.ap-pain-copy p{font-size:18px}.ap-recap{padding:20px}.ap-recap li{gap:10px;font-size:15px;flex-wrap:wrap}.ap-recap-name{flex-basis:calc(100% - 40px)}.ap-recap-value{margin-left:auto;padding-left:35px}.ap-recap .ap-total{text-align:left;font-size:18px}.ap-ribbon{padding:22px;font-size:19px}.ap-books{max-width:480px;width:100%;margin:auto}.ap-books .ap-book-0{max-height:460px}.ap-books .ap-book-1,.ap-books .ap-book-2{max-height:220px;margin-top:-110px}.ap-price a.cta{font-size:17px}.ap-path{padding:26px}.ap-close p{font-size:18px}.ap-close h3{font-size:25px}}
 @media(max-width:430px){.ap-thoughts{grid-template-columns:1fr}.ap-benefit h3{font-size:18px}.ap-benefit .ap-icon{width:24px;height:24px}.ap-benefits{gap:18px}.ap-access-steps{gap:18px}.ap-bonus-card header h3{font-size:21px}.barra-btn{max-width:42%;padding:12px 10px;font-size:11.5px}.barra-txt{font-size:12px}}
@@ -1173,7 +1181,10 @@ details p{margin-top:11px; font-size:15.5px}
 
     atalho: function(c){
       if(!c.titulo)return '';
-      return secao('<h2>'+formato(c.titulo)+'</h2><div class="ap-paths">'+(c.caminhos||[]).map(function(x){return '<article class="ap-path">'+approvalIcon(x.icone||'check')+'<h3>'+formato(x.rotulo||'')+'</h3>'+paragrafos(x.texto)+'</article>';}).join('')+'</div><div class="ap-close">'+paragrafos(c.texto)+(c.destaque?'<h3>'+formato(c.destaque)+'</h3>':'')+paragrafos(c.fecho)+botao(c.botao)+'</div>','leitura ap-paths-section');
+      // Cada caminho pode abrir com uma foto: a noite sem dormir de um lado e
+      // a noite dormida do outro. A decisão fica mais fácil de sentir vendo as
+      // duas cenas lado a lado do que lendo as duas descrições.
+      return secao('<h2>'+formato(c.titulo)+'</h2><div class="ap-paths">'+(c.caminhos||[]).map(function(x){return '<article class="ap-path">'+(x.imagem?'<img class="ap-path-img" src="'+esc(x.imagem)+'" alt="'+esc(x.imagem_alt||'')+'" loading="lazy">':'')+approvalIcon(x.icone||'check')+'<h3>'+formato(x.rotulo||'')+'</h3>'+paragrafos(x.texto)+'</article>';}).join('')+'</div><div class="ap-close">'+paragrafos(c.texto)+(c.destaque?'<h3>'+formato(c.destaque)+'</h3>':'')+paragrafos(c.fecho)+botao(c.botao)+'</div>','leitura ap-paths-section');
     },
 
     mockups: function(c){
@@ -1297,7 +1308,13 @@ details p{margin-top:11px; font-size:15.5px}
         var gratis=typeof x==='object'&&x.gratis===true;
         var valor=v?(gratis?'<s>'+esc(m+v)+'</s>':'<b>'+esc(m+v)+'</b>'):'';
         if(gratis)valor+='<span class="p-gratis">'+esc(c.gratis||'')+'</span>';
-        return '<li>'+approvalIcon('check')+'<span class="ap-recap-name">'+formato(n||'')+'</span>'+(valor?'<span class="ap-recap-value">'+valor+'</span>':'')+'</li>';
+        // A miniatura do produto no lugar do tique, quando o item traz uma.
+        // Ver a capa de cada coisa que se leva vale mais do que um tique
+        // igual em todas as linhas; sem imagem, o tique continua valendo.
+        var fig = (typeof x==='object' && x.imagem)
+          ? '<img class="ap-recap-img" src="'+esc(x.imagem)+'" alt="" loading="lazy">'
+          : approvalIcon('check');
+        return '<li>'+fig+'<span class="ap-recap-name">'+formato(n||'')+'</span>'+(valor?'<span class="ap-recap-value">'+valor+'</span>':'')+'</li>';
       }).join('')+'</ul>'+
       '<p class="ap-total">'+esc(p.rotulo_de||'')+' <s>'+esc(m+(p.de||''))+'</s></p></div>'+
       '<div class="ap-ribbon">'+formato(c.faixa||'')+'</div>'+approvalOffer(c,T),'leitura ap-summary');
