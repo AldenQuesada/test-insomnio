@@ -999,9 +999,11 @@ details p{margin-top:11px; font-size:15.5px}
     // Sem link de checkout o botão não existe. Botão que não leva a lugar
     // nenhum custa mais caro que botão nenhum.
     if (!b || !b.texto || !CHECKOUT) return '';
-    // O riscado embaixo do botão só entra onde o bloco pedir. No herói não
-    // entra: ali a pessoa ainda não sabe o que está comprando, e preço antes
-    // do valor é só um número.
+    // O riscado embaixo do botão só entra onde o bloco pedir. O herói passou
+    // a pedir por decisão dela em 12/10/2026: na página de referência o preço
+    // está na primeira tela, e com um produto de US$ 9,99 o número baixo é
+    // argumento, não obstáculo. O comentário antigo dizia o contrário; ficava
+    // valendo uma opinião minha contra uma decisão dela.
     var p = T.preco || {}, m = p.moeda ? p.moeda + ' ' : '';
     // `preco_de` no próprio botão vence o total: antes da pilha a pessoa
     // ainda não viu o valor dos bônus, então ali o riscado é só o do livro.
@@ -1343,6 +1345,11 @@ details p{margin-top:11px; font-size:15.5px}
         (c.aviso ? '<p class="r-aviso">' + esc(c.aviso) + '</p>' : '') + '</div></section>';
     }
   };
+
+  // "Cómo funciona" usa o mesmo desenho de passos numerados da entrega, porque
+  // é a mesma figura: uma sequência com começo, meio e fim. Bloco novo com
+  // desenho próprio seria uma segunda maneira de mostrar a mesma coisa.
+  BLOCOS.como_funciona = BLOCOS.acesso;
 
   // Abertura falando do caso dela, quando o quiz mandou os dados.
   function saudacao(){
