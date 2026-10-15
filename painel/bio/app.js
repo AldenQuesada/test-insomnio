@@ -1,22 +1,47 @@
-import * as session from '../js/sessao.js';
-import {chamar, SEM_SESSAO} from '../js/api.js';
-import {render,csv} from './view.js?v=1';
-const $=id=>document.getElementById(id);let data=null,request=0;
-function login(){ $('login').hidden=false;$('app').hidden=true;$('email').value=session.emailLembrado(); }
-function options(id,values){const select=$(id),selected=select.value;select.replaceChildren(new Option(id==='source'?'Todas':'Todos',''));(values||[]).filter(Boolean).sort().forEach(v=>select.add(new Option(v,v)));select.value=selected;}
-async function load(){
- const seq=++request;$('status').textContent='Consultando os registros…';$('refresh').disabled=true;$('csv').disabled=true;$('content').setAttribute('aria-busy','true');
- try{
-  const d=await chamar('analytics_bio_report',{p_days:Number($('days').value),p_internal:$('internal').checked,p_source:$('source').value||null,p_device:$('device').value||null,p_browser:$('browser').value||null});
-  if(seq!==request)return;data=d;$('content').innerHTML=render(d);options('source',d.filters.sources);options('device',d.filters.devices);options('browser',d.filters.browsers);
-  $('period').textContent=new Date(d.period.from).toLocaleDateString('pt-BR',{timeZone:d.config.timezone})+' até agora · '+d.config.timezone+' · '+(d.period.internal?'inclui testes internos':'tráfego sem marca de teste');
-  $('status').textContent='Atualizado às '+new Date().toLocaleTimeString('pt-BR')+'. Comparação com o mesmo intervalo de tempo anterior.';$('csv').disabled=false;
- }catch(e){if(seq!==request)return;data=null;$('content').replaceChildren();if(e===SEM_SESSAO){session.esquecer();login();}else $('status').textContent='Não foi possível consultar os dados. Verifique sua conexão e se sua conta tem acesso ao painel da bio.';}
- finally{if(seq===request){$('refresh').disabled=false;$('content').removeAttribute('aria-busy');}}
+import * as session from './auth.js?v=studio-1';
+import {createRefreshLoop,createRequest} from './client.js?v=studio-1';
+import {overview,analysis,bioFunnel,insomnia,health,drawCharts,empty} from './views.js?v=studio-1';
+import {esc,date,csv,deviceLabel,browserLabel,sourceLabel} from './format.js?v=studio-1';
+import {icone} from '../js/icones.js';
+const $=id=>document.getElementById(id),all=s=>Array.from(document.querySelectorAll(s));
+const screens={overview:['VISÃO GERAL','Da visita à decisão.','O desempenho da sua bio, com contexto.'],funnels:['FUNIS VISUAIS','Veja onde o caminho muda.','Exposição, cliques e etapas observadas.'],analysis:['ANÁLISES','Encontre o que explica.','Compare cards, campanhas, horários e aparelhos.'],health:['SAÚDE DOS DADOS','Decida com contexto.','Cobertura, histórico e qualidade da coleta.']};
+const state={view:'overview',funnel:'bio',card:'',step:'abriu'};let data=null,signedIn=false,lastChecked=null;
+function module(){return state.view==='funnels'&&state.funnel==='insomnia'?'insomnia':'bio';}
+function args(){const m=module();return {p_module:m,p_days:Number($('days').value),p_internal:$('internal').checked,p_source:m==='bio'?$('source').value||null:null,p_device:m==='bio'?$('device').value||null:null,p_browser:m==='bio'?$('browser').value||null:null};}
+function connection(type,text){$('connection').dataset.state=type;$('connection-label').textContent=text;}
+function showLogin(message=''){signedIn=false;loop.stop();data=null;lastChecked=null;$('login').hidden=false;$('app').hidden=true;$('content').replaceChildren();$('email').value=session.emailLembrado();$('login-error').textContent=message;}
+function setOptions(id,values,label,format=x=>x){const el=$(id),selected=el.value,vs=[...new Set((values||[]).filter(Boolean))].sort();if(selected&&!vs.includes(selected))vs.push(selected);const signature=JSON.stringify(vs);if(el.dataset.options===signature)return;el.dataset.options=signature;el.replaceChildren(new Option(label,''));vs.forEach(v=>el.add(new Option(format(v),v)));el.value=selected;}
+function cards(d){const picker=$('card-picker');const signature=JSON.stringify(d.cards.map(c=>[c.id,c.title]));if(picker.dataset.options!==signature){picker.dataset.options=signature;picker.replaceChildren(...d.cards.map(c=>new Option(c.title,c.id)));}if(!d.cards.some(c=>c.id===state.card))state.card=d.cards.find(c=>c.exposed_sessions||c.clicks)?.id||d.cards[0]?.id||'';picker.value=state.card;}
+function render(){if(!data)return;const open=all('details[data-detail][open]').map(e=>e.dataset.detail),focus=document.activeElement,focusKey=focus?.dataset?.step;let html='';
+ if(module()==='insomnia')html=insomnia(data,state.step);else if(state.view==='overview')html=overview(data);else if(state.view==='analysis')html=analysis(data);else if(state.view==='health')html=health(data);else html=bioFunnel(data,state.card);
+ $('content').innerHTML=html;all('details[data-detail]').forEach(e=>e.open=open.includes(e.dataset.detail));if(focusKey)all('[data-step]').find(e=>e.dataset.step===focusKey)?.focus({preventScroll:true});drawCharts($('content'));
 }
-async function open(){ $('login').hidden=true;$('app').hidden=false;await load(); }
-$('form').onsubmit=async ev=>{ev.preventDefault();const b=ev.currentTarget.querySelector('button');b.disabled=true;$('login-error').textContent='';try{const s=await session.entrar($('email').value.trim(),$('password').value);if(!s)throw Error();$('password').value='';await open();}catch(_){$('login-error').textContent='Não foi possível entrar. Confira a conta e tente novamente.';}finally{b.disabled=false;}};
-['days','source','device','browser','internal'].forEach(id=>$(id).addEventListener('change',load));$('refresh').onclick=load;
-$('logout').onclick=()=>{request++;data=null;session.esquecer();$('content').replaceChildren();login();};
-$('csv').onclick=()=>{if(!data)return;const url=URL.createObjectURL(new Blob([csv(data)],{type:'text/csv;charset=utf-8'})),a=document.createElement('a');a.href=url;a.download='bio-cards.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
-if(session.guardada()&&(session.viva()||await session.renovar()))open();else login();
+function decorate(){const s=screens[state.view];$('breadcrumb').textContent='INSTITUTO / '+s[0];$('title').textContent=s[1];$('subtitle').textContent=s[2];all('[data-view]').forEach(b=>{if(b.dataset.view===state.view)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});$('funnel-controls').hidden=state.view!=='funnels';$('card-picker-label').hidden=module()!=='bio';all('[data-funnel]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.funnel===state.funnel)));all('[data-bio-filter]').forEach(e=>e.hidden=module()!=='bio');$('internal-note').hidden=!$('internal').checked;$('csv').textContent=module()==='insomnia'?'Exportar funil ↓':'Exportar cards ↓';}
+function markStale(text){connection('error','Atualização indisponível');$('status').textContent=text+(data?' Os valores exibidos são da última consulta bem-sucedida.':'');if(!data)$('content').innerHTML=`<section class="panel error-panel">${empty('Não foi possível carregar','Use Atualizar para tentar novamente.')}</section>`;}
+const loop=createRefreshLoop({request:createRequest({session,config:window.QUIZ_CONFIG}),interval:15000,onBusy(b){$('refresh').disabled=b;$('content').setAttribute('aria-busy',String(b));},onData(d){
+ if(d.module!==module())return;data=d;lastChecked=d.checked_at;$('status').textContent='';connection('ok','Atualização ativa · 15 s');$('last-check').textContent='Consulta: '+date(d.checked_at,d.timezone,true);
+ if(d.bio){setOptions('source',d.bio.filters.sources,'Todas as origens',sourceLabel);setOptions('device',d.bio.filters.devices,'Todos os aparelhos',deviceLabel);setOptions('browser',d.bio.filters.browsers,'Todos os navegadores',browserLabel);cards(d.bio);$('period').textContent=date(d.bio.period.from,d.timezone)+' até agora · Brasília';}
+ else $('period').textContent=(d.funnel.data.periodo.desde||'').split('-').reverse().join('/')+' até agora · medição histórica do quiz';
+ $('coverage').textContent=d.module==='bio'?'Coleta própria · histórico preservado · vendas não conectadas':'Funil histórico da insônia · sem vínculo de sessão com a bio nesta etapa';$('csv').disabled=false;render();
+ },onError(e){if(e.code==='AUTH'){session.esquecer();showLogin('Sua sessão expirou. Entre novamente para consultar os dados.');}else markStale(e.code==='FORBIDDEN'?'Esta conta não tem acesso ao painel.':'A consulta falhou. Confira a conexão ou tente novamente.');}});
+function start(){if(!signedIn)return;if(document.hidden){loop.stop();connection('paused','Pausado · aba oculta');return;}if(!navigator.onLine){loop.stop();connection('paused','Sem conexão');$('status').textContent='Sem conexão. A atualização será retomada quando a rede voltar.';return;}connection('loading',data?'Atualizando':'Conectando');loop.start(args());}
+function reload(clear=false){if(clear){data=null;lastChecked=null;$('last-check').textContent='';$('period').textContent='';$('csv').disabled=true;$('content').innerHTML='<section class="panel skeleton">Consultando os registros…</section>';}decorate();start();}
+function navigate(view){if(!screens[view])return;const old=module();state.view=view;decorate();if(data&&module()===old)render();else reload(true);history.replaceState(null,'','#'+(state.view==='funnels'&&state.funnel==='insomnia'?'insomnia':state.view));}
+async function open(){signedIn=true;$('login').hidden=true;$('app').hidden=false;reload(true);}
+all('[data-icon]').forEach(e=>{e.innerHTML=icone(e.dataset.icon);e.setAttribute('aria-hidden','true');});
+all('[data-view]').forEach(b=>b.onclick=()=>navigate(b.dataset.view));
+all('[data-funnel]').forEach(b=>b.onclick=()=>{if(state.funnel===b.dataset.funnel)return;state.funnel=b.dataset.funnel;reload(true);history.replaceState(null,'','#'+(state.funnel==='insomnia'?'insomnia':'funnels'));});
+$('card-picker').onchange=()=>{state.card=$('card-picker').value;render();};
+['days','source','device','browser','internal'].forEach(id=>$(id).addEventListener('change',()=>reload(true)));
+$('refresh').onclick=()=>start();$('logout').onclick=()=>{session.esquecer();showLogin();};
+$('form').onsubmit=async e=>{e.preventDefault();$('enter').disabled=true;$('login-error').textContent='';try{if(!await session.entrar($('email').value.trim(),$('password').value))throw new Error();$('password').value='';await open();}catch(_){$('login-error').textContent='Não foi possível entrar. Confira sua conta e conexão.';}finally{$('enter').disabled=false;}};
+$('content').onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.go)navigate(b.dataset.go);if(b.dataset.card){state.card=b.dataset.card;state.funnel='bio';navigate('funnels');$('card-picker').value=state.card;}if(b.dataset.source){$('source').value=b.dataset.source;state.view='analysis';reload(true);}if(b.dataset.browser){$('browser').value=b.dataset.browser;$('device').value=b.dataset.device;reload(true);}if(b.dataset.step){state.step=b.dataset.step;render();}};
+$('csv').onclick=()=>{if(!data)return;const rows=module()==='insomnia'?[['Etapa','Sessoes'],...data.funnel.data.funil.map(s=>[data.funnel.config.passos?.[s.chave]?.rotulo||s.chave,s.n])]:[['Card','Sessoes expostas','Cliques','Sessoes expostas que clicaram','Tempo ativo mediano (s)'],...data.bio.cards.map(c=>[c.title,c.exposed_sessions,c.clicks,c.exposed_click_sessions,c.median_active_seconds])];const url=URL.createObjectURL(new Blob([csv(rows)],{type:'text/csv;charset=utf-8'})),a=document.createElement('a');a.href=url;a.download='instituto-'+module()+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
+function theme(t){document.documentElement.dataset.theme=t;$('theme').textContent=t==='dark'?'Tema claro':'Tema escuro';}
+try{theme(localStorage.getItem('instituto_studio_theme')==='light'?'light':'dark');}catch(_){theme('dark');}
+$('theme').onclick=()=>{const t=document.documentElement.dataset.theme==='dark'?'light':'dark';theme(t);try{localStorage.setItem('instituto_studio_theme',t);}catch(_){}};
+document.addEventListener('visibilitychange',start);window.addEventListener('online',start);window.addEventListener('offline',start);window.addEventListener('pagehide',()=>loop.stop());window.addEventListener('pageshow',e=>{if(e.persisted)start();});
+window.addEventListener('storage',e=>{if(e.key==='painel_sessao'&&!e.newValue){session.esquecer();showLogin();}});
+let resize;new ResizeObserver(()=>{clearTimeout(resize);resize=setTimeout(()=>drawCharts($('content')),80);}).observe($('content'));
+const hash=location.hash.slice(1);if(hash==='insomnia'){state.view='funnels';state.funnel='insomnia';}else if(screens[hash])state.view=hash;
+if(session.guardada()&&(session.viva()||await session.renovar()))open();else showLogin();
