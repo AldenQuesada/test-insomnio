@@ -32,6 +32,8 @@
   function gravar(tipo, meta, manter){
     if (!cfg || !cfg.quizId) return;
     var m = meta || {};
+    var journey = window.InstitutoJourney && window.InstitutoJourney.meta();
+    if (journey) { m.aq = journey; if (journey.internal) m.interno = true; }
     if (INTERNO) m.interno = true;
     try {
       fetch(cfg.url + '/rest/v1/quiz_events', {

@@ -1,0 +1,15 @@
+const vm=require('node:vm'),fs=require('node:fs'),assert=require('node:assert/strict'),crypto=require('node:crypto');
+const source=fs.readFileSync(__dirname+'/../analytics/journey.js','utf8');
+const storage=()=>{const m=new Map();return {getItem:k=>m.get(k)||null,setItem:(k,v)=>m.set(k,v),removeItem:k=>m.delete(k)};};
+function boot(path,opts={}){let now=1000000000,url=new URL('https://aldenquesada.github.io'+path),local=opts.local||storage(),session=opts.session||storage();const ctx={URL,Uint8Array,Date:{now:()=>now},location:url,navigator:{...opts.navigator},history:{state:null,replaceState:(_,x,s)=>url=new URL(s)},window:{crypto:crypto.webcrypto,sessionStorage:session,localStorage:local,performance:{getEntriesByType:()=>[{type:opts.nav||'navigate'}]}}};vm.createContext(ctx);vm.runInContext(source,ctx);return {api:ctx.window.InstitutoJourney,session,local,url:()=>url,advance:ms=>now+=ms};}
+const bio=crypto.randomUUID();let a=boot('/test-insomnio/metodo/?utm_source=instagram&aq_bio='+bio+'&aq_i=1');let m=a.api.meta();assert.equal(m.bio,bio);assert.equal(m.internal,true);assert.equal(a.url().search,'?utm_source=instagram');
+let reload=boot('/test-insomnio/metodo/?interno=1',{session:a.session,nav:'reload'});assert.equal(reload.api.meta().id,m.id);assert.notEqual(reload.api.meta().page,m.page);
+let fresh=boot('/test-insomnio/metodo/?interno=1',{session:a.session});assert.notEqual(fresh.api.meta().id,m.id);assert.equal(fresh.api.meta().bio,null);
+for(const opt of [{navigator:{doNotTrack:'1'}},{navigator:{globalPrivacyControl:true}},{local:{getItem:()=> '1'}}]){const b=boot('/test-insomnio/?aq_bio='+bio,opt);assert.equal(b.api.meta(),null);assert.equal(b.url().search,'');}
+for(const path of ['/test-insomnio/?ver=resultado','/test-insomnio/?medicao=off','/another/'])assert.equal(boot(path).api.meta(),null);
+a.advance(1800001);assert.equal(a.api.meta(),null);
+const blocked={getItem(){throw Error()},setItem(){throw Error()},removeItem(){throw Error()}};a=boot('/test-insomnio/?aq_bio='+bio,{local:blocked,session:blocked});assert.equal(a.api.meta().bio,bio);
+let dest={href:'https://aldenquesada.github.io/test-insomnio/metodo/?utm_campaign=kept#oferta'};a.api.decorate(dest);const link=new URL(dest.href);assert.equal(link.searchParams.get('aq_bio'),bio);assert.equal(link.searchParams.get('utm_campaign'),'kept');assert.equal(link.hash,'#oferta');let b=boot(link.pathname+link.search+link.hash);assert.equal(b.api.meta().id,a.api.meta().id);
+for(const href of ['https://pay.hotmart.com/example','https://other.test/test-insomnio/metodo/','https://aldenquesada.github.io/other/']){let d={href};a.api.decorate(d);assert.equal(d.href,href);}
+a=boot('/test-insomnio/?aq_bio=invalid&aq_flow=not-a-uuid');assert.equal(a.api.meta().bio,null);assert.match(a.api.meta().id,/^[a-f0-9-]{36}$/);
+assert(!source.includes('insonia_resultado'));assert(!source.includes('fbq'));console.log('PASS: link provenance, same-origin routes, query cleanup, UTMs/hash preservation, internal flags, privacy gates, reload/different entry, expiry, blocked storage, no health or checkout propagation.');

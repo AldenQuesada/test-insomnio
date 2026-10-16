@@ -32,7 +32,7 @@ export function createRequest({session,config,fetcher=fetch}){
      headers:{apikey:config.anon,Authorization:'Bearer '+s.access_token,'Content-Type':'application/json'},body:JSON.stringify(args)});
     if(r.status===401){if(attempt===0&&await renew())continue;throw Object.assign(new Error('Session expired'),{code:'AUTH'});}
     if(!r.ok)throw Object.assign(new Error('Report unavailable'),{code:r.status===403?'FORBIDDEN':'NETWORK'});
-    const d=await r.json();if(!d||!d.checked_at||!['bio','insomnia'].includes(d.module))throw new Error('Invalid report');return d;
+    const d=await r.json();if(!d||!d.checked_at||!['bio','insomnia','journey'].includes(d.module))throw new Error('Invalid report');return d;
    }catch(e){if(timeout)throw Object.assign(new Error('Timed out'),{code:'TIMEOUT'});throw e;}
    finally{clearTimeout(deadline);signal.removeEventListener('abort',abort);}
   }

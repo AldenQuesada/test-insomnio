@@ -238,6 +238,7 @@ a.cta-res{
 <main class="palco"><div class="tela" id="tela"></div></main>
 
 <script src="config.js"></script>
+<script src="analytics/journey.js?v=1"></script>
 <script>
 (function(){
   'use strict';
@@ -421,6 +422,8 @@ a.cta-res{
   function evento(tipo, extra, manter){
     if (PREVIA) return;
     var meta = extra || {};
+    var journey = window.InstitutoJourney && window.InstitutoJourney.meta();
+    if (journey) { meta.aq = journey; if (journey.internal) meta.interno = true; }
     if (INTERNO) meta.interno = true;
     // Best-effort: se o registro de evento falhar, o quiz não pode parar.
     try {
@@ -832,7 +835,8 @@ a.cta-res{
     tela.querySelector('.apoio').textContent = faixaCorpo[res.faixa] || '';
     tela.querySelector('.aviso').textContent = res.aviso;
     if (cta.url) {
-      tela.querySelector('.cta-res').addEventListener('click', function(){
+      tela.querySelector('.cta-res').addEventListener('click', function(ev){
+        if (window.InstitutoJourney) window.InstitutoJourney.decorate(ev.currentTarget);
         evento('cta_resultado', { destino: cta.url });
       });
       tela.querySelector('.chamada').textContent =

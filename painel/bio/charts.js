@@ -1,4 +1,4 @@
-import {esc,num,seconds,pct} from './format.js?v=charts-2';
+import {esc,num,seconds,pct} from './format.js?v=journey-1';
 
 const dayLabel=day=>day.split('-').reverse().slice(0,2).join('/');
 export function periodDays(value,now=new Date(),zone='America/Sao_Paulo'){
