@@ -1,24 +1,26 @@
-import * as session from './auth.js?v=studio-1';
-import {createRefreshLoop,createRequest} from './client.js?v=studio-1';
-import {overview,analysis,bioFunnel,insomnia,health,drawCharts,empty} from './views.js?v=studio-1';
-import {esc,date,csv,deviceLabel,browserLabel,sourceLabel} from './format.js?v=studio-1';
+import * as session from './auth.js?v=charts-2';
+import {createRefreshLoop,createRequest} from './client.js?v=charts-2';
+import {overview,analysis,bioFunnel,insomnia,health,drawCharts,empty} from './views.js?v=charts-2';
+import {esc,date,csv,deviceLabel,browserLabel,sourceLabel} from './format.js?v=charts-2';
+import {periodDays} from './charts.js?v=charts-2';
 import {icone} from '../js/icones.js';
 const $=id=>document.getElementById(id),all=s=>Array.from(document.querySelectorAll(s));
 const screens={overview:['VISÃO GERAL','Da visita à decisão.','O desempenho da sua bio, com contexto.'],funnels:['FUNIS VISUAIS','Veja onde o caminho muda.','Exposição, cliques e etapas observadas.'],analysis:['ANÁLISES','Encontre o que explica.','Compare cards, campanhas, horários e aparelhos.'],health:['SAÚDE DOS DADOS','Decida com contexto.','Cobertura, histórico e qualidade da coleta.']};
 const state={view:'overview',funnel:'bio',card:'',step:'abriu'};let data=null,signedIn=false,lastChecked=null;
 function module(){return state.view==='funnels'&&state.funnel==='insomnia'?'insomnia':'bio';}
-function args(){const m=module();return {p_module:m,p_days:Number($('days').value),p_internal:$('internal').checked,p_source:m==='bio'?$('source').value||null:null,p_device:m==='bio'?$('device').value||null:null,p_browser:m==='bio'?$('browser').value||null:null};}
+function args(){const m=module();return {p_module:m,p_days:periodDays($('days').value),p_internal:$('internal').checked,p_source:m==='bio'?$('source').value||null:null,p_device:m==='bio'?$('device').value||null:null,p_browser:m==='bio'?$('browser').value||null:null};}
 function connection(type,text){$('connection').dataset.state=type;$('connection-label').textContent=text;}
 function showLogin(message=''){signedIn=false;loop.stop();data=null;lastChecked=null;$('login').hidden=false;$('app').hidden=true;$('content').replaceChildren();$('email').value=session.emailLembrado();$('login-error').textContent=message;}
 function setOptions(id,values,label,format=x=>x){const el=$(id),selected=el.value,vs=[...new Set((values||[]).filter(Boolean))].sort();if(selected&&!vs.includes(selected))vs.push(selected);const signature=JSON.stringify(vs);if(el.dataset.options===signature)return;el.dataset.options=signature;el.replaceChildren(new Option(label,''));vs.forEach(v=>el.add(new Option(format(v),v)));el.value=selected;}
 function cards(d){const picker=$('card-picker');const signature=JSON.stringify(d.cards.map(c=>[c.id,c.title]));if(picker.dataset.options!==signature){picker.dataset.options=signature;picker.replaceChildren(...d.cards.map(c=>new Option(c.title,c.id)));}if(!d.cards.some(c=>c.id===state.card))state.card=d.cards.find(c=>c.exposed_sessions||c.clicks)?.id||d.cards[0]?.id||'';picker.value=state.card;}
-function render(){if(!data)return;const open=all('details[data-detail][open]').map(e=>e.dataset.detail),focus=document.activeElement,focusKey=focus?.dataset?.step;let html='';
+function render(){if(!data)return;const scrolls=all('.plot-scroll,.hours-scroll').map(el=>[el.scrollLeft,el.scrollTop]);const point=document.activeElement?.closest?.('[data-point]');const pointKey=point?[point.closest('[data-plot]').dataset.plot,point.dataset.point]:null;const open=all('details[data-detail][open]').map(e=>e.dataset.detail),focus=document.activeElement,focusKey=focus?.dataset?.step;let html='';
  if(module()==='insomnia')html=insomnia(data,state.step);else if(state.view==='overview')html=overview(data);else if(state.view==='analysis')html=analysis(data);else if(state.view==='health')html=health(data);else html=bioFunnel(data,state.card);
- $('content').innerHTML=html;all('details[data-detail]').forEach(e=>e.open=open.includes(e.dataset.detail));if(focusKey)all('[data-step]').find(e=>e.dataset.step===focusKey)?.focus({preventScroll:true});drawCharts($('content'));
+ $('content').innerHTML=html;all('details[data-detail]').forEach(e=>e.open=open.includes(e.dataset.detail));if(focusKey)all('[data-step]').find(e=>e.dataset.step===focusKey)?.focus({preventScroll:true});drawCharts($('content'));all('.plot-scroll,.hours-scroll').forEach((el,i)=>{el.scrollLeft=scrolls[i]?.[0]||0;el.scrollTop=scrolls[i]?.[1]||0;});if(pointKey)all('[data-plot]').find(el=>el.dataset.plot===pointKey[0])?.querySelector(`[data-point="${pointKey[1]}"]`)?.focus({preventScroll:true});
 }
 function decorate(){const s=screens[state.view];$('breadcrumb').textContent='INSTITUTO / '+s[0];$('title').textContent=s[1];$('subtitle').textContent=s[2];all('[data-view]').forEach(b=>{if(b.dataset.view===state.view)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});$('funnel-controls').hidden=state.view!=='funnels';$('card-picker-label').hidden=module()!=='bio';all('[data-funnel]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.funnel===state.funnel)));all('[data-bio-filter]').forEach(e=>e.hidden=module()!=='bio');$('internal-note').hidden=!$('internal').checked;$('csv').textContent=module()==='insomnia'?'Exportar funil ↓':'Exportar cards ↓';}
 function markStale(text){connection('error','Atualização indisponível');$('status').textContent=text+(data?' Os valores exibidos são da última consulta bem-sucedida.':'');if(!data)$('content').innerHTML=`<section class="panel error-panel">${empty('Não foi possível carregar','Use Atualizar para tentar novamente.')}</section>`;}
-const loop=createRefreshLoop({request:createRequest({session,config:window.QUIZ_CONFIG}),interval:15000,onBusy(b){$('refresh').disabled=b;$('content').setAttribute('aria-busy',String(b));},onData(d){
+const requestReport=createRequest({session,config:window.QUIZ_CONFIG});
+const loop=createRefreshLoop({request:(input,signal)=>requestReport({...input,p_days:periodDays($('days').value)},signal),interval:15000,onBusy(b){$('refresh').disabled=b;$('content').setAttribute('aria-busy',String(b));},onData(d){
  if(d.module!==module())return;data=d;lastChecked=d.checked_at;$('status').textContent='';connection('ok','Atualização ativa · 15 s');$('last-check').textContent='Consulta: '+date(d.checked_at,d.timezone,true);
  if(d.bio){setOptions('source',d.bio.filters.sources,'Todas as origens',sourceLabel);setOptions('device',d.bio.filters.devices,'Todos os aparelhos',deviceLabel);setOptions('browser',d.bio.filters.browsers,'Todos os navegadores',browserLabel);cards(d.bio);$('period').textContent=date(d.bio.period.from,d.timezone)+' até agora · Brasília';}
  else $('period').textContent=(d.funnel.data.periodo.desde||'').split('-').reverse().join('/')+' até agora · medição histórica do quiz';
@@ -42,6 +44,6 @@ try{theme(localStorage.getItem('instituto_studio_theme')==='light'?'light':'dark
 $('theme').onclick=()=>{const t=document.documentElement.dataset.theme==='dark'?'light':'dark';theme(t);try{localStorage.setItem('instituto_studio_theme',t);}catch(_){}};
 document.addEventListener('visibilitychange',start);window.addEventListener('online',start);window.addEventListener('offline',start);window.addEventListener('pagehide',()=>loop.stop());window.addEventListener('pageshow',e=>{if(e.persisted)start();});
 window.addEventListener('storage',e=>{if(e.key==='painel_sessao'&&!e.newValue){session.esquecer();showLogin();}});
-let resize;new ResizeObserver(()=>{clearTimeout(resize);resize=setTimeout(()=>drawCharts($('content')),80);}).observe($('content'));
+let resize,chartWidth=0;new ResizeObserver(([entry])=>{if(entry.contentRect.width===chartWidth)return;chartWidth=entry.contentRect.width;clearTimeout(resize);resize=setTimeout(()=>drawCharts($('content')),80);}).observe($('content'));
 const hash=location.hash.slice(1);if(hash==='insomnia'){state.view='funnels';state.funnel='insomnia';}else if(screens[hash])state.view=hash;
 if(session.guardada()&&(session.viva()||await session.renovar()))open();else showLogin();
