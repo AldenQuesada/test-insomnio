@@ -26,7 +26,12 @@ export async function chamarPublica(funcao, args = {}){
   return r.json();
 }
 
+// `?quiz=<slug>` muestra el panel de otro quiz. Sin él, el banco usa 'insonia'.
+const QUIZ = new URLSearchParams(location.search).get('quiz');
+const POR_QUIZ = ['painel_funil', 'painel_mapa', 'painel_agora'];
+
 export async function chamar(funcao, args = {}, segunda = false){
+  if (QUIZ && POR_QUIZ.includes(funcao)) args = { ...args, p_slug: QUIZ };
   const s = guardada();
   if (!s || !s.access_token) throw SEM_SESSAO;
 
