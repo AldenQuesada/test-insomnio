@@ -700,6 +700,23 @@ details p{margin-top:11px; font-size:15.5px}
 (function(){
   var CFG = window.QUIZ_CONFIG || {};
   var url = new URLSearchParams(location.search);
+
+  // Checkout da Hotmart leva a origem da visita (utm da chegada) em src e sck,
+  // que aparecem no relatório de vendas e no aviso de compra: assim uma venda
+  // diz se veio do perfil (link-bio_instagram) ou de uma conta parceira
+  // (vivirconsalud_tiktok). Sem UTM na chegada, o link fica como está no banco.
+  function comOrigem(destino){
+    try {
+      var d = new URL(destino);
+      if (!/(^|\.)hotmart\.com$/.test(d.hostname)) return destino;
+      var limpa = function(v){ return String(v || '').replace(/[^a-zA-Z0-9._-]/g, '').slice(0, 40); };
+      // src = qual produto (o slug desta página no banco); sck = de onde veio.
+      var sck = [url.get('utm_campaign'), url.get('utm_source'), url.get('utm_content')].map(limpa).filter(Boolean).join('_');
+      if (!d.searchParams.has('src')) d.searchParams.set('src', limpa(CFG.slug));
+      if (sck && !d.searchParams.has('sck')) d.searchParams.set('sck', sck);
+      return d.toString();
+    } catch (e) { return destino; }
+  }
   // Dados que o resultado do quiz passa adiante: a página abre falando do caso
   // dela, não de uma dor genérica.
   var pessoa = { nome: url.get('n') || '', faixa: url.get('f') || '', pior: url.get('p') || '' };
@@ -1573,7 +1590,7 @@ details p{margin-top:11px; font-size:15.5px}
     ESQ = linhas[0].schema || {};
     var QUIZ_ID = linhas[0].id;
     T = ESQ.tsl_es || {};
-    CHECKOUT = T.checkout || '';
+    CHECKOUT = comOrigem(T.checkout || '');
     // Na conferência os botões aparecem mesmo sem checkout: é essa copy que
     // mais precisa ser lida antes de existir para onde mandar.
     if (PREVIA && !CHECKOUT) CHECKOUT = '#';
