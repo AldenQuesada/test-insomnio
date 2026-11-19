@@ -132,6 +132,17 @@ a.cta-res{
   text-decoration:none; border-radius:11px; padding:17px; margin-top:24px;
 }
 
+/* mockups do livro no resultado, antes do botao (Alden 19/11): carrossel no dedo */
+.res-car{margin:22px -6px 0}
+.res-pista{display:flex; overflow-x:auto; scroll-snap-type:x mandatory; scrollbar-width:none}
+.res-pista::-webkit-scrollbar{display:none}
+.res-pista figure{flex:0 0 100%; margin:0; scroll-snap-align:center}
+.res-pista img{width:100%; height:auto; aspect-ratio:4/3; object-fit:contain; display:block}
+.res-passos{display:flex; align-items:center; justify-content:center; gap:16px; margin-top:8px;
+  font-size:13px; color:var(--luz-3)}
+.res-passos button{width:36px; height:36px; border-radius:50%; border:1px solid var(--lua);
+  background:transparent; color:var(--lua); font-size:20px; line-height:1; cursor:pointer}
+
 .selo-previa{
   font-size:11.5px; letter-spacing:.06em; color:var(--noite);
   background:var(--lua); border-radius:5px; padding:5px 9px;
@@ -821,6 +832,12 @@ a.cta-res{
       // botão não existe: botão que não leva a lugar nenhum custa mais do que
       // botão nenhum.
       (cta.url ? '<p class="chamada surge"' + atraso() + '></p>' +
+                 // mockups do livro entre a chamada e o botao (cta.imagens no banco)
+                 ((cta.imagens || []).length ? '<div class="res-car surge"' + atraso() + '><div class="res-pista">' +
+                   cta.imagens.map(function(u, i){ return '<figure><img src="' + esc(u) + '" alt="" loading="' + (i ? 'lazy' : 'eager') + '"></figure>'; }).join('') +
+                   '</div>' + (cta.imagens.length > 1 ? '<div class="res-passos"><button type="button" data-r="-1" aria-label="Anterior">&#8249;</button>' +
+                   '<span class="res-conta">1 / ' + cta.imagens.length + '</span><button type="button" data-r="1" aria-label="Siguiente">&#8250;</button></div>' : '') +
+                   '</div>' : '') +
                  '<a class="cta-res surge"' + atraso() + ' href="' + esc(cta.url) + '"' +
                  // Destino externo abre em outra aba: o resultado dela continua
                  // aberto atrás, e `noopener` impede que a página de destino
@@ -841,6 +858,21 @@ a.cta-res{
       });
       tela.querySelector('.chamada').textContent =
         preencherNome(faixaChamada[res.faixa] || '');
+      var rc = tela.querySelector('.res-car');
+      if (rc && rc.querySelector('.res-conta')) {
+        var rp = rc.querySelector('.res-pista'), rn = rp.children.length, ri = 0, rt = null;
+        var rconta = rc.querySelector('.res-conta');
+        var rpinta = function(){ rconta.textContent = (ri + 1) + ' / ' + rn; };
+        rc.querySelectorAll('[data-r]').forEach(function(bt){
+          bt.onclick = function(){
+            ri = (ri + parseInt(bt.dataset.r, 10) + rn) % rn; rpinta();
+            rp.scrollTo({ left: ri * rp.clientWidth, behavior: 'smooth' });
+          };
+        });
+        var rassenta = function(){ clearTimeout(rt); rt = setTimeout(function(){ ri = Math.round(rp.scrollLeft / Math.max(1, rp.clientWidth)); rpinta(); }, 450); };
+        rp.addEventListener('touchend', rassenta, { passive: true });
+        rp.addEventListener('pointerup', rassenta);
+      }
     }
     if (pior) {
       tela.querySelector('.pior').innerHTML =
