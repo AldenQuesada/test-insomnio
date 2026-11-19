@@ -1,0 +1,171 @@
+<!doctype html>
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Mesma paleta e mesma dupla tipográfica da tela de resultado: o informe é a
+   continuação dela, e a pessoa acabou de sair daquela tela. */
+:root{{
+  --noite:#11151d; --noite-2:#1a2130; --noite-3:#252e40;
+  --luz:#f4f1ea; --luz-2:#cdd3de; --luz-3:#8d97a8;
+  --linha:#2d3648; --lua:#e2a04a;
+}}
+*{{margin:0; padding:0; box-sizing:border-box}}
+body{{font-family:"IBM Plex Sans",sans-serif; background:var(--noite); color:var(--luz)}}
+
+/* Uma ideia por página. Ele é lido no celular, depois de chegar por WhatsApp,
+   então o corpo é grande de propósito: A4 denso obriga a dar zoom, e o que
+   obriga a dar zoom não é lido. */
+.pg{{
+  width:210mm; height:297mm; padding:22mm 20mm 18mm; position:relative;
+  page-break-after:always; display:flex; flex-direction:column;
+  background:var(--noite);
+}}
+.pg:last-child{{page-break-after:auto}}
+.miolo{{justify-content:center}}
+
+.topo{{position:absolute; top:12mm; left:20mm; right:20mm;
+  display:flex; justify-content:space-between; align-items:baseline;
+  font-size:9pt; color:var(--luz-3); letter-spacing:.08em;
+  text-transform:uppercase; border-bottom:1px solid var(--linha);
+  padding-bottom:4mm}}
+.pe{{position:absolute; bottom:10mm; left:20mm; right:20mm;
+  display:flex; justify-content:space-between; align-items:baseline;
+  font-size:8.5pt; color:var(--luz-3); border-top:1px solid var(--linha);
+  padding-top:3mm}}
+
+h1{{font-family:Fraunces,Georgia,serif; font-weight:700; font-size:34pt;
+  line-height:1.1; letter-spacing:-.02em}}
+h2{{font-family:Fraunces,Georgia,serif; font-weight:700; font-size:22pt;
+  line-height:1.15; letter-spacing:-.015em; margin-bottom:6mm}}
+p{{font-size:12pt; line-height:1.62; color:var(--luz-2); max-width:150mm}}
+.sub{{font-size:11pt; color:var(--luz-3); margin-top:3mm}}
+
+/* ── capa ── */
+.capa{{justify-content:center}}
+.capa .nota{{font-family:Fraunces,serif; font-weight:700; font-size:104pt;
+  line-height:.9; color:var(--lua); letter-spacing:-.04em; margin-top:14mm}}
+.capa .nota small{{font-size:26pt; color:var(--luz-3)}}
+/* `align-self` porque a página é flex em coluna: sem isso a pílula estica de
+   margem a margem e vira faixa. */
+.pilula{{align-self:flex-start; margin-top:6mm; padding:3mm 7mm; border-radius:40px;
+  font-size:12pt; font-weight:600; color:var(--noite)}}
+
+/* ── gráficos ── */
+.graf{{margin:8mm 0}}
+.trilho{{fill:var(--noite-3)}}
+.rot{{font-family:"IBM Plex Sans"; font-size:12px; fill:var(--luz-2)}}
+.val{{font-family:"IBM Plex Sans"; font-size:13px; font-weight:600;
+  fill:var(--noite); text-anchor:end}}
+.q{{fill:var(--noite-2); stroke:var(--noite); stroke-width:2}}
+.q.aceso{{fill:var(--noite-3); stroke:var(--lua); stroke-width:2}}
+.qn{{font-family:"IBM Plex Sans"; font-size:12px; fill:var(--luz-3);
+  letter-spacing:.04em}}
+.qn.aceso-t{{fill:var(--lua); font-weight:600}}
+.eixo{{stroke:var(--linha); stroke-width:1.5}}
+.eixo-t{{font-family:"IBM Plex Sans"; font-size:11px; fill:var(--luz-3);
+  letter-spacing:.1em}}
+.tick{{font-family:"IBM Plex Sans"; font-size:11px; fill:var(--luz-3)}}
+.guia{{stroke:var(--lua); stroke-width:1; stroke-dasharray:3 4; opacity:.6}}
+.aqui{{font-family:"IBM Plex Sans"; font-size:12px; font-weight:600; fill:var(--lua)}}
+.fim{{text-anchor:end}}
+.meio{{text-anchor:middle}}
+.ponto{{fill:var(--lua)}}
+.halo{{fill:none; stroke:var(--lua); stroke-width:1.5; opacity:.45}}
+.cel{{fill:var(--noite-2); stroke:var(--noite); stroke-width:3}}
+.cel.aceso{{stroke:var(--luz); stroke-width:3}}
+.leg{{font-family:"IBM Plex Sans"; font-size:12px; fill:var(--luz-2)}}
+.legn{{font-family:"IBM Plex Sans"; font-size:12px; font-weight:600; fill:var(--luz)}}
+
+.eixos{{display:flex; justify-content:space-between; font-size:9.5pt;
+  color:var(--luz-3); letter-spacing:.05em; text-transform:uppercase;
+  margin-top:-4mm}}
+.cartao{{background:var(--noite-2); border:1px solid var(--linha);
+  border-radius:4mm; padding:7mm; margin-top:6mm}}
+.cartao h3{{font-family:Fraunces,serif; font-size:15pt; margin-bottom:3mm;
+  color:var(--lua)}}
+.cartao p{{font-size:11.5pt}}
+
+.dado{{display:flex; gap:7mm; align-items:baseline; margin-bottom:9mm;
+  border-left:2px solid var(--lua); padding-left:7mm}}
+.dado-n{{font-family:Fraunces,serif; font-weight:700; font-size:20pt;
+  color:var(--lua); flex:0 0 38mm; line-height:1.1}}
+
+
+/* O fecho: gravidade, tempo e o item que mais pesou, numa olhada. É a página
+   que fica aberta no telefone e a que ela fotografa. */
+.resumo{{margin:8mm 0 10mm; border-top:1px solid var(--linha)}}
+.resumo dt{{font-size:9.5pt; color:var(--luz-3); letter-spacing:.08em;
+  text-transform:uppercase; padding-top:5mm}}
+.resumo dd{{font-family:Fraunces,serif; font-weight:700; font-size:19pt;
+  color:var(--lua); line-height:1.2; padding-bottom:5mm;
+  border-bottom:1px solid var(--linha)}}
+
+.cta{{display:block; text-align:center; text-decoration:none;
+  background:var(--lua); color:var(--noite); font-weight:600; font-size:14pt;
+  border-radius:3mm; padding:6mm; margin-top:10mm}}
+.nota-pe{{font-size:10pt; color:var(--luz-3); border-left:2px solid var(--linha);
+  padding-left:5mm; margin-top:auto; margin-bottom:6mm}}
+</style>
+
+<!-- 1 · capa -->
+<section class="pg capa">
+  <div class="topo"><span>{marca}</span><span>{preparado}</span></div>
+  <p class="sub">{subtitulo}</p>
+  <h1>{titulo}</h1>
+  <div class="nota">{nota}<small> / 28</small></div>
+  <span class="pilula" style="background:{faixa_cor}">{faixa}</span>
+  <div class="pe"><span>{rodape}</span><span>1 / 6</span></div>
+</section>
+
+<!-- 2 · perfil -->
+<section class="pg miolo">
+  <div class="topo"><span>{marca}</span><span>{nome}</span></div>
+  <h2>{p2_titulo}</h2>
+  <p>{p2_texto}</p>
+  <div class="graf">{grafico_perfil}</div>
+  <div class="cartao"><p>{p2_pico}</p></div>
+  <div class="pe"><span>{rodape}</span><span>2 / 6</span></div>
+</section>
+
+<!-- 3 · mapa -->
+<section class="pg miolo">
+  <div class="topo"><span>{marca}</span><span>{nome}</span></div>
+  <h2>{p3_titulo}</h2>
+  <p>{p3_texto}</p>
+  <div class="graf">{grafico_mapa}</div>
+  <div class="cartao"><h3>{quad_nome}</h3><p>{quad_texto}</p></div>
+  <div class="pe"><span>{rodape}</span><span>3 / 6</span></div>
+</section>
+
+<!-- 4 · gravidade contra tempo -->
+<section class="pg miolo">
+  <div class="topo"><span>{marca}</span><span>{nome}</span></div>
+  <h2>{p4_titulo}</h2>
+  <p>{p4_texto}</p>
+  <div class="graf">{grafico_matriz}</div>
+  <div class="cartao"><h3>{clase_nome}</h3><p>{clase_texto}</p></div>
+  <div class="pe"><span>{rodape}</span><span>4 / 6</span></div>
+</section>
+
+<!-- 5 · epidemiologia -->
+<section class="pg miolo">
+  <div class="topo"><span>{marca}</span><span>{nome}</span></div>
+  <h2>{p5_titulo}</h2>
+  {p5_blocos}
+  <p class="nota-pe">{p5_nota}</p>
+  <div class="pe"><span>{rodape}</span><span>5 / 6</span></div>
+</section>
+
+<!-- 6 · saída -->
+<section class="pg miolo">
+  <div class="topo"><span>{marca}</span><span>{nome}</span></div>
+  <h2>{p6_titulo}</h2>
+  <dl class="resumo">
+    <dt>{r_gravidade}</dt><dd>{v_gravidade}</dd>
+    <dt>{r_tempo}</dt><dd>{v_tempo}</dd>
+    <dt>{r_peso}</dt><dd>{v_peso}</dd>
+  </dl>
+  <p>{p6_texto}</p>
+  <a class="cta" href="{cta_url}">{p6_botao}</a>
+  <div class="pe"><span>{rodape}</span><span>6 / 6</span></div>
+</section>

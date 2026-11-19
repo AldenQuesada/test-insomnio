@@ -1,0 +1,60 @@
+# Informe del sueno em PDF para o WhatsApp (Alden 19/11).
+# Disparo: o banco chama repository_dispatch (tipo "informe") quando uma resposta entra na fila.
+# Rede de seguranca: a cada 15 min pega o que tiver ficado aguardando.
+name: informe
+
+on:
+  repository_dispatch:
+    types: [informe]
+  workflow_dispatch:
+    inputs:
+      response:
+        description: id da resposta (vazio = todas as aguardando)
+        required: false
+  schedule:
+    - cron: "*/15 * * * *"
+
+concurrency:
+  group: informe
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  gerar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      TEM_CHAVE: ${{ secrets.SUPABASE_SERVICE_KEY != '' }}
+    steps:
+      - name: Sem chave do banco, nao roda
+        if: env.TEM_CHAVE != 'true'
+        run: echo "SUPABASE_SERVICE_KEY ainda nao configurada"
+      - uses: actions/checkout@v4
+        if: env.TEM_CHAVE == 'true'
+        with:
+          sparse-checkout: .github/informe
+      - uses: actions/setup-python@v5
+        if: env.TEM_CHAVE == 'true'
+        with:
+          python-version: "3.12"
+      - name: Cache do Chromium
+        if: env.TEM_CHAVE == 'true'
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: pw-1.48.0
+      - name: Playwright
+        if: env.TEM_CHAVE == 'true'
+        run: |
+          pip install -q playwright==1.48.0
+          python -m playwright install --with-deps chromium
+      - name: Gerar e enviar
+        if: env.TEM_CHAVE == 'true'
+        working-directory: .github/informe
+        env:
+          SUPABASE_URL: https://gqibxdwvagjvvhixmcsg.supabase.co
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          RESPOSTA: ${{ github.event.client_payload.response || github.event.inputs.response || '' }}
+        run: python gerar.py "$RESPOSTA"
