@@ -204,6 +204,14 @@ ul.itens li .marca svg{width:12px; height:12px; color:var(--noite)}
 .texto-longo{text-align:left}
 .texto-longo h2{text-align:left}
 .m-img img{width:100%; margin:0 auto 12px}
+/* carrossel dos mockups (Alden 19/11) */
+.mk-car{max-width:900px; margin:26px auto 0}
+.mk-pista{display:flex; overflow-x:auto; scroll-snap-type:x mandatory; scrollbar-width:none;
+  -webkit-overflow-scrolling:touch}
+.mk-pista::-webkit-scrollbar{display:none}
+.mk-item{flex:0 0 100%; margin:0; scroll-snap-align:center; display:flex; justify-content:center}
+.mk-item img{width:100%; max-width:820px; height:auto; aspect-ratio:4/3; object-fit:contain}
+@media (max-width:899px){ .mk-car{width:calc(100% + 28px); margin-left:-14px} }
 /* No celular a faixa tem 40px de margem de cada lado, e isso tira 80px dos
    390 da tela. Num mockup de cinco peças cada capa fica com menos de 70px e o
    nome do livro some. Aqui ele fura a margem: o que precisa ser lido é a capa,
@@ -1208,6 +1216,21 @@ details p{margin-top:11px; font-size:15.5px}
     mockups: function(c){
       var ims = c.imagens || [];
       if (!ims.length) return '';
+      // Com várias imagens vira carrossel (Alden 19/11: todos os mockups do livro
+      // aberto, na ordem do livro). Uma só continua como antes.
+      if (ims.length > 1) {
+        return secao(
+          '<h2>' + esc(c.titulo || '') + '</h2>' +
+          (c.texto ? '<p>' + esc(c.texto) + '</p>' : '') +
+          '<div class="mk-car"><div class="mk-pista">' + ims.map(function(u, i){
+            return '<figure class="mk-item"><img src="' + esc(u) + '" alt="" loading="' +
+              (i < 2 ? 'eager' : 'lazy') + '" decoding="async"></figure>';
+          }).join('') + '</div>' +
+          '<div class="previa-passos"><button class="pv" data-mk="-1" aria-label="Anterior">&#8249;</button>' +
+          '<span class="mk-conta">1 / ' + ims.length + '</span>' +
+          '<button class="pv" data-mk="1" aria-label="Siguiente">&#8250;</button></div></div>',
+          'mk-sec');
+      }
       return secao(
         '<div class="m-img">' + ims.map(function(u){
           return '<img src="' + esc(u) + '" alt="">';
@@ -1489,6 +1512,23 @@ details p{margin-top:11px; font-size:15.5px}
     } else { andar(); }
   }
 
+  // Carrossel dos mockups: rolagem nativa com encaixe, setas e contador.
+  function montarMockups(){
+    document.querySelectorAll('.mk-car').forEach(function(car){
+      var pista = car.querySelector('.mk-pista'), conta = car.querySelector('.mk-conta');
+      var n = pista.children.length;
+      function atual(){ return Math.round(pista.scrollLeft / Math.max(1, pista.clientWidth)); }
+      function pintar(){ conta.textContent = (atual() + 1) + ' / ' + n; }
+      car.querySelectorAll('[data-mk]').forEach(function(b){
+        b.onclick = function(){
+          var i = (atual() + parseInt(b.dataset.mk, 10) + n) % n;
+          pista.scrollTo({ left: i * pista.clientWidth, behavior: 'smooth' });
+        };
+      });
+      pista.addEventListener('scroll', pintar, { passive: true });
+    });
+  }
+
   // Monta todos os folheáveis que a página desenhou, cada um com a sua
   // configuração. Chamar uma vez por página.
   function montarFolhetos(){
@@ -1615,6 +1655,7 @@ details p{margin-top:11px; font-size:15.5px}
     });
     document.getElementById('pagina').innerHTML = html;
     montarFolhetos();
+    montarMockups();
     montarCarrossel(T.depoimentos || {});
     montarGaleria(T.galeria || {});
     montarLetreiro(T.cabecalho);
