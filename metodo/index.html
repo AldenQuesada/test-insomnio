@@ -1517,15 +1517,21 @@ details p{margin-top:11px; font-size:15.5px}
     document.querySelectorAll('.mk-car').forEach(function(car){
       var pista = car.querySelector('.mk-pista'), conta = car.querySelector('.mk-conta');
       var n = pista.children.length;
-      function atual(){ return Math.round(pista.scrollLeft / Math.max(1, pista.clientWidth)); }
-      function pintar(){ conta.textContent = (atual() + 1) + ' / ' + n; }
+      // a posicao vem do clique (setas) ou do fim da rolagem (dedo); nunca do meio
+      // de uma animacao, senao cliques seguidos param o carrossel entre duas imagens
+      var idx = 0, t = null;
+      function pintar(){ conta.textContent = (idx + 1) + ' / ' + n; }
+      function ir(i){
+        idx = (i + n) % n; pintar();
+        pista.scrollTo({ left: idx * pista.clientWidth, behavior: 'smooth' });
+      }
       car.querySelectorAll('[data-mk]').forEach(function(b){
-        b.onclick = function(){
-          var i = (atual() + parseInt(b.dataset.mk, 10) + n) % n;
-          pista.scrollTo({ left: i * pista.clientWidth, behavior: 'smooth' });
-        };
+        b.onclick = function(){ ir(idx + parseInt(b.dataset.mk, 10)); };
       });
-      pista.addEventListener('scroll', pintar, { passive: true });
+      function assentou(){ idx = Math.round(pista.scrollLeft / Math.max(1, pista.clientWidth)); pintar(); }
+      pista.addEventListener('pointerup', function(){ clearTimeout(t); t = setTimeout(assentou, 450); });
+      pista.addEventListener('touchend', function(){ clearTimeout(t); t = setTimeout(assentou, 450); }, { passive: true });
+      window.addEventListener('resize', function(){ pista.scrollLeft = idx * pista.clientWidth; });
     });
   }
 
